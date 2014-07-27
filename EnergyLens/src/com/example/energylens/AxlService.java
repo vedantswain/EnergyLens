@@ -31,7 +31,7 @@ public class AxlService extends Service {
 
 	    @Override
 	    public void onDestroy() {        
-	    	Log.v("ELSERVICES","axlService stopped "+System.currentTimeMillis());	
+	    	//Log.v("ELSERVICES","axlService stopped "+System.currentTimeMillis());	
 	        stopSelf();
 	    }
 
@@ -67,7 +67,7 @@ public class AxlService extends Service {
 	
 	class UnregisterTask extends TimerTask {
 		public void run() {
-	    	Log.v("ELSERVICES","axlService stopped "+System.currentTimeMillis());
+//	    	Log.v("ELSERVICES","axlService stopped "+System.currentTimeMillis());
 			axlSensorManager.unregisterListener(axlSensorListener);
 			timer.cancel();
 		}
@@ -102,12 +102,11 @@ public class AxlService extends Service {
 				long epoch = System.currentTimeMillis();
 				log=epoch+","+X+","+Y+","+Z;
 				//Log.v("ELSERVICES", log);
-				LogWriter.axlLogWrite(log);
-			}
+				}
 			
-//			synchronized(this){	    
-//				Logger.acclLogger(log);	
-//			}
+			synchronized(this){	    
+				LogWriter.axlLogWrite(log);					
+			}
 
 		}
 		

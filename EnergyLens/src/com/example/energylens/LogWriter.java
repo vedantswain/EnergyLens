@@ -9,7 +9,7 @@ import android.os.Environment;
 import android.util.Log;
 
 public class LogWriter {
-	public static File axlLog, errorLog; 
+	public static File axlLog, errorLog, wifiLog; 
 	
 	public static File EnergyLensDir=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+");
 	
@@ -65,6 +65,11 @@ public class LogWriter {
 	public static void axlLogWrite(String logstring){
 		axlLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"accelerometer_log"+".csv");
 		LogWrite(axlLog,logstring);
+	}
+	
+	public static void wifiLogWrite(String logstring){
+		wifiLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"wifi_log"+".csv");
+		LogWrite(wifiLog,logstring);
 	}
 	
 	public static void errorLogWrite(String logstring){
