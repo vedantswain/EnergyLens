@@ -11,9 +11,11 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 public class AxlService extends Service {
 	
+	private static final int LENGTH_SHORT = 1000;
 	private SensorManager axlSensorManager;
 	private Sensor axlSensor;
 	int rate=SensorManager.SENSOR_DELAY_NORMAL;
@@ -29,7 +31,7 @@ public class AxlService extends Service {
 
 	    @Override
 	    public void onDestroy() {        
-	        super.onDestroy();
+	    	Log.v("ELSERVICES","axlService stopped "+System.currentTimeMillis());	
 	        stopSelf();
 	    }
 
@@ -37,11 +39,15 @@ public class AxlService extends Service {
 	    public int onStartCommand(Intent intent, int flags, int startId) {  
 	    	 Start();
 	    	 
-	        return START_NOT_STICKY;
+	        return START_NOT_STICKY; //makes sure services don't restart on stopping
 	       
 	    }
 	    
 	public void Start(){
+
+		Log.v("ELSERVICES","axlService started "+System.currentTimeMillis());
+		//Toast.makeText(this, "axlService started", LENGTH_SHORT).show();
+		
 		axlSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 		axlSensor = axlSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		
@@ -54,14 +60,16 @@ public class AxlService extends Service {
 				timer.schedule(new UnregisterTask(), SampleTime*1000);
 			  }
 			else {
-				Log.v(SENSOR_SERVICE,"Not found!");
+				Log.v("ELSERVICES","Not found!");
 			}
+
 	}
 	
 	class UnregisterTask extends TimerTask {
 		public void run() {
+	    	Log.v("ELSERVICES","axlService stopped "+System.currentTimeMillis());
 			axlSensorManager.unregisterListener(axlSensorListener);
-			timer.cancel(); 		
+			timer.cancel();
 		}
 	}
 	
@@ -93,7 +101,8 @@ public class AxlService extends Service {
 				
 				long epoch = System.currentTimeMillis();
 				log=epoch+","+X+","+Y+","+Z;
-				Log.v("ACCELEROMETER", log);
+				//Log.v("ELSERVICES", log);
+				LogWriter.axlLogWrite(log);
 			}
 			
 //			synchronized(this){	    

@@ -7,17 +7,20 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 	
+	private static final int LENGTH_SHORT = 1000;
+	private static final long INTERVAL = 20; //milliseconds between each scheduling of service
 	private AlarmManager alarmMgr;
 	private PendingIntent axlServicePendingIntent;
 	private Intent axlServiceIntent;
-	long interval=20000; //milliseconds between each scheduling of service
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -44,10 +47,12 @@ public class MainActivity extends Activity {
 	}
 	
 	public void startService(View view){
+		Log.v("ELSERVICES","Service started");
+		Toast.makeText(this, "Data collection started", LENGTH_SHORT).show();
 		axlServiceIntent = new Intent(MainActivity.this, AxlService.class);
 		
 		axlServicePendingIntent = PendingIntent.getService(this,
-				12345, axlServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+				26194, axlServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 		     
 		alarmMgr= (AlarmManager)this.getSystemService(this.ALARM_SERVICE);
 
@@ -55,13 +60,19 @@ public class MainActivity extends Activity {
 		calendar.setTimeInMillis(System.currentTimeMillis());
 		calendar.add(Calendar.SECOND, 10);
 
-		alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP,
-				calendar.getTimeInMillis(), interval, axlServicePendingIntent); 
+		alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP,
+				calendar.getTimeInMillis(), INTERVAL*1000, axlServicePendingIntent); 
 	}
 	
 	public void stopService(View view){
 		Intent i = new Intent(MainActivity.this, AxlService.class);
-        MainActivity.this.stopService(i);
-        alarmMgr.cancel(axlServicePendingIntent);
-	}
+		Log.v("ELSERVICES","Service stopped");
+		Toast.makeText(this, "Data collection stopped", LENGTH_SHORT).show();
+		try{
+			alarmMgr.cancel(axlServicePendingIntent);
+		}
+		catch(Exception e){
+				Log.v("EL+SERVICES",e.toString());
+			}
+		}
 }
