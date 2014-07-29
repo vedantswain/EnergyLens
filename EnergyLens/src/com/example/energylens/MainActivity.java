@@ -16,10 +16,10 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
 	
 	private static final int LENGTH_SHORT = 1000;
-	private static final long INTERVAL = 20; //milliseconds between each scheduling of service
-	private AlarmManager axlAlarmMgr,wifiAlarmMgr;
-	private PendingIntent axlServicePendingIntent,wifiServicePendingIntent;
-	private Intent axlServiceIntent,wifiServiceIntent;
+	private static final long INTERVAL = 30; //milliseconds between each scheduling of service
+	private AlarmManager axlAlarmMgr,wifiAlarmMgr,audioAlarmMgr;
+	private PendingIntent axlServicePendingIntent,wifiServicePendingIntent,audioServicePendingIntent;
+	private Intent axlServiceIntent,wifiServiceIntent,audioServiceIntent;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +61,13 @@ public class MainActivity extends Activity {
 				12345, wifiServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 	    wifiAlarmMgr= (AlarmManager)this.getSystemService(this.ALARM_SERVICE);
 		setAlarm(wifiServiceIntent,wifiServicePendingIntent,12345,wifiAlarmMgr);
+		
+
+		audioServiceIntent = new Intent(MainActivity.this, AudioService.class);
+		audioServicePendingIntent = PendingIntent.getService(this,
+				2512, audioServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+	    audioAlarmMgr= (AlarmManager)this.getSystemService(this.ALARM_SERVICE);
+		setAlarm(audioServiceIntent,audioServicePendingIntent,2512,audioAlarmMgr);
 	}
 	
 	public void setAlarm(Intent ServiceIntent,PendingIntent ServicePendingIntent,int ReqCode, AlarmManager alarmMgr){
@@ -74,7 +81,7 @@ public class MainActivity extends Activity {
 	
 			alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP,
 					calendar.getTimeInMillis(), INTERVAL*1000, ServicePendingIntent); 
-			Log.v("ELSERVICES","Alarm Set "+ReqCode);
+			Log.v("ELSERVICES","Alarm Set "+ReqCode+" "+INTERVAL);
 		}
 		catch(Exception e){
 			Log.e("ELSERVICES",e.toString(), e.getCause());
@@ -88,6 +95,7 @@ public class MainActivity extends Activity {
 		try{
 			axlAlarmMgr.cancel(axlServicePendingIntent);
 			wifiAlarmMgr.cancel(wifiServicePendingIntent);
+			audioAlarmMgr.cancel(audioServicePendingIntent);
 		}
 		catch(Exception e){
 			Log.e("ELSERVICES",e.toString(), e.getCause());
