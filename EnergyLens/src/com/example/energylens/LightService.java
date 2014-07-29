@@ -72,7 +72,6 @@ public class LightService extends Service{
 	               catch (Exception e) {
 	              }
 	            }
-	          LightService.this.stopSelf();
 	        }
 	      };
 	    

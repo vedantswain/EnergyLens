@@ -17,9 +17,9 @@ public class MainActivity extends Activity {
 	
 	private static final int LENGTH_SHORT = 1000;
 	private static final long INTERVAL = 30; //milliseconds between each scheduling of service
-	private AlarmManager axlAlarmMgr,wifiAlarmMgr,audioAlarmMgr,lightAlarmMgr;
-	private PendingIntent axlServicePendingIntent,wifiServicePendingIntent,audioServicePendingIntent,lightServicePendingIntent;
-	private Intent axlServiceIntent,wifiServiceIntent,audioServiceIntent,lightServiceIntent;
+	private AlarmManager axlAlarmMgr,wifiAlarmMgr,audioAlarmMgr,lightAlarmMgr,magAlarmMgr;
+	private PendingIntent axlServicePendingIntent,wifiServicePendingIntent,audioServicePendingIntent,lightServicePendingIntent,magServicePendingIntent;
+	private Intent axlServiceIntent,wifiServiceIntent,audioServiceIntent,lightServiceIntent,magServiceIntent;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -74,10 +74,16 @@ public class MainActivity extends Activity {
 				11894, lightServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 	    lightAlarmMgr= (AlarmManager)this.getSystemService(this.ALARM_SERVICE);
 		setAlarm(lightServiceIntent,lightServicePendingIntent,11894,lightAlarmMgr);
+		
+		magServiceIntent = new Intent(MainActivity.this, MagService.class);
+		magServicePendingIntent = PendingIntent.getService(this,
+				20591, magServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+	    magAlarmMgr= (AlarmManager)this.getSystemService(this.ALARM_SERVICE);
+		setAlarm(magServiceIntent,magServicePendingIntent,20591,magAlarmMgr);
 	}
 	
 	public void setAlarm(Intent ServiceIntent,PendingIntent ServicePendingIntent,int ReqCode, AlarmManager alarmMgr){
-		Log.v("ELSERVICES","Service started "+ReqCode);
+		Log.v("ELSERVICES","Services started "+ReqCode);
 				
 		try{
 						
@@ -87,26 +93,25 @@ public class MainActivity extends Activity {
 	
 			alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP,
 					calendar.getTimeInMillis(), INTERVAL*1000, ServicePendingIntent); 
-			Log.v("ELSERVICES","Alarm Set "+ReqCode+" "+INTERVAL);
+			Log.v("ELSERVICES","Alarm Set for service "+ReqCode+" "+INTERVAL);
 		}
 		catch(Exception e){
 			Log.e("ELSERVICES",e.toString(), e.getCause());
 		}
 	}
 	
-	public void stopService(View view){
-		Intent i = new Intent(MainActivity.this, AxlService.class);
-		Log.v("ELSERVICES","Service stopped");
+	public void stopService(View view) throws Throwable{
+		Log.v("ELSERVICES","Services stopped");
 		Toast.makeText(this, "Data collection stopped", LENGTH_SHORT).show();
 		try{
 			axlAlarmMgr.cancel(axlServicePendingIntent);
 			wifiAlarmMgr.cancel(wifiServicePendingIntent);
 			audioAlarmMgr.cancel(audioServicePendingIntent);
 			lightAlarmMgr.cancel(lightServicePendingIntent);
+			magAlarmMgr.cancel(magServicePendingIntent);
 		}
 		catch(Exception e){
-			//Log.e("ELSERVICES",e.toString(), e.getCause());
-			throw(e);
+			Log.e("ELSERVICES",e.toString(), e);
 			}
 		}
 }

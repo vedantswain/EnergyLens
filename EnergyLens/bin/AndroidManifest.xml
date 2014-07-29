@@ -50,6 +50,8 @@
          android:enabled="true"/>
          <service android:name=".LightService" 
          android:enabled="true"/>
+         <service android:name=".MagService" 
+         android:enabled="true"/>
     </application>
 
 </manifest>
