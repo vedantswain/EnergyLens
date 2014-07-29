@@ -22,7 +22,6 @@ public class MagService extends Service{
 	int rate=SensorManager.SENSOR_DELAY_NORMAL;
 	Timer timer;
 	String log;
-	private int SAMPLE_TIME=10;
 	
 	@Override
 	public void onCreate() {
@@ -66,7 +65,7 @@ public class MagService extends Service{
 			magSensorManager.registerListener( MagSensorListener , magSensor , rate);
 
 			timer = new Timer();
-			timer.schedule(new UnregisterTask(), SAMPLE_TIME*1000);
+			timer.schedule(new UnregisterTask(), Constants.SAMPLE_TIME*1000);
 
 		}catch(Exception e){
 			Log.i("ELSERVICES",e.toString());

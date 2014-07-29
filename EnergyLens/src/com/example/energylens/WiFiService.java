@@ -21,7 +21,6 @@ import android.widget.Toast;
 public class WiFiService extends Service {
 
 	private static final int LENGTH_SHORT = 1000;
-	private static final int SAMPLE_TIME = 10;
 	WifiManager wifiMgr;
 	WifiReceiver wifiRcvr;
 	String log;
@@ -52,7 +51,7 @@ public class WiFiService extends Service {
 		//Toast.makeText(this, "wifiService started", LENGTH_SHORT).show();
 		Thread thr = new Thread(null, mTask, "AlarmService_Service");
 		timer = new Timer();
-		timer.schedule(new wifiUnregisterTask(), SAMPLE_TIME*1000);
+		timer.schedule(new wifiUnregisterTask(), Constants.SAMPLE_TIME*1000);
 		thr.start();
 		//runWiFiTask();
 

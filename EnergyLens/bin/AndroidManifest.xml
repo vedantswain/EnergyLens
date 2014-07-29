@@ -21,6 +21,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.GET_TASKS"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
 	<application
         android:allowBackup="true"
@@ -42,6 +43,7 @@
             android:label="@string/title_activity_axl_serv" >
         </activity>
         
+            
         <service android:name=".AxlService" 
          android:enabled="true"/>
         <service android:name=".WiFiService" 
@@ -52,6 +54,11 @@
          android:enabled="true"/>
          <service android:name=".MagService" 
          android:enabled="true"/>
+
+
+	
+
+	<meta-data android:name="com.crashlytics.ApiKey" android:value="089ec5b2bd9235f5f2655bfa69944ad4a889004a"/>
     </application>
 
 </manifest>

@@ -24,9 +24,7 @@ public class LightService extends Service{
 	int rate=SensorManager.SENSOR_DELAY_NORMAL;
 	Timer timer;
 	String log;
-	private int SAMPLE_TIME=10;
-	
-	
+		
 	@Override
 	public IBinder onBind(Intent arg0) {
 		// TODO Auto-generated method stub
@@ -89,7 +87,7 @@ public class LightService extends Service{
 				  			  
 					
 					timer = new Timer();
-					timer.schedule(new UnregisterTask(), SAMPLE_TIME*1000);
+					timer.schedule(new UnregisterTask(), Constants.SAMPLE_TIME*1000);
 				  }
 				else {
 					Log.v("ELSERVICES","Not found!");

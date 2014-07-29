@@ -1,5 +1,6 @@
 package com.example.energylens;
 
+import com.crashlytics.android.Crashlytics;
 import java.util.Calendar;
 
 import android.app.Activity;
@@ -16,7 +17,6 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
 	
 	private static final int LENGTH_SHORT = 1000;
-	private static final long INTERVAL = 30; //milliseconds between each scheduling of service
 	private AlarmManager axlAlarmMgr,wifiAlarmMgr,audioAlarmMgr,lightAlarmMgr,magAlarmMgr;
 	private PendingIntent axlServicePendingIntent,wifiServicePendingIntent,audioServicePendingIntent,lightServicePendingIntent,magServicePendingIntent;
 	private Intent axlServiceIntent,wifiServiceIntent,audioServiceIntent,lightServiceIntent,magServiceIntent;
@@ -24,6 +24,7 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Crashlytics.start(this);
 		setContentView(R.layout.activity_main);
 	}
 
@@ -47,8 +48,12 @@ public class MainActivity extends Activity {
 	}
 	
 	public void startService(View view){
+		start();
+	}
+	
+	public void start(){
 		Log.v("ELSERVICES","Service started");
-		Toast.makeText(this, "Data collection started", LENGTH_SHORT).show();
+//		Toast.makeText(this, "Data collection started", LENGTH_SHORT).show();
 		
 		axlServiceIntent = new Intent(MainActivity.this, AxlService.class);
 		axlServicePendingIntent = PendingIntent.getService(this,
@@ -92,8 +97,8 @@ public class MainActivity extends Activity {
 			calendar.add(Calendar.SECOND, 10);
 	
 			alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-					calendar.getTimeInMillis(), INTERVAL*1000, ServicePendingIntent); 
-			Log.v("ELSERVICES","Alarm Set for service "+ReqCode+" "+INTERVAL);
+					System.currentTimeMillis()+100, Constants.INTERVAL*1000, ServicePendingIntent); 
+			Log.v("ELSERVICES","Alarm Set for service "+ReqCode+" "+Constants.INTERVAL);
 		}
 		catch(Exception e){
 			Log.e("ELSERVICES",e.toString(), e.getCause());

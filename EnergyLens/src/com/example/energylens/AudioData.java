@@ -20,8 +20,7 @@ import android.os.Handler;
 import android.util.Log;
 
 public class AudioData {
-	protected int SAMPLE_TIME=10;
-	
+		
 	private static int RECORDER_SOURCE = MediaRecorder.AudioSource.VOICE_RECOGNITION;
 	private static int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
 	private static int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
@@ -115,8 +114,14 @@ public class AudioData {
 			
 			long before = System.currentTimeMillis();
 			t = (System.currentTimeMillis()/1000) - (before/1000) ;
-			recorder.startRecording();
-			while(t <= SAMPLE_TIME)
+			
+			try{
+				recorder.startRecording();
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
+			while(t <= Constants.SAMPLE_TIME)
 				
 			{
 												
