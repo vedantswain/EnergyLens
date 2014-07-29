@@ -17,9 +17,9 @@ public class MainActivity extends Activity {
 	
 	private static final int LENGTH_SHORT = 1000;
 	private static final long INTERVAL = 30; //milliseconds between each scheduling of service
-	private AlarmManager axlAlarmMgr,wifiAlarmMgr,audioAlarmMgr;
-	private PendingIntent axlServicePendingIntent,wifiServicePendingIntent,audioServicePendingIntent;
-	private Intent axlServiceIntent,wifiServiceIntent,audioServiceIntent;
+	private AlarmManager axlAlarmMgr,wifiAlarmMgr,audioAlarmMgr,lightAlarmMgr;
+	private PendingIntent axlServicePendingIntent,wifiServicePendingIntent,audioServicePendingIntent,lightServicePendingIntent;
+	private Intent axlServiceIntent,wifiServiceIntent,audioServiceIntent,lightServiceIntent;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +68,12 @@ public class MainActivity extends Activity {
 				2512, audioServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 	    audioAlarmMgr= (AlarmManager)this.getSystemService(this.ALARM_SERVICE);
 		setAlarm(audioServiceIntent,audioServicePendingIntent,2512,audioAlarmMgr);
+		
+		lightServiceIntent = new Intent(MainActivity.this, LightService.class);
+		lightServicePendingIntent = PendingIntent.getService(this,
+				11894, lightServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+	    lightAlarmMgr= (AlarmManager)this.getSystemService(this.ALARM_SERVICE);
+		setAlarm(lightServiceIntent,lightServicePendingIntent,11894,lightAlarmMgr);
 	}
 	
 	public void setAlarm(Intent ServiceIntent,PendingIntent ServicePendingIntent,int ReqCode, AlarmManager alarmMgr){
@@ -96,9 +102,11 @@ public class MainActivity extends Activity {
 			axlAlarmMgr.cancel(axlServicePendingIntent);
 			wifiAlarmMgr.cancel(wifiServicePendingIntent);
 			audioAlarmMgr.cancel(audioServicePendingIntent);
+			lightAlarmMgr.cancel(lightServicePendingIntent);
 		}
 		catch(Exception e){
-			Log.e("ELSERVICES",e.toString(), e.getCause());
+			//Log.e("ELSERVICES",e.toString(), e.getCause());
+			throw(e);
 			}
 		}
 }

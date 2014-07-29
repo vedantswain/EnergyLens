@@ -20,8 +20,8 @@ public class AxlService extends Service {
 	private Sensor axlSensor;
 	int rate=SensorManager.SENSOR_DELAY_NORMAL;
 	Timer timer;
-	int SampleTime=10; //Sampling time in seconds
 	String log;
+	private int SAMPLE_TIME=10;
 	
 	 @Override
 	    public void onCreate() {        
@@ -57,7 +57,7 @@ public class AxlService extends Service {
 			  			  
 				
 				timer = new Timer();
-				timer.schedule(new UnregisterTask(), SampleTime*1000);
+				timer.schedule(new UnregisterTask(), SAMPLE_TIME*1000);
 			  }
 			else {
 				Log.v("ELSERVICES","Not found!");

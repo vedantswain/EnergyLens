@@ -9,7 +9,7 @@ import android.os.Environment;
 import android.util.Log;
 
 public class LogWriter {
-	public static File axlLog, errorLog, wifiLog,audioLog,rawaudioLog; 
+	public static File axlLog, errorLog, wifiLog,audioLog,rawaudioLog,lightLog; 
 	
 	public static File EnergyLensDir=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+");
 	
@@ -50,6 +50,7 @@ public class LogWriter {
 						buf.append(logstring);
 						buf.newLine();
 						buf.close();
+						//Log.v("ELSERVICES", "written " + logstring +" into"+logFile.toString() );
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -75,6 +76,11 @@ public class LogWriter {
 	public static void rawaudioLogWrite(String logstring){
 		rawaudioLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"rawaudio_log"+".csv");
 		LogWrite(rawaudioLog,logstring);
+	}
+	
+	public static void lightLogWrite(String logstring){
+		lightLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"light_log"+".csv");
+		LogWrite(lightLog,logstring);
 	}
 	
 	public static void wifiLogWrite(String logstring){
