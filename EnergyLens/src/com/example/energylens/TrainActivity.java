@@ -20,6 +20,8 @@ public class TrainActivity extends Activity{
 	private AlarmManager axlAlarmMgr,wifiAlarmMgr,audioAlarmMgr,lightAlarmMgr,magAlarmMgr,uploaderAlarmMgr;
 	private PendingIntent axlServicePendingIntent,wifiServicePendingIntent,audioServicePendingIntent,lightServicePendingIntent,magServicePendingIntent,uploaderServicePendingIntent;
 	private Intent axlServiceIntent,wifiServiceIntent,audioServiceIntent,lightServiceIntent,magServiceIntent,uploaderServiceIntent;
+	private String[] labels={"Fan","AC","Microwave","TV","Computer","Printer","Washing Machine","Fan+AC"};
+	private String[] locations={"Kitchen","Dining Room","Bedroom1","Bedroom2","Bedroom3","Study","Corridor","Inside","Outside","None"};
 	
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
