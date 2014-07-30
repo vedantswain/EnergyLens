@@ -87,7 +87,7 @@ public class LightService extends Service{
 				  			  
 					
 					timer = new Timer();
-					timer.schedule(new UnregisterTask(), Constants.SAMPLE_TIME*1000);
+					timer.schedule(new UnregisterTask(), Common.SAMPLE_TIME*1000);
 				  }
 				else {
 					Log.v("ELSERVICES","Not found!");

@@ -121,7 +121,7 @@ public class AudioData {
 			catch(Exception e){
 				e.printStackTrace();
 			}
-			while(t <= Constants.SAMPLE_TIME)
+			while(t <= Common.SAMPLE_TIME)
 				
 			{
 												

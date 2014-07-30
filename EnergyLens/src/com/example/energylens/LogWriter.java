@@ -20,9 +20,9 @@ public class LogWriter {
 	
 	public static File EnergyLensDir=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+");
 	
-	
-	
+		
 	public static void PathCheck(File logFile,String header){
+//		Log.v("ELSERVICES", "checking path");
 		if(!EnergyLensDir.exists()){
 			try{
 			EnergyLensDir.mkdir();
@@ -54,16 +54,17 @@ public class LogWriter {
 
 	public static void LogWrite(File logFile,String logstring,String header){
 		synchronized(logFile){
-			
+					
+//					Log.v("ELSERVICES", "Writing Log");
 					PathCheck(logFile,header);
-
+					
 					BufferedWriter buf;
 					try {
 						buf = new BufferedWriter(new FileWriter(logFile, true));
-						buf.append(logstring);
+						buf.append(logstring+","+Common.LABEL);
 						buf.newLine();
 						buf.close();
-						//Log.v("ELSERVICES", "written " + logstring +" into"+logFile.toString() );
+//						Log.v("ELSERVICES", "written  into"+logFile.toString() );
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -77,27 +78,27 @@ public class LogWriter {
 
 	
 	public static void axlLogWrite(String logstring){
-		axlLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"accelerometer_log"+".csv");
+		axlLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+Common.FILE_PREFIX+"accelerometer_log"+".csv");
 		LogWrite(axlLog,logstring,ACCLHEADER);
 	}
 	
 	public static void audioLogWrite(String logstring){
-		audioLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"audio_log"+".csv");
+		audioLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+Common.FILE_PREFIX+"audio_log"+".csv");
 		LogWrite(audioLog,logstring,SOUNDHEADER);
 	}
 	
 	public static void rawaudioLogWrite(String logstring){
-		rawaudioLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"rawaudio_log"+".csv");
+		rawaudioLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+Common.FILE_PREFIX+"rawaudio_log"+".csv");
 		LogWrite(rawaudioLog,logstring,RAWSOUNDHEADER);
 	}
 	
 	public static void lightLogWrite(String logstring){
-		lightLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"light_log"+".csv");
+		lightLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+Common.FILE_PREFIX+"light_log"+".csv");
 		LogWrite(lightLog,logstring,LIGHTHEADER);
 	}
 	
 	public static void magLogWrite(String logstring){
-		magLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"mag_log"+".csv");
+		magLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+Common.FILE_PREFIX+"mag_log"+".csv");
 		LogWrite(magLog,logstring,MAGHEADER);
 	}
 	

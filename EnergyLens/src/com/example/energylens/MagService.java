@@ -65,7 +65,7 @@ public class MagService extends Service{
 			magSensorManager.registerListener( MagSensorListener , magSensor , rate);
 
 			timer = new Timer();
-			timer.schedule(new UnregisterTask(), Constants.SAMPLE_TIME*1000);
+			timer.schedule(new UnregisterTask(), Common.SAMPLE_TIME*1000);
 
 		}catch(Exception e){
 			Log.i("ELSERVICES",e.toString());
