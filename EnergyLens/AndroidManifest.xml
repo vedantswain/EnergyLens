@@ -34,7 +34,8 @@
         android:largeHeap="true">
         <activity
             android:name=".CollectionTabActivity"
-            android:label="@string/title_activity_collection_tab" >
+            android:label="@string/title_activity_collection_tab"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

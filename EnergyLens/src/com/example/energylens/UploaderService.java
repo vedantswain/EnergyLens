@@ -130,6 +130,7 @@ public class UploaderService extends Service{
 	    		int upload_flag=1;
 	    	    URL url = new URL(urlServer);
 	    	    connection = (HttpURLConnection) url.openConnection();
+	    	    connection.setChunkedStreamingMode(0);
 	    	    	    		    	    
 	    		String pathToFile=path+filename;
 	    		String upPathToFile=path+"upload_"+filename;

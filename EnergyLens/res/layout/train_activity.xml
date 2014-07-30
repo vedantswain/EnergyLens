@@ -12,19 +12,42 @@
         android:id="@+id/startButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="92dp"
-        android:src="@drawable/ic_launcher"
-        android:onClick="startService" />
+        android:layout_marginBottom="131dp"
+        android:onClick="startService"
+        android:src="@drawable/ic_launcher" />
 
     <ImageButton
         android:id="@+id/stopButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/startButton"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:src="@android:drawable/ic_delete"
-         android:onClick="stopService" />
+        android:layout_marginTop="63dp"
+        android:onClick="stopService"
+        android:src="@android:drawable/ic_delete" />
+
+    <Button
+        android:id="@+id/setApp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="49dp"
+        android:text="no appliance selected"
+        android:onClick="launchAppDialog" />
+
+    <Button
+        android:id="@+id/setLoc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/setApp"
+        android:layout_alignRight="@+id/setApp"
+        android:layout_below="@+id/setApp"
+        android:layout_marginTop="35dp"
+        android:text="no location selected" 
+        android:onClick="launchLocDialog" />
 
 </RelativeLayout>

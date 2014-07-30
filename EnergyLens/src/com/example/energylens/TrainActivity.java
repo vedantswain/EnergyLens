@@ -1,27 +1,23 @@
 package com.example.energylens;
 
-import java.util.Calendar;
-
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
-public class TrainActivity extends Activity{
+public class TrainActivity extends FragmentActivity implements ApplianceDialogFragment.ApplianceDialogListener,LocationDialogFragment.LocationDialogListener{
 	private static final int LENGTH_SHORT = 1000;
 	private AlarmManager axlAlarmMgr,wifiAlarmMgr,audioAlarmMgr,lightAlarmMgr,magAlarmMgr,uploaderAlarmMgr;
 	private PendingIntent axlServicePendingIntent,wifiServicePendingIntent,audioServicePendingIntent,lightServicePendingIntent,magServicePendingIntent,uploaderServicePendingIntent;
 	private Intent axlServiceIntent,wifiServiceIntent,audioServiceIntent,lightServiceIntent,magServiceIntent,uploaderServiceIntent;
-	private String[] labels={"Fan","AC","Microwave","TV","Computer","Printer","Washing Machine","Fan+AC"};
-	private String[] locations={"Kitchen","Dining Room","Bedroom1","Bedroom2","Bedroom3","Study","Corridor","Inside","Outside","None"};
 	
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
@@ -31,8 +27,27 @@ public class TrainActivity extends Activity{
 	    setContentView(R.layout.train_activity);
 	}
 	
+	public void launchAppDialog(View view){
+		 DialogFragment newFragment = new ApplianceDialogFragment();
+		    newFragment.show(getSupportFragmentManager(), "Appliances");
+		    
+	}
+	
+	public void launchLocDialog(View view){
+		 DialogFragment newFragment = new LocationDialogFragment();
+		    newFragment.show(getSupportFragmentManager(), "Locations");
+		    
+	}
+	
+	
 	public void startService(View view){
-		start();
+		if(Common.LABEL!="none" && Common.LOCATION!="none"){
+			Common.changePrefix("Training");
+//			Log.v("ELSERVICES", Common.LABEL+" "+Common.LOCATION+" "+Common.FILE_PREFIX);
+			start();
+		}
+		else
+			Toast.makeText(this, "Both appliance & location are required", LENGTH_SHORT).show();
 	}
 	
 	
@@ -120,4 +135,19 @@ public class TrainActivity extends Activity{
 			e.printStackTrace();
 			}
 		}
+
+	@Override
+	public void onAppSelected(String label) {
+		// TODO Auto-generated method stub
+//		Log.v("ELSERVICES", "here");
+		TextView textView=(TextView) findViewById(R.id.setApp);
+		textView.setText(Common.LABEL);
+	}
+
+	@Override
+	public void onLocSelected(String loc) {
+		// TODO Auto-generated method stub
+		TextView textView=(TextView) findViewById(R.id.setLoc);
+		textView.setText(Common.LOCATION);
+	}
 }

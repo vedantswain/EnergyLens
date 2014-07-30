@@ -10,12 +10,12 @@ import android.util.Log;
 
 public class LogWriter {
 	public static File axlLog, errorLog, wifiLog,audioLog,rawaudioLog,lightLog,magLog; 
-	public static String WIFIHEADER="time"+","+"mac"+","+"ssid"+","+"rssi"+","+"label";
-	public static String ACCLHEADER="time"+","+"x"+","+"y"+","+"z"+","+"label";
-	public static String RAWSOUNDHEADER="time"+","+"label"+","+"values";
-	public static String SOUNDHEADER="time"+","+"mfcc1"+","+"mfcc2"+","+"mfcc3"+","+"mfcc4"+","+"mfcc5"+","+"mfcc6"+","+"mfcc7"+","+"mfcc8"+","+"mfcc9"+","+"mfcc10"+","+"mfcc11"+","+"mfcc12"+","+"mfcc13"+","+"label";
-	public static String LIGHTHEADER = "time" + "," + "value" + "," + "label" ;
-	public static String MAGHEADER = "time" + "," + "x" + "," + "y" + "," + "z" + "label"; 
+	public static String WIFIHEADER="time"+","+"mac"+","+"ssid"+","+"rssi"+","+"label"+","+"location";
+	public static String ACCLHEADER="time"+","+"x"+","+"y"+","+"z"+","+"label"+","+"location";;
+	public static String RAWSOUNDHEADER="time"+","+"label"+","+"values"+","+"location";;
+	public static String SOUNDHEADER="time"+","+"mfcc1"+","+"mfcc2"+","+"mfcc3"+","+"mfcc4"+","+"mfcc5"+","+"mfcc6"+","+"mfcc7"+","+"mfcc8"+","+"mfcc9"+","+"mfcc10"+","+"mfcc11"+","+"mfcc12"+","+"mfcc13"+","+"label"+","+"location";
+	public static String LIGHTHEADER = "time" + "," + "value" + "," + "label" +","+"location";
+	public static String MAGHEADER = "time" + "," + "x" + "," + "y" + "," + "z" + "label"+","+"location"; 
 	public static String ERRHEADER = "error log";
 	
 	public static File EnergyLensDir=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+");
@@ -61,7 +61,7 @@ public class LogWriter {
 					BufferedWriter buf;
 					try {
 						buf = new BufferedWriter(new FileWriter(logFile, true));
-						buf.append(logstring+","+Common.LABEL);
+						buf.append(logstring+","+Common.LABEL+","+Common.LOCATION);
 						buf.newLine();
 						buf.close();
 //						Log.v("ELSERVICES", "written  into"+logFile.toString() );
