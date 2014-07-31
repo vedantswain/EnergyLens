@@ -169,7 +169,7 @@ public class UploaderService extends Service{
 			    	   		    	 
 				    	    outputStream = new DataOutputStream( connection.getOutputStream() );
 				    	    outputStream.writeBytes(twoHyphens + boundary + lineEnd);
-				    	    outputStream.writeBytes("Content-Disposition: form-data; name=\"uploadedfile\";filename=\"" +"upload_"+pathToFile +"\"" + lineEnd);
+				    	    outputStream.writeBytes("Content-Disposition: form-data; name=\"uploadedfile\";filename=\"" +upFile.getAbsolutePath() +"\"" + lineEnd);
 				    	    outputStream.writeBytes(lineEnd);
 				    	 
 				    	    bytesAvailable = fileInputStream.available();
