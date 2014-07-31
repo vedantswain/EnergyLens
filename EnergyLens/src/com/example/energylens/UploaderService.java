@@ -28,7 +28,8 @@ public class UploaderService extends Service{
 	String path = Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator;
 	String [] file={"accelerometer_log.csv","audio_log.csv","light_log.csv","mag_log.csv","rawaudio_log.csv","wifi_log.csv",
 			"Training_accelerometer_log.csv","Training_audio_log.csv","Training_light_log.csv","Training_mag_log.csv","Training_rawaudio_log.csv","Training_wifi_log.csv"};
-	String urlServer = "http://192.168.20.217:9010/data/upload/";
+//	String [] file={"Training_mag_log.csv"};
+	String urlServer = Common.SERVER_URL+Common.API;
 	String lineEnd = "\r\n";
 	String twoHyphens = "--";
 	String boundary =  "*****";
@@ -129,53 +130,43 @@ public class UploaderService extends Service{
 	    	try
 	    	{
 	    		int upload_flag=1;
-	    	    URL url = new URL(urlServer);
-	    	    connection = (HttpURLConnection) url.openConnection();
-//	    	    connection.setChunkedStreamingMode(0);
-	    	    
-	    	 // Allow Inputs &amp; Outputs.
-	    	    connection.setDoInput(true);
-	    	    connection.setDoOutput(true);
-	    	    connection.setUseCaches(false);
-	    	 
-	    	    // Set HTTP method to POST.
-	    	    connection.setRequestMethod("POST");
-	    	    	    		    	    
-	    		String pathToFile=path+filename;
-	    		String upPathToFile=path+"upload_"+filename;
-	    	
-	    		File oldFile=new File(pathToFile);
-	    		File upFile=new File(upPathToFile);
-	    		
-	    		if(oldFile.exists() && !upFile.exists()){
-	    			fileCopy(oldFile,upFile);
-	    		}
-	    		else if(!oldFile.exists() || !upFile.exists()){
-	    			Log.i("ELSERVICES", "No new log to upload");
-	    			upload_flag=0;
-	    		}
-	    		
-	    		Log.i("ELSERVICES","Response code received "+connection.getResponseMessage() );
-	    		
-	    		if(!(connection.getResponseCode()>=200 && connection.getResponseCode()<300)){
-	    			upload_flag=0;
-	    			Log.i("ELSERVICES","Files not uploaded because: "+connection.getResponseMessage() );
-	    		}
-	    		
-	    		if(upload_flag==1){
-		    	    Log.v("ELSERVICES",upFile.getAbsolutePath());
-		    	 
-		    		
-		    	    FileInputStream fileInputStream = new FileInputStream(upFile);
-			    	Log.i("ELSERVICES", upFile.getAbsolutePath());
-			    	    
-			    	    if(connection!=null){
-					    	 
-				    	    
-				    	 
-				    	    connection.setRequestProperty("Connection", "Keep-Alive");
-				    	    connection.setRequestProperty("Content-Type", "multipart/form-data;boundary="+boundary);
-				    	 
+    	    URL url = new URL(urlServer);
+    	    connection = (HttpURLConnection) url.openConnection();
+
+    		String pathToFile=path+filename;
+    		String upPathToFile=path+"upload_"+filename;
+
+    		File oldFile=new File(pathToFile);
+    		File upFile=new File(upPathToFile);
+
+    		if(oldFile.exists() && !upFile.exists()){
+    			fileCopy(oldFile,upFile);
+    		}
+    		else if(!oldFile.exists() || !upFile.exists()){
+    			Log.i("ELSERVICES", "No new log to upload");
+    			upload_flag=0;
+    		}
+    		
+    		 // Allow Inputs &amp; Outputs.
+    	    connection.setDoInput(true);
+    	    connection.setDoOutput(true);
+    	    connection.setUseCaches(false);
+
+    	    // Set HTTP method to POST.
+    	    connection.setRequestMethod("POST");
+
+    	    connection.setRequestProperty("Connection", "Keep-Alive");
+    	    connection.setRequestProperty("Content-Type", "multipart/form-data;boundary="+boundary);
+    		
+    		if(upload_flag==1){
+//	    	    Log.v("ELSERVICES",upFile.getAbsolutePath());
+
+
+	    	    FileInputStream fileInputStream = new FileInputStream(upFile);
+//		    	Log.i("ELSERVICES", upFile.getAbsolutePath());
+
+		    	    if(connection!=null){
+			    	   		    	 
 				    	    outputStream = new DataOutputStream( connection.getOutputStream() );
 				    	    outputStream.writeBytes(twoHyphens + boundary + lineEnd);
 				    	    outputStream.writeBytes("Content-Disposition: form-data; name=\"uploadedfile\";filename=\"" +"upload_"+pathToFile +"\"" + lineEnd);
@@ -189,7 +180,7 @@ public class UploaderService extends Service{
 				    	    
 				    	    // Read file
 				    	    bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-				    	 
+				    					    	    				    	    
 				    	    while (bytesRead > 0)
 				    	    {
 				    	        outputStream.write(buffer, 0, bufferSize);
@@ -210,9 +201,15 @@ public class UploaderService extends Service{
 				    	    fileInputStream.close();
 				    	    outputStream.flush();
 				    	    outputStream.close();
-				    	    upFile.delete();
-	
-					    	Log.v("ELSERVICES", "Upload complete "+System.currentTimeMillis());
+				    	    
+				    	    if(connection.getResponseCode()>=200 && connection.getResponseCode()<300){
+				    	    	upFile.delete();	    	    
+						    	Log.v("ELSERVICES", "Upload complete "+System.currentTimeMillis());
+
+				    	    }
+				    	    else{
+				    	    	Log.i("ELSERVICES", "can't upload due to Code: "+Integer.toString(serverResponseCode)+serverResponseMessage);
+				    		}
 			    	    }
 			    	    else{
 			    	    	Log.v("ELSERVICES", "Upload failed "+System.currentTimeMillis());

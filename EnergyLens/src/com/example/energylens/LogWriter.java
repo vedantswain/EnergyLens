@@ -11,11 +11,11 @@ import android.util.Log;
 public class LogWriter {
 	public static File axlLog, errorLog, wifiLog,audioLog,rawaudioLog,lightLog,magLog; 
 	public static String WIFIHEADER="time"+","+"mac"+","+"ssid"+","+"rssi"+","+"label"+","+"location";
-	public static String ACCLHEADER="time"+","+"x"+","+"y"+","+"z"+","+"label"+","+"location";;
-	public static String RAWSOUNDHEADER="time"+","+"label"+","+"values"+","+"location";;
+	public static String ACCLHEADER="time"+","+"x"+","+"y"+","+"z"+","+"label"+","+"location";
+	public static String RAWSOUNDHEADER="time"+","+"values"+","+"label"+","+"location";
 	public static String SOUNDHEADER="time"+","+"mfcc1"+","+"mfcc2"+","+"mfcc3"+","+"mfcc4"+","+"mfcc5"+","+"mfcc6"+","+"mfcc7"+","+"mfcc8"+","+"mfcc9"+","+"mfcc10"+","+"mfcc11"+","+"mfcc12"+","+"mfcc13"+","+"label"+","+"location";
 	public static String LIGHTHEADER = "time" + "," + "value" + "," + "label" +","+"location";
-	public static String MAGHEADER = "time" + "," + "x" + "," + "y" + "," + "z" + "label"+","+"location"; 
+	public static String MAGHEADER = "time" + "," + "x" + "," + "y" + "," + "z" + ","+"label"+","+"location"; 
 	public static String ERRHEADER = "error log";
 	
 	public static File EnergyLensDir=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+");
@@ -103,7 +103,7 @@ public class LogWriter {
 	}
 	
 	public static void wifiLogWrite(String logstring){
-		wifiLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"wifi_log"+".csv");
+		wifiLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+Common.FILE_PREFIX+"wifi_log"+".csv");
 		LogWrite(wifiLog,logstring,WIFIHEADER);
 	}
 	

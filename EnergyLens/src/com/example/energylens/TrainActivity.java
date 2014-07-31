@@ -108,7 +108,7 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 				4816, uploaderServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 	    uploaderAlarmMgr= (AlarmManager)TrainActivity.this.getSystemService(TrainActivity.this.ALARM_SERVICE);
 		uploaderAlarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-				System.currentTimeMillis()+100, Common.UPLOAD_INTERVAL*30*1000, uploaderServicePendingIntent); 
+				System.currentTimeMillis()+Common.UPLOAD_INTERVAL*60*1000, Common.UPLOAD_INTERVAL*60*1000, uploaderServicePendingIntent); 
 		Log.v("ELSERVICES","Uploader alarm Set for service "+4816+" "+Common.INTERVAL);
 	}
 
@@ -167,7 +167,12 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 	@Override
 	public void onCancel() {
 		// TODO Auto-generated method stub
-		start();
+		try {
+			stop();
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		finish();
 	}
 }

@@ -9,9 +9,11 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -23,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class CollectionTabActivity extends FragmentActivity {
 
@@ -54,10 +57,22 @@ public class CollectionTabActivity extends FragmentActivity {
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 		
-		
+		updatePreferences();
+	}
+	
+	public void updatePreferences(){
+		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+		Common.changeServerUrl(sharedPref.getString("SERVER_URL", "http://192.168.20.217:9010/"));
+		Log.v("ELSERVICES", "Updated URL"+Common.SERVER_URL);
+	}
+	
+	public void openSettings(){
+		Intent intent = new Intent(this,SettingsActivity.class);
+		startActivity(intent);
 	}
 	
 	public void startTraining(View view){
+		updatePreferences();
 		Intent intent = new Intent(this,TrainActivity.class);
 		startActivity(intent);
 	}
@@ -76,6 +91,7 @@ public class CollectionTabActivity extends FragmentActivity {
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
+			openSettings();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
