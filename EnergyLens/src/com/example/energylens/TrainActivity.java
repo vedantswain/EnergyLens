@@ -14,7 +14,7 @@ import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 
-public class TrainActivity extends FragmentActivity implements ApplianceDialogFragment.ApplianceDialogListener,LocationDialogFragment.LocationDialogListener{
+public class TrainActivity extends FragmentActivity implements ApplianceDialogFragment.ApplianceDialogListener,LocationDialogFragment.LocationDialogListener,TrainMoreDialogFragment.TrainMoreDialogListener{
 	private static final int LENGTH_SHORT = 1000;
 	private AlarmManager axlAlarmMgr,wifiAlarmMgr,audioAlarmMgr,lightAlarmMgr,magAlarmMgr,uploaderAlarmMgr;
 	private PendingIntent axlServicePendingIntent,wifiServicePendingIntent,audioServicePendingIntent,lightServicePendingIntent,magServicePendingIntent,uploaderServicePendingIntent;
@@ -33,7 +33,20 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 	public void launchAppDialog(View view){
 		 DialogFragment newFragment = new ApplianceDialogFragment();
 		    newFragment.show(getSupportFragmentManager(), "Appliances");
-		    
+	}
+	
+	public void launchTrainMoreDialog(View view){
+		 DialogFragment newFragment = new TrainMoreDialogFragment();
+		    newFragment.show(getSupportFragmentManager(), "TrainMore");
+		    try {
+				stop();
+			} catch (Throwable e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			Common.changeLabel("none");
+			Common.changeLocation("none");
+			Common.changePrefix("");
 	}
 	
 	public void launchLocDialog(View view){
@@ -52,19 +65,6 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 		}
 		else
 			Toast.makeText(this, "Both appliance & location are required", LENGTH_SHORT).show();
-	}
-	
-	
-	public void stopService(View view){
-		try {
-			Common.changeLabel("none");
-			Common.changeLocation("none");
-			Common.changePrefix("");
-			stop();
-		} catch (Throwable e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 	
 	
@@ -156,5 +156,18 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 		// TODO Auto-generated method stub
 		TextView textView=(TextView) findViewById(R.id.setLoc);
 		textView.setText(Common.LOCATION);
+	}
+
+	@Override
+	public void onTrainMore() {
+		// TODO Auto-generated method stub
+		viewFlipper.showPrevious();
+	}
+
+	@Override
+	public void onCancel() {
+		// TODO Auto-generated method stub
+		start();
+		finish();
 	}
 }

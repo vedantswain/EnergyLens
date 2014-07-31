@@ -66,7 +66,7 @@
 		        android:layout_alignParentBottom="true"
 		        android:layout_centerHorizontal="true"
 		        android:layout_marginBottom="158dp"
-		        android:onClick="stopService"
+		        android:onClick="launchTrainMoreDialog"
 		        android:src="@android:drawable/ic_delete" />
 		
 		    <ProgressBar

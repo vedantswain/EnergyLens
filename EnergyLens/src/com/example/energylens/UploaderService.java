@@ -131,7 +131,15 @@ public class UploaderService extends Service{
 	    		int upload_flag=1;
 	    	    URL url = new URL(urlServer);
 	    	    connection = (HttpURLConnection) url.openConnection();
-	    	    connection.setChunkedStreamingMode(0);
+//	    	    connection.setChunkedStreamingMode(0);
+	    	    
+	    	 // Allow Inputs &amp; Outputs.
+	    	    connection.setDoInput(true);
+	    	    connection.setDoOutput(true);
+	    	    connection.setUseCaches(false);
+	    	 
+	    	    // Set HTTP method to POST.
+	    	    connection.setRequestMethod("POST");
 	    	    	    		    	    
 	    		String pathToFile=path+filename;
 	    		String upPathToFile=path+"upload_"+filename;
@@ -147,6 +155,13 @@ public class UploaderService extends Service{
 	    			upload_flag=0;
 	    		}
 	    		
+	    		Log.i("ELSERVICES","Response code received "+connection.getResponseMessage() );
+	    		
+	    		if(!(connection.getResponseCode()>=200 && connection.getResponseCode()<300)){
+	    			upload_flag=0;
+	    			Log.i("ELSERVICES","Files not uploaded because: "+connection.getResponseMessage() );
+	    		}
+	    		
 	    		if(upload_flag==1){
 		    	    Log.v("ELSERVICES",upFile.getAbsolutePath());
 		    	 
@@ -156,13 +171,7 @@ public class UploaderService extends Service{
 			    	    
 			    	    if(connection!=null){
 					    	 
-				    	    // Allow Inputs &amp; Outputs.
-				    	    connection.setDoInput(true);
-				    	    connection.setDoOutput(true);
-				    	    connection.setUseCaches(false);
-				    	 
-				    	    // Set HTTP method to POST.
-				    	    connection.setRequestMethod("POST");
+				    	    
 				    	 
 				    	    connection.setRequestProperty("Connection", "Keep-Alive");
 				    	    connection.setRequestProperty("Content-Type", "multipart/form-data;boundary="+boundary);

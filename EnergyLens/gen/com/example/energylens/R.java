@@ -69,6 +69,7 @@ public final class R {
         public static final int title_activity_axl_serv=0x7f040005;
         public static final int title_activity_collection_tab=0x7f040006;
         public static final int title_activity_main=0x7f040002;
+        public static final int title_activity_settings=0x7f040011;
         public static final int title_activity_train=0x7f04000a;
         public static final int title_section1=0x7f040007;
         public static final int title_section2=0x7f040008;
