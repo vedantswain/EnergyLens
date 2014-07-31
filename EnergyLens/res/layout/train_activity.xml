@@ -7,47 +7,80 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.energylens.MainActivity" >
+    
+    <ViewFlipper
+            android:id="@+id/view_flipper"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_margin="6dip" >
 
-    <ImageButton
-        android:id="@+id/startButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="131dp"
-        android:onClick="startService"
-        android:src="@drawable/ic_launcher" />
-
-    <ImageButton
-        android:id="@+id/stopButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/startButton"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="63dp"
-        android:onClick="stopService"
-        android:src="@android:drawable/ic_delete" />
-
-    <Button
-        android:id="@+id/setApp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="49dp"
-        android:text="no appliance selected"
-        android:onClick="launchAppDialog" />
-
-    <Button
-        android:id="@+id/setLoc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/setApp"
-        android:layout_alignRight="@+id/setApp"
-        android:layout_below="@+id/setApp"
-        android:layout_marginTop="35dp"
-        android:text="no location selected" 
-        android:onClick="launchLocDialog" />
+        <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:gravity="center"
+                    android:orientation="vertical" >
+		    <ImageButton
+		        android:id="@+id/startButton"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_alignParentBottom="true"
+		        android:layout_centerHorizontal="true"
+		        android:layout_marginBottom="131dp"
+		        android:onClick="startService"
+		        android:src="@drawable/ic_launcher" />
+		
+		      <Button
+		        android:id="@+id/setApp"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_alignParentLeft="true"
+		        android:layout_alignParentRight="true"
+		        android:layout_alignParentTop="true"
+		        android:layout_marginTop="49dp"
+		        android:text="no appliance selected"
+		        android:onClick="launchAppDialog" />
+		
+		    <Button
+		        android:id="@+id/setLoc"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_alignLeft="@+id/setApp"
+		        android:layout_alignRight="@+id/setApp"
+		        android:layout_below="@+id/setApp"
+		        android:layout_marginTop="35dp"
+		        android:text="no location selected" 
+		        android:onClick="launchLocDialog" />
+		    
+    </RelativeLayout>
+    
+         <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:gravity="center"
+                    android:orientation="vertical" >
+		  
+		               <ImageButton
+		        android:id="@+id/stopButton"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_alignParentBottom="true"
+		        android:layout_centerHorizontal="true"
+		        android:layout_marginBottom="158dp"
+		        android:onClick="stopService"
+		        android:src="@android:drawable/ic_delete" />
+		
+		    <ProgressBar
+		        android:id="@+id/trainingResume"
+		        style="?android:attr/progressBarStyleLarge"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_alignParentTop="true"
+		        android:layout_centerHorizontal="true"
+		        android:layout_marginTop="83dp" />
+				    
+    </RelativeLayout>
+    
+    
+      </ViewFlipper>
 
 </RelativeLayout>

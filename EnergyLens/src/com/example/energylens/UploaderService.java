@@ -26,8 +26,9 @@ public class UploaderService extends Service{
 	DataOutputStream outputStream = null;
 	DataInputStream inputStream = null;
 	String path = Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator;
-	String [] file={"accelerometer_log.csv","audio_log.csv","light_log.csv","mag_log.csv","rawaudio_log.csv","wifi_log.csv"};
-	String urlServer = "http://http://192.168.20.217:9010/data/upload/";
+	String [] file={"accelerometer_log.csv","audio_log.csv","light_log.csv","mag_log.csv","rawaudio_log.csv","wifi_log.csv",
+			"Training_accelerometer_log.csv","Training_audio_log.csv","Training_light_log.csv","Training_mag_log.csv","Training_rawaudio_log.csv","Training_wifi_log.csv"};
+	String urlServer = "http://192.168.20.217:9010/data/upload/";
 	String lineEnd = "\r\n";
 	String twoHyphens = "--";
 	String boundary =  "*****";

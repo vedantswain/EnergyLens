@@ -25,21 +25,25 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int action_settings=0x7f080008;
+        public static final int action_settings=0x7f08000b;
         public static final int pager=0x7f080000;
         public static final int pager_title_strip=0x7f080001;
+        public static final int progressBar1=0x7f080005;
         public static final int section_label=0x7f080002;
-        public static final int setApp=0x7f080006;
+        public static final int setApp=0x7f080008;
         public static final int setDev=0x7f080003;
-        public static final int setLoc=0x7f080007;
-        public static final int startButton=0x7f080004;
-        public static final int stopButton=0x7f080005;
+        public static final int setLoc=0x7f080009;
+        public static final int startButton=0x7f080007;
+        public static final int stopButton=0x7f080004;
+        public static final int trainingResume=0x7f08000a;
+        public static final int view_flipper=0x7f080006;
     }
     public static final class layout {
         public static final int activity_collection_tab=0x7f030000;
         public static final int fragment_collection_tab=0x7f030001;
         public static final int fragment_train=0x7f030002;
-        public static final int train_activity=0x7f030003;
+        public static final int layout_testing=0x7f030003;
+        public static final int train_activity=0x7f030004;
     }
     public static final class menu {
         public static final int collection_tab=0x7f070000;
@@ -59,6 +63,7 @@ public final class R {
         public static final int com_crashlytics_android_build_id=0x7f040000;
         public static final int dialog_appliances=0x7f04000d;
         public static final int dialog_locations=0x7f04000e;
+        public static final int dialog_train_more=0x7f04000f;
         public static final int hello_world=0x7f040003;
         public static final int ok=0x7f04000b;
         public static final int title_activity_axl_serv=0x7f040005;
@@ -68,6 +73,7 @@ public final class R {
         public static final int title_section1=0x7f040007;
         public static final int title_section2=0x7f040008;
         public static final int title_section3=0x7f040009;
+        public static final int yes=0x7f040010;
     }
     public static final class style {
         /** 

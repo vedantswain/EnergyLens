@@ -15,5 +15,7 @@
     <string name="cancel">Cancel</string>
     <string name="dialog_appliances">Select appliances</string>
     <string name="dialog_locations">Select location</string>
+    <string name="dialog_train_more">Train another device?</string>
+    <string name="yes">Yes</string>
 
 </resources>

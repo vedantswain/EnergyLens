@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewFlipper;
 
 
 public class TrainActivity extends FragmentActivity implements ApplianceDialogFragment.ApplianceDialogListener,LocationDialogFragment.LocationDialogListener{
@@ -18,6 +19,7 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 	private AlarmManager axlAlarmMgr,wifiAlarmMgr,audioAlarmMgr,lightAlarmMgr,magAlarmMgr,uploaderAlarmMgr;
 	private PendingIntent axlServicePendingIntent,wifiServicePendingIntent,audioServicePendingIntent,lightServicePendingIntent,magServicePendingIntent,uploaderServicePendingIntent;
 	private Intent axlServiceIntent,wifiServiceIntent,audioServiceIntent,lightServiceIntent,magServiceIntent,uploaderServiceIntent;
+	  private ViewFlipper viewFlipper;
 	
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
@@ -25,6 +27,7 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 	    // Set the user interface layout for this Activity
 	    // The layout file is defined in the project res/layout/main_activity.xml file
 	    setContentView(R.layout.train_activity);
+        viewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
 	}
 	
 	public void launchAppDialog(View view){
@@ -44,6 +47,7 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 		if(Common.LABEL!="none" && Common.LOCATION!="none"){
 			Common.changePrefix("Training");
 //			Log.v("ELSERVICES", Common.LABEL+" "+Common.LOCATION+" "+Common.FILE_PREFIX);
+			viewFlipper.showNext();
 			start();
 		}
 		else
@@ -53,6 +57,9 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 	
 	public void stopService(View view){
 		try {
+			Common.changeLabel("none");
+			Common.changeLocation("none");
+			Common.changePrefix("");
 			stop();
 		} catch (Throwable e) {
 			// TODO Auto-generated catch block
