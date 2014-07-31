@@ -10,7 +10,7 @@ import android.util.Log;
 
 public class LogWriter {
 	public static File axlLog, errorLog, wifiLog,audioLog,rawaudioLog,lightLog,magLog; 
-	public static String WIFIHEADER="time"+","+"mac"+","+"ssid"+","+"rssi"+","+"label"+","+"location";
+	public static String WIFIHEADER="time"+","+"mac"+","+"ssid"+","+"rssi"+","+"label";
 	public static String ACCLHEADER="time"+","+"x"+","+"y"+","+"z"+","+"label"+","+"location";
 	public static String RAWSOUNDHEADER="time"+","+"values"+","+"label"+","+"location";
 	public static String SOUNDHEADER="time"+","+"mfcc1"+","+"mfcc2"+","+"mfcc3"+","+"mfcc4"+","+"mfcc5"+","+"mfcc6"+","+"mfcc7"+","+"mfcc8"+","+"mfcc9"+","+"mfcc10"+","+"mfcc11"+","+"mfcc12"+","+"mfcc13"+","+"label"+","+"location";
@@ -52,7 +52,7 @@ public class LogWriter {
 		}
 	}
 
-	public static void LogWrite(File logFile,String logstring,String header){
+	public static void LogWrite(File logFile,String logstring,String header,boolean isWifi){
 		synchronized(logFile){
 					
 //					Log.v("ELSERVICES", "Writing Log");
@@ -61,7 +61,10 @@ public class LogWriter {
 					BufferedWriter buf;
 					try {
 						buf = new BufferedWriter(new FileWriter(logFile, true));
-						buf.append(logstring+","+Common.LABEL+","+Common.LOCATION);
+						if(isWifi==false)
+							buf.append(logstring+","+Common.LABEL+","+Common.LOCATION);
+						else
+							buf.append(logstring+","+Common.LOCATION);
 						buf.newLine();
 						buf.close();
 //						Log.v("ELSERVICES", "written  into"+logFile.toString() );
@@ -79,37 +82,37 @@ public class LogWriter {
 	
 	public static void axlLogWrite(String logstring){
 		axlLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+Common.FILE_PREFIX+"accelerometer_log"+".csv");
-		LogWrite(axlLog,logstring,ACCLHEADER);
+		LogWrite(axlLog,logstring,ACCLHEADER,false);
 	}
 	
 	public static void audioLogWrite(String logstring){
 		audioLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+Common.FILE_PREFIX+"audio_log"+".csv");
-		LogWrite(audioLog,logstring,SOUNDHEADER);
+		LogWrite(audioLog,logstring,SOUNDHEADER,false);
 	}
 	
 	public static void rawaudioLogWrite(String logstring){
 		rawaudioLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+Common.FILE_PREFIX+"rawaudio_log"+".csv");
-		LogWrite(rawaudioLog,logstring,RAWSOUNDHEADER);
+		LogWrite(rawaudioLog,logstring,RAWSOUNDHEADER,false);
 	}
 	
 	public static void lightLogWrite(String logstring){
 		lightLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+Common.FILE_PREFIX+"light_log"+".csv");
-		LogWrite(lightLog,logstring,LIGHTHEADER);
+		LogWrite(lightLog,logstring,LIGHTHEADER,false);
 	}
 	
 	public static void magLogWrite(String logstring){
 		magLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+Common.FILE_PREFIX+"mag_log"+".csv");
-		LogWrite(magLog,logstring,MAGHEADER);
+		LogWrite(magLog,logstring,MAGHEADER,false);
 	}
 	
 	public static void wifiLogWrite(String logstring){
 		wifiLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+Common.FILE_PREFIX+"wifi_log"+".csv");
-		LogWrite(wifiLog,logstring,WIFIHEADER);
+		LogWrite(wifiLog,logstring,WIFIHEADER,true);
 	}
 	
 	public static void errorLogWrite(String logstring){
 		errorLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"error_log"+".csv");
-		LogWrite(errorLog,logstring,ERRHEADER);
+		LogWrite(errorLog,logstring,ERRHEADER,false);
 	}
 	
 }
