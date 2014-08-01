@@ -42,7 +42,7 @@ public class TrainMoreDialogFragment extends DialogFragment {
                        
                    }
                })
-               .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+               .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
                        // User cancelled the dialog
                 	   mListener.onCancel();

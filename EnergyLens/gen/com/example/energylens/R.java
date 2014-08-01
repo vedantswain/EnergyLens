@@ -65,6 +65,7 @@ public final class R {
         public static final int dialog_locations=0x7f05000e;
         public static final int dialog_train_more=0x7f05000f;
         public static final int hello_world=0x7f050003;
+        public static final int no=0x7f050012;
         public static final int ok=0x7f05000b;
         public static final int title_activity_axl_serv=0x7f050005;
         public static final int title_activity_collection_tab=0x7f050006;

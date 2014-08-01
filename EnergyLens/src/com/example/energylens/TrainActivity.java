@@ -53,6 +53,9 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 		 DialogFragment newFragment = new TrainMoreDialogFragment();
 		    newFragment.show(getSupportFragmentManager(), "TrainMore");
 		    Common.changeTrainingStatus(0);
+		    Common.changeLabel("none");
+			Common.changeLocation("none");
+			Common.changePrefix("");
 			updatePreferences(Common.TRAINING_STATUS);
 		    try {
 				stop();
@@ -60,9 +63,6 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			Common.changeLabel("none");
-			Common.changeLocation("none");
-			Common.changePrefix("");
 	}
 	
 	public void launchLocDialog(View view){
@@ -200,7 +200,7 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 	public void onCancel() {
 		// TODO Auto-generated method stub
 		try {
-			stop();
+			start();
 		} catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

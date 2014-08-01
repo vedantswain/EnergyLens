@@ -18,5 +18,6 @@
     <string name="dialog_train_more">Train another device?</string>
     <string name="yes">Yes</string>
     <string name="title_activity_settings">SettingsActivity</string>
+    <string name="no">No</string>
 
 </resources>
