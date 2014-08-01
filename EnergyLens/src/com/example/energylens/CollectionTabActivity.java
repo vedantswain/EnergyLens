@@ -57,13 +57,26 @@ public class CollectionTabActivity extends FragmentActivity {
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 		
-		updatePreferences();
+		getUpdatedPreferences();
+		
+		if(Common.TRAINING_STATUS==1){
+			Intent intent = new Intent(this,TrainActivity.class);
+			startActivity(intent);
+		}
 	}
 	
-	public void updatePreferences(){
+	public void getUpdatedPreferences(){
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 		Common.changeServerUrl(sharedPref.getString("SERVER_URL", "http://192.168.20.217:9010/"));
-		Log.v("ELSERVICES", "Updated URL"+Common.SERVER_URL);
+		
+		SharedPreferences trainingPref = getSharedPreferences(Common.EL_PREFS,0);
+		Common.changeTrainingStatus(trainingPref.getInt("TRAINING_STATUS", 0));
+		Common.changeLabel(trainingPref.getString("LABEL","none"));
+	    Common.changeLocation(trainingPref.getString("LOCATION", "none"));
+	    Common.changePrefix(trainingPref.getString("FILE_PREFIX", ""));
+		
+		Log.v("ELSERVICES", "Training onresume "+Common.TRAINING_STATUS+"\n Label "+Common.LABEL+"\n Location "+Common.LOCATION);
+		
 	}
 	
 	public void openSettings(){
@@ -72,7 +85,7 @@ public class CollectionTabActivity extends FragmentActivity {
 	}
 	
 	public void startTraining(View view){
-		updatePreferences();
+		getUpdatedPreferences();
 		Intent intent = new Intent(this,TrainActivity.class);
 		startActivity(intent);
 	}

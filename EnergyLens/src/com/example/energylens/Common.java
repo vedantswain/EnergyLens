@@ -11,10 +11,16 @@ public class Common{
 	public static String FILE_PREFIX="";
 	public static String SERVER_URL="http://192.168.20.217:9010/";
 	public static String API="data/upload/";
+	public static int TRAINING_STATUS=0;
+	public static int TRAINING_COUNT=0;
+	public static String EL_PREFS="EnerglyLens_Prefs";
 	
-	public static void updatePreferences(){
-		
-		
+	public static void changeTrainingStatus(int status){
+		TRAINING_STATUS=status;
+	}
+	
+	public static void incTrainingCount(){
+		TRAINING_COUNT++;
 	}
 			
 	public static void changeLabel(String newLabel){

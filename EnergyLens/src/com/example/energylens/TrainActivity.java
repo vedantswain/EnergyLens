@@ -4,7 +4,9 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -28,6 +30,18 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 	    // The layout file is defined in the project res/layout/main_activity.xml file
 	    setContentView(R.layout.train_activity);
         viewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
+        
+        if(Common.TRAINING_STATUS==1){
+			viewFlipper.showNext();
+		}
+        
+	}
+	
+	@Override
+	public void onBackPressed() {
+		if(Common.TRAINING_STATUS==0){
+			super.onBackPressed();
+		}
 	}
 	
 	public void launchAppDialog(View view){
@@ -38,6 +52,8 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 	public void launchTrainMoreDialog(View view){
 		 DialogFragment newFragment = new TrainMoreDialogFragment();
 		    newFragment.show(getSupportFragmentManager(), "TrainMore");
+		    Common.changeTrainingStatus(0);
+			updatePreferences(Common.TRAINING_STATUS);
 		    try {
 				stop();
 			} catch (Throwable e) {
@@ -55,12 +71,24 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 		    
 	}
 	
-	
+	public void updatePreferences(int update){
+		SharedPreferences trainingPref = getSharedPreferences(Common.EL_PREFS,0);
+		SharedPreferences.Editor editor = trainingPref.edit();
+	    editor.putInt("TRAINING_STATUS", update);
+	    editor.putString("LABEL",Common.LABEL);
+	    editor.putString("LOCATION", Common.LOCATION);
+	    editor.putString("FILE_PREFIX", Common.FILE_PREFIX);
+	      // Commit the edits!
+	      editor.commit();
+	}
+		
 	public void startService(View view){
 		if(Common.LABEL!="none" && Common.LOCATION!="none"){
 			Common.changePrefix("Training");
 //			Log.v("ELSERVICES", Common.LABEL+" "+Common.LOCATION+" "+Common.FILE_PREFIX);
 			viewFlipper.showNext();
+			Common.changeTrainingStatus(1);
+			updatePreferences(Common.TRAINING_STATUS);
 			start();
 		}
 		else
@@ -162,6 +190,10 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 	public void onTrainMore() {
 		// TODO Auto-generated method stub
 		viewFlipper.showPrevious();
+		TextView textView=(TextView) findViewById(R.id.setApp);
+		textView.setText("no appliance selected");
+		textView=(TextView) findViewById(R.id.setLoc);
+		textView.setText("no location selected");
 	}
 
 	@Override
