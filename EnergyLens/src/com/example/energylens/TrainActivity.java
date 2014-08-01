@@ -50,6 +50,8 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 	}
 	
 	public void launchTrainMoreDialog(View view){
+
+		Toast.makeText(TrainActivity.this, "Training data collection stopped", LENGTH_SHORT).show();
 		 DialogFragment newFragment = new TrainMoreDialogFragment();
 		    newFragment.show(getSupportFragmentManager(), "TrainMore");
 		    Common.changeTrainingStatus(0);
@@ -89,6 +91,7 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 			viewFlipper.showNext();
 			Common.changeTrainingStatus(1);
 			updatePreferences(Common.TRAINING_STATUS);
+			Toast.makeText(TrainActivity.this, "Training data collection started", LENGTH_SHORT).show();
 			start();
 		}
 		else
@@ -98,7 +101,6 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 	
 	public void start(){
 		Log.v("ELSERVICES","Service started");
-		Toast.makeText(TrainActivity.this, "Data collection started", LENGTH_SHORT).show();
 		
 		axlServiceIntent = new Intent(TrainActivity.this, AxlService.class);
 		axlServicePendingIntent = PendingIntent.getService(TrainActivity.this,
@@ -157,7 +159,7 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 	
 	public void stop() throws Throwable{
 		Log.v("ELSERVICES","Services stopped");
-		Toast.makeText(TrainActivity.this, "Data collection stopped", LENGTH_SHORT).show();
+		
 		try{
 			axlAlarmMgr.cancel(axlServicePendingIntent);
 			wifiAlarmMgr.cancel(wifiServicePendingIntent);
@@ -200,6 +202,8 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 	public void onCancel() {
 		// TODO Auto-generated method stub
 		try {
+
+			Toast.makeText(TrainActivity.this, "Regular data collection started", LENGTH_SHORT).show();
 			start();
 		} catch (Throwable e) {
 			// TODO Auto-generated catch block

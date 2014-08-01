@@ -155,8 +155,6 @@ public class AudioData {
 								raw_data+=",";
 						}
 					}
-
-					raw_data+="\""+"\n";
 					 
 					// Convert shorts to 8-bit bytes for raw audio output
 						

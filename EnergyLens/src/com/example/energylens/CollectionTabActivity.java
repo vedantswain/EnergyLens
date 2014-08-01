@@ -126,15 +126,27 @@ public class CollectionTabActivity extends FragmentActivity {
 			// Return a PlaceholderFragment (defined as a static inner class
 			// below).
 			Fragment fragment=null;
+		switch(position){	
+		case 0:
 			fragment=new TrainFragment();
-			
+			break;
+		case 1:
+			fragment=new PersonalEnergyFragment();
+			break;
+		case 2:
+			fragment=new RealTimePowerFragment();
+			break;
+		case 3:
+			fragment=new ComparisonFragment();
+			break;
+		}
 			return fragment;
 		}
 
 		@Override
 		public int getCount() {
-			// Show 3 total pages.
-			return 3;
+			// Show 4 total pages.
+			return 4;
 		}
 
 		@Override
@@ -147,6 +159,8 @@ public class CollectionTabActivity extends FragmentActivity {
 				return getString(R.string.title_section2).toUpperCase(l);
 			case 2:
 				return getString(R.string.title_section3).toUpperCase(l);
+			case 3:
+				return getString(R.string.title_section4).toUpperCase(l);
 			}
 			return null;
 		}
