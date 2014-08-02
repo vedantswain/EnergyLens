@@ -20,5 +20,6 @@
     <string name="title_activity_settings">SettingsActivity</string>
     <string name="no">No</string>
     <string name="title_section4">Comparison</string>
+    <string name="title_activity_reassign">ReassignActivity</string>
 
 </resources>

@@ -14,6 +14,9 @@ public class Common{
 	public static int TRAINING_STATUS=0;
 	public static int TRAINING_COUNT=0;
 	public static String EL_PREFS="EnerglyLens_Prefs";
+	public static String UPLOAD_SUCCESS = "SUCCESS[0]: Data was successfully uploaded";
+	public static String UPLOAD_UNSUCCESSFUL = "ERROR[0]: Data was not uploaded";
+	public static String ERROR_INVALID_REQUEST = "ERROR[1]: Invalid request made";
 	
 	public static void changeTrainingStatus(int status){
 		TRAINING_STATUS=status;

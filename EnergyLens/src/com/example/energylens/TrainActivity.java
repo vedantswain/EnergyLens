@@ -10,6 +10,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,10 +38,30 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
         
 	}
 	
+	public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case android.R.id.home:
+        	if(Common.TRAINING_STATUS==0){
+    			super.onOptionsItemSelected(item);
+    		}
+        	else if(Common.TRAINING_STATUS==2){
+    			Toast.makeText(TrainActivity.this, "Press the X to exit", LENGTH_SHORT).show();
+    		}
+    		else{
+    			Toast.makeText(TrainActivity.this, "Training in progress. Stop training to exit", LENGTH_SHORT).show();
+    		}
+
+        }
+        return true;
+}
+	
 	@Override
 	public void onBackPressed() {
 		if(Common.TRAINING_STATUS==0){
 			super.onBackPressed();
+		}
+		else if(Common.TRAINING_STATUS==2){
+			Toast.makeText(TrainActivity.this, "Press the X to exit", LENGTH_SHORT).show();
 		}
 		else{
 			Toast.makeText(TrainActivity.this, "Training in progress. Stop training to exit", LENGTH_SHORT).show();
@@ -53,16 +74,20 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 	}
 	
 	public void launchTrainMoreDialog(View view){
-
-		Toast.makeText(TrainActivity.this, "Training data collection stopped", LENGTH_SHORT).show();
-		 DialogFragment newFragment = new TrainMoreDialogFragment();
+		
+		View prog_view=findViewById(R.id.trainingResume);
+		prog_view.setVisibility(View.GONE);
+		if(Common.TRAINING_STATUS==1){
+			Toast.makeText(TrainActivity.this, "Training data collection stopped", LENGTH_SHORT).show();
+		}
+		 	Common.changeTrainingStatus(2);
+			DialogFragment newFragment = new TrainMoreDialogFragment();
 		    newFragment.show(getSupportFragmentManager(), "TrainMore");
-		    Common.changeTrainingStatus(0);
 		    Common.changeLabel("none");
 			Common.changeLocation("none");
 			Common.changePrefix("");
 			Common.changeTrainingCount(Common.TRAINING_COUNT+1);
-			updatePreferences(Common.TRAINING_STATUS);
+			
 		    try {
 				stop();
 			} catch (Throwable e) {
@@ -196,6 +221,8 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 	@Override
 	public void onTrainMore() {
 		// TODO Auto-generated method stub
+		 Common.changeTrainingStatus(0);
+		 updatePreferences(Common.TRAINING_STATUS);
 		viewFlipper.showPrevious();
 		TextView textView=(TextView) findViewById(R.id.setApp);
 		textView.setText("no appliance selected");
@@ -207,7 +234,8 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 	public void onCancel() {
 		// TODO Auto-generated method stub
 		try {
-
+			 Common.changeTrainingStatus(0);
+			 updatePreferences(Common.TRAINING_STATUS);
 			Toast.makeText(TrainActivity.this, "Regular data collection started", LENGTH_SHORT).show();
 			start();
 		} catch (Throwable e) {

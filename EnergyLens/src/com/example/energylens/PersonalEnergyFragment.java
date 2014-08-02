@@ -14,6 +14,7 @@ import org.achartengine.renderer.XYSeriesRenderer;
 
 import android.app.Fragment;
 import android.graphics.Color;
+import android.graphics.Paint.Align;
 import android.os.Bundle;
 import android.text.format.Time;
 import android.util.Log;
@@ -46,17 +47,11 @@ public class PersonalEnergyFragment extends Fragment{
 	}
 	
 	public void setupChart(){
-		int[] x = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23};
+		int[] x = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24};
 		int[] y = { 2000,3000,2800,3500,2500,2700,3000,2800,3500,3700,3800,2800,3500,3700,3800,2800,3500,3700,3800,2800,2000,2500,2700,3000};
-        adjustTime(x);
-		drawChart(x,y);
+ 		drawChart(x,y);
 	}
-	
-	public void hourLabel(XYMultipleSeriesRenderer mRenderer,int[] x){
-		for(int i=0;i<x.length;i++){
-  			mRenderer.addXTextLabel(i, Integer.toString(x[i])+":00");
-  		}
-	}
+
 	
 	public void drawChart(int[] x, int[] y){
 		Log.v("ELSERVICES", "chart drawn");
@@ -65,7 +60,7 @@ public class PersonalEnergyFragment extends Fragment{
         XYSeries mSeries = new XYSeries("Power");
         
         for(int i=0;i<x.length;i++){
-            mSeries.add(i+0.5, y[i]);
+            mSeries.add(x[i], y[i]);
         }
         
         XYSeriesRenderer renderer = new XYSeriesRenderer();
@@ -87,14 +82,19 @@ public class PersonalEnergyFragment extends Fragment{
   	  
   		mRenderer.setPanEnabled(true);
   		mRenderer.setPanLimits(new double[] {0,24,0,5000});
-  		mRenderer.setZoomEnabled(true);
+  		mRenderer.setZoomButtonsVisible(true);
   		mRenderer.setYAxisMax(5000);
   		mRenderer.setYAxisMin(0);
   		mRenderer.setXAxisMin(0);
-  		mRenderer.setChartTitle("Absolute Power Consumption");
+  		mRenderer.setChartTitle("Your Energy Consumption for the Last 24 hours");
+  		mRenderer.setChartTitleTextSize(18);
+  		mRenderer.setLabelsColor(Color.BLACK);
+  		mRenderer.setLabelsTextSize(15);
+  		mRenderer.setXTitle("Hours");
+  		mRenderer.setYTitle("Energy");
+  		mRenderer.setYLabelsAlign(Align.RIGHT);
+  		mRenderer.setBarSpacing(1);
   		mRenderer.setShowGrid(true);
-  		
-  		hourLabel(mRenderer,x);
   		
   		XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
   		dataset.addSeries(mSeries);

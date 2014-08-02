@@ -75,10 +75,13 @@ public class ComparisonFragment extends Fragment{
 	 
 	        defaultRenderer.setChartTitle("Android version distribution as on October 1, 2012 ");
 	        defaultRenderer.setChartTitleTextSize(20);
-	        defaultRenderer.setZoomEnabled(true);
-	        defaultRenderer.setChartTitle("Occupant Power Distribution");
+	        defaultRenderer.setPanEnabled(false);
+	        defaultRenderer.setZoomButtonsVisible(true);
+	        defaultRenderer.setChartTitle("You v/s Other Occupants");
 	        defaultRenderer.setDisplayValues(true);
 	        defaultRenderer.setLabelsColor(Color.BLACK);
+	    	defaultRenderer.setChartTitleTextSize(18);
+	  		defaultRenderer.setLabelsTextSize(14);
 	       
 	         		
 	  		GraphicalView chartView = ChartFactory.getDoughnutChartView(getActivity(), mSeries, defaultRenderer);

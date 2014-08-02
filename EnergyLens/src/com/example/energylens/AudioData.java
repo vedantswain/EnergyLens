@@ -2,8 +2,6 @@ package com.example.energylens;
 
 import java.util.Arrays;
 
-
-
 import mfcc.FFT;
 import mfcc.MFCC;
 import mfcc.Window;
@@ -86,7 +84,6 @@ public class AudioData {
 
 
 	Handler handler = new Handler();
-	
 
 	Runnable mTask = new Runnable() {
 		public void run() {
@@ -96,14 +93,18 @@ public class AudioData {
 				int timeout=50;
 
 				while (timeout>0 && recorder.getState() != AudioRecord.STATE_INITIALIZED) {
+
 					Thread.sleep(5);
 					timeout-=5;
 
-					Log.i("ELSERVICES", "Audio failed to initialize");
+					Log.i("AudioData", "Audio reader failed to initialize");
 
 				}
+
 				if(recorder.getState() != AudioRecord.STATE_INITIALIZED)
+
 					running=true;
+
 				else
 					running=false;
 
@@ -112,19 +113,20 @@ public class AudioData {
 				e.printStackTrace();
 			}
 			
+			/*
+			t=0;
+			while(t<sample)
+			{
+				t++;
+			*/
 			long before = System.currentTimeMillis();
 			t = (System.currentTimeMillis()/1000) - (before/1000) ;
-			
-			try{
-				recorder.startRecording();
-			}
-			catch(Exception e){
-				e.printStackTrace();
-			}
-			while(t <= Common.SAMPLE_TIME)
+			recorder.startRecording();
+			while(t <= sample)
 				
 			{
-												
+				
+				
 				try{
 
 					byte data8bit[] = new byte[recorderBufferSize];
@@ -133,12 +135,23 @@ public class AudioData {
 					double featureCepstrum[] = new double[MFCCS_VALUE];
 					short data16bit[] = new short[recorderBufferSamples];
 
+					
+					//long samples_prev=System.currentTimeMillis();
+					
 					bufferRead=recorder.read(data16bit, 0,recorderBufferSamples);
-					
+
+					//long samples_current=System.currentTimeMillis();
+
+
+					//long samples_diff=samples_current-samples_prev;
+
+
+					//System.out.println("recorderBufferSize:"+data16bit);
+
+					//System.out.println("buffer length:"+data16bit.length);
 					t= (System.currentTimeMillis()/1000) - (before/1000) ;
-					//Log.v("ELSERVICES", Long.toString(t));
-					
 					long now=System.currentTimeMillis();
+					//double currentPower = SignalPower.calculatePowerDb(recordedAudioBuffer, 0, recordedAudioBuffer.length);
 					
 					String raw_data=String.valueOf(now);
 					
@@ -154,17 +167,23 @@ public class AudioData {
 							else
 								raw_data+=",";
 						}
+
+
 					}
-					
+
+
 					raw_data+="\"";
+
 					 
 					// Convert shorts to 8-bit bytes for raw audio output
-						
+		
+					
 					for (int i = 0; i < recorderBufferSamples; i ++)
 					{
 						data8bit[i*2] = (byte)data16bit[i];
 						data8bit[i*2+1] = (byte)(data16bit[i] >> 8);
 					}
+
 
 					// Frequency analysis
 					Arrays.fill(fftBufferR, 0);
@@ -182,7 +201,9 @@ public class AudioData {
 					featureWin.applyWindow(fftBufferR);
 
 					long fft_current=System.currentTimeMillis();
+
 					long fft_diff=fft_current-fft_prev;
+
 					long win_prev=System.currentTimeMillis();
 
 
@@ -190,7 +211,9 @@ public class AudioData {
 					featureFFT.fft(fftBufferR, fftBufferI);
 
 					long win_current=System.currentTimeMillis();
+
 					long win_diff=win_current-win_prev;
+
 					long mfcc_prev=System.currentTimeMillis();
 
 					// Get MFCCs
@@ -198,6 +221,7 @@ public class AudioData {
 					featureCepstrum = featureMFCC.cepstrum(fftBufferR, fftBufferI);
 
 					long mfcc_current=System.currentTimeMillis();
+
 					long mfcc_diff=mfcc_current-mfcc_prev;
 
 					data+=",";
@@ -220,27 +244,33 @@ public class AudioData {
 					synchronized(this){
 						LogWriter.audioLogWrite(data);
 						LogWriter.rawaudioLogWrite(raw_data);
+
 					}
 
 
 				}catch(IllegalStateException e){
-						Log.v("ELSERVICES",e.toString());
+					//	Logger.logger(e.toString());
+
 				}
 				
-			} 
+				
+			} 		
 
 			stopReader();
-			
 
 		}
 
 	};
 
-	
+
+
+
+
+
 	public void stopReader(){
 
 
-		Log.v("ELSERVICES","stopped audioRecorder "+System.currentTimeMillis());
+		System.out.println("realeasing audioRecorder");
 		try{
 			recorder.stop();
 			recorder.release();

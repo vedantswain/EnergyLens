@@ -37,7 +37,7 @@ public class RealTimePowerFragment extends Fragment{
 		Random rnd=new Random();
 		int counter=0;
 		while(true){
-			drawChart(counter,rnd.nextInt(5000));
+			drawChart(counter,rnd.nextInt(3000));
 			counter++;
 			try {
 				Thread.sleep(1000);
@@ -77,6 +77,9 @@ public class RealTimePowerFragment extends Fragment{
   		mRenderer.setPanLimits(new double[] {0,24,0,5000});
 		mRenderer.setYAxisMax(5000);
 		mRenderer.setYAxisMin(0);
+		mRenderer.setChartTitleTextSize(14);
+  		mRenderer.setLabelsColor(Color.BLACK);
+  		mRenderer.setLabelsTextSize(18);
   		mRenderer.setChartTitle("Real-Time Power Consumption");
 		mRenderer.setShowGrid(true);
 	
@@ -104,7 +107,7 @@ public class RealTimePowerFragment extends Fragment{
 	    // TODO Auto-generated method stub
 	    super.onViewCreated(view, savedInstanceState);
 	    Thread thr = new Thread(null, mTask, "RealTime_Power");
-        thr.start();
+//        thr.start();
 	    }
 	
 	 Runnable mTask = new Runnable() {

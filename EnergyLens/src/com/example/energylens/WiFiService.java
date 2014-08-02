@@ -21,10 +21,10 @@ import android.widget.Toast;
 public class WiFiService extends Service {
 
 	private static final int LENGTH_SHORT = 1000;
-	WifiManager wifiMgr;
+	static WifiManager wifiMgr;
 	WifiReceiver wifiRcvr;
-	String log;
-	public List<ScanResult> wifiList;
+	static String log;
+	public static List<ScanResult> wifiList;
 	private Timer timer;
 	
 	@Override
@@ -42,7 +42,7 @@ public class WiFiService extends Service {
 		
 		stopSelf();
 		mTask=null;
-		unregisterReceiver(wifiRcvr);
+//		unregisterReceiver(wifiRcvr);
 	}
 	
 	@Override
@@ -63,11 +63,12 @@ public class WiFiService extends Service {
 	    	Log.v("ELSERVICES","wifiService stopped "+System.currentTimeMillis());
 		    try{	
 	    		mTask=null;
-				unregisterReceiver(wifiRcvr);
+//				unregisterReceiver(wifiRcvr);
 				timer.cancel();
+				stopSelf();
 		    }
 		    catch(Exception e){
-		    	Log.v("ELSERVICES","wifiService stopped "+System.currentTimeMillis());
+		    	e.printStackTrace();
 		    }
 		}
 	}
@@ -94,9 +95,10 @@ public class WiFiService extends Service {
 	};
 	
 
-	class WifiReceiver extends BroadcastReceiver {
+	static class WifiReceiver extends BroadcastReceiver {
 		public void onReceive(Context c, Intent intent) {
 			long epoch = System.currentTimeMillis();
+			Log.i("ELSERVICES","Wifi received in MainActivity");
 			wifiList = wifiMgr.getScanResults();
 			
 			if (wifiList != null){
@@ -107,7 +109,7 @@ public class WiFiService extends Service {
 					log=epoch+","+result.BSSID+","+result.SSID+","+result.level;
 
 					synchronized(this){
-//							Log.v("ELSERVICES", log);
+//							Log.v("ELSERVICES","wifi log "+log);
 							LogWriter.wifiLogWrite(log);
 						}
 					}
