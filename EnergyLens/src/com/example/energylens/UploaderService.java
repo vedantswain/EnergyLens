@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.app.Service;
@@ -29,9 +30,9 @@ public class UploaderService extends Service{
 	DataOutputStream outputStream = null;
 	DataInputStream inputStream = null;
 	String path = Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator;
-//	String [] file={"accelerometer_log.csv","audio_log.csv","light_log.csv","mag_log.csv","rawaudio_log.csv","wifi_log.csv",
-//			"Training_accelerometer_log.csv","Training_audio_log.csv","Training_light_log.csv","Training_mag_log.csv","Training_rawaudio_log.csv","Training_wifi_log.csv"};
-	String [] file={"light_log.csv"};
+	String [] file={"accelerometer_log.csv","audio_log.csv","light_log.csv","mag_log.csv","rawaudio_log.csv","wifi_log.csv",
+			"Training_accelerometer_log.csv","Training_audio_log.csv","Training_light_log.csv","Training_mag_log.csv","Training_rawaudio_log.csv","Training_wifi_log.csv"};
+//	String [] file={"audio_log.csv"};
 	String urlServer = Common.SERVER_URL+Common.API;
 	String lineEnd = "\r\n";
 	String twoHyphens = "--";
@@ -136,9 +137,10 @@ public class UploaderService extends Service{
 	   
 	   public String getDate() {
 		   	 Date date = new Date();
-		   	 String unique= date.toString().replace(" ", "");
-		   	 Log.i("ELSERVICES","path new: "+unique.replace(":",""));
-		     return unique.replace(":","");
+		   	 SimpleDateFormat ft = new SimpleDateFormat ("dd-MM-yyyy_hh-mm-ss");
+//		   	 String unique= date.toString().replace(" ", "");
+//		   	 Log.i("ELSERVICES","path new: "+unique.replace(":",""));
+		     return ft.format(date);
 	   }
 	   
 	   public void upload_pending(){
@@ -156,14 +158,17 @@ public class UploaderService extends Service{
 	   
 	   public void upload_setup(String filename){
    		String pathToFile=path+filename;
+   		String[] split=filename.split("\\.");
    		String uniqueID=getDate();
-   		String upPathToFile=path+"upload_"+uniqueID+"_"+filename; 
+   		String upPathToFile=path+"upload_"+split[0]+"_"+uniqueID+".csv"; 
 
    		File oldFile=new File(pathToFile);
    		File upFile=new File(upPathToFile);
 
+   		if(oldFile.exists()){
    			fileCopy(oldFile,upFile);
    			upload(upFile);
+   		}
    		}
 	   
 	      

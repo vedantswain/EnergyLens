@@ -12,19 +12,6 @@
         android:id="@+id/chart"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/button1"
-        android:orientation="vertical" >
-
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/chart"
-        android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/chart"
-        android:layout_marginBottom="35dp"
-        android:text="Reassign Data" />
+        android:orientation="vertical" />
 
 </RelativeLayout>
