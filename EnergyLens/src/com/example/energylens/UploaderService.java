@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Date;
 
 import android.app.Service;
 import android.content.Intent;
@@ -26,9 +27,9 @@ public class UploaderService extends Service{
 	DataOutputStream outputStream = null;
 	DataInputStream inputStream = null;
 	String path = Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator;
-	String [] file={"accelerometer_log.csv","audio_log.csv","light_log.csv","mag_log.csv","rawaudio_log.csv","wifi_log.csv",
-			"Training_accelerometer_log.csv","Training_audio_log.csv","Training_light_log.csv","Training_mag_log.csv","Training_rawaudio_log.csv","Training_wifi_log.csv"};
-//	String [] file={"Training_mag_log.csv"};
+//	String [] file={"accelerometer_log.csv","audio_log.csv","light_log.csv","mag_log.csv","rawaudio_log.csv","wifi_log.csv",
+//			"Training_accelerometer_log.csv","Training_audio_log.csv","Training_light_log.csv","Training_mag_log.csv","Training_rawaudio_log.csv","Training_wifi_log.csv"};
+	String [] file={"light_log.csv"};
 	String urlServer = Common.SERVER_URL+Common.API;
 	String lineEnd = "\r\n";
 	String twoHyphens = "--";
@@ -84,8 +85,9 @@ public class UploaderService extends Service{
 	        	
 	            synchronized (mBinder) {
 	              try {
+	            	  upload_pending();
 	            	for(String filename:file){
-	            		upload(filename);
+	            		upload_setup(filename);
 	            		}
 	            	Log.i("ELSERVICES", "all files visited "+System.currentTimeMillis());
 	            	stopSelf();
@@ -98,13 +100,12 @@ public class UploaderService extends Service{
 	      };
 	    
 	   public void fileCopy(File src,File dst){
-		   if(!dst.exists()){
-			   try {
-				dst.createNewFile();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		   try {
+			dst.createNewFile();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		   InputStream input = null;
 		   OutputStream output = null;
 			try {
@@ -123,29 +124,47 @@ public class UploaderService extends Service{
 			catch(Exception e){
 				e.printStackTrace();				
 			}
+	   }
+	   
+	   public String getDate() {
+		   	 Date date = new Date();
+		   	 String unique= date.toString().replace(" ", "");
+		   	 Log.i("ELSERVICES","path new: "+unique.replace(":",""));
+		     return unique.replace(":","");
+	   }
+	   
+	   public void upload_pending(){
+
+		   File list[] = (new File(path)).listFiles();
+		   for(File file:list){
+			   String filename=file.getAbsolutePath().replace(path, "");
+			   Log.i("ELSERVICES", "pending "+filename);
+			   if(filename.contains("upload_")){
+				   Log.i("ELSERVICES", "uploading pending files");
+				   upload(file);
+			   }
 		   }
 	   }
+	   
+	   public void upload_setup(String filename){
+   		String pathToFile=path+filename;
+   		String uniqueID=getDate();
+   		String upPathToFile=path+"upload_"+uniqueID+"_"+filename; 
+
+   		File oldFile=new File(pathToFile);
+   		File upFile=new File(upPathToFile);
+
+   			fileCopy(oldFile,upFile);
+   			upload(upFile);
+   		}
+	   
 	      
-	    public void upload(String filename){
+	    public void upload(File upFile){
 	    	try
 	    	{
-	    		int upload_flag=1;
+	    		
     	    URL url = new URL(urlServer);
     	    connection = (HttpURLConnection) url.openConnection();
-
-    		String pathToFile=path+filename;
-    		String upPathToFile=path+"upload_"+filename;
-
-    		File oldFile=new File(pathToFile);
-    		File upFile=new File(upPathToFile);
-
-    		if(oldFile.exists() && !upFile.exists()){
-    			fileCopy(oldFile,upFile);
-    		}
-    		else if(!oldFile.exists() || !upFile.exists()){
-    			Log.i("ELSERVICES", "No new log to upload");
-    			upload_flag=0;
-    		}
     		
     		 // Allow Inputs &amp; Outputs.
     	    connection.setDoInput(true);
@@ -157,8 +176,7 @@ public class UploaderService extends Service{
 
     	    connection.setRequestProperty("Connection", "Keep-Alive");
     	    connection.setRequestProperty("Content-Type", "multipart/form-data;boundary="+boundary);
-    		
-    		if(upload_flag==1){
+
 //	    	    Log.v("ELSERVICES",upFile.getAbsolutePath());
 
 
@@ -214,8 +232,6 @@ public class UploaderService extends Service{
 			    	    else{
 			    	    	Log.v("ELSERVICES", "Upload failed "+System.currentTimeMillis());
 			    	    }
-		    	    
-	    		}  
 	    	}
 	    	catch (Exception e)
 	    	{

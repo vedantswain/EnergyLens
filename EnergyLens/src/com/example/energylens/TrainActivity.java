@@ -42,6 +42,9 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 		if(Common.TRAINING_STATUS==0){
 			super.onBackPressed();
 		}
+		else{
+			Toast.makeText(TrainActivity.this, "Training in progress. Stop training to exit", LENGTH_SHORT).show();
+		}
 	}
 	
 	public void launchAppDialog(View view){
@@ -58,6 +61,7 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 		    Common.changeLabel("none");
 			Common.changeLocation("none");
 			Common.changePrefix("");
+			Common.changeTrainingCount(Common.TRAINING_COUNT+1);
 			updatePreferences(Common.TRAINING_STATUS);
 		    try {
 				stop();
@@ -80,13 +84,14 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 	    editor.putString("LABEL",Common.LABEL);
 	    editor.putString("LOCATION", Common.LOCATION);
 	    editor.putString("FILE_PREFIX", Common.FILE_PREFIX);
+	    editor.putInt("TRAINING_COUNT",Common.TRAINING_COUNT);
 	      // Commit the edits!
 	      editor.commit();
 	}
 		
 	public void startService(View view){
 		if(Common.LABEL!="none" && Common.LOCATION!="none"){
-			Common.changePrefix("Training");
+			Common.changePrefix("Training_");
 //			Log.v("ELSERVICES", Common.LABEL+" "+Common.LOCATION+" "+Common.FILE_PREFIX);
 			viewFlipper.showNext();
 			Common.changeTrainingStatus(1);
@@ -138,7 +143,7 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 				4816, uploaderServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 	    uploaderAlarmMgr= (AlarmManager)TrainActivity.this.getSystemService(TrainActivity.this.ALARM_SERVICE);
 		uploaderAlarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-				System.currentTimeMillis()+Common.UPLOAD_INTERVAL*60*1000, Common.UPLOAD_INTERVAL*60*1000, uploaderServicePendingIntent); 
+				System.currentTimeMillis()+Common.UPLOAD_INTERVAL*30*1000, Common.UPLOAD_INTERVAL*30*1000, uploaderServicePendingIntent); 
 		Log.v("ELSERVICES","Uploader alarm Set for service "+4816+" "+Common.INTERVAL);
 	}
 

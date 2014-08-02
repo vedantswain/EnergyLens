@@ -2,7 +2,6 @@ package com.example.energylens;
 
 import com.crashlytics.android.Crashlytics;
 import java.util.Locale;
-
 import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
@@ -63,6 +62,10 @@ public class CollectionTabActivity extends FragmentActivity {
 			Intent intent = new Intent(this,TrainActivity.class);
 			startActivity(intent);
 		}
+		else if(Common.TRAINING_COUNT>0){
+			mViewPager.setCurrentItem(1);
+			  Log.v("ELSERVICES", "Switched");
+		}
 	}
 	
 	public void getUpdatedPreferences(){
@@ -74,6 +77,7 @@ public class CollectionTabActivity extends FragmentActivity {
 		Common.changeLabel(trainingPref.getString("LABEL","none"));
 	    Common.changeLocation(trainingPref.getString("LOCATION", "none"));
 	    Common.changePrefix(trainingPref.getString("FILE_PREFIX", ""));
+	    Common.changeTrainingCount(trainingPref.getInt("TRAINING_COUNT", 0));
 		
 		Log.v("ELSERVICES", "Training onresume "+Common.TRAINING_STATUS+"\n Label "+Common.LABEL+"\n Location "+Common.LOCATION);
 		

@@ -19,8 +19,8 @@ public class Common{
 		TRAINING_STATUS=status;
 	}
 	
-	public static void incTrainingCount(){
-		TRAINING_COUNT++;
+	public static void changeTrainingCount(int newcount){
+		TRAINING_COUNT=newcount;
 	}
 			
 	public static void changeLabel(String newLabel){
@@ -38,12 +38,7 @@ public class Common{
 	}
 	
 	public static void changePrefix(String prefix){
-		if(prefix!=""){
-			FILE_PREFIX=prefix+"_";
-		}
-		else{
-			FILE_PREFIX=prefix;
-		}
+		FILE_PREFIX=prefix;
 	}
 	
 	public static void changeInterval(long interval){
