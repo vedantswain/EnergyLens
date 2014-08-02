@@ -64,10 +64,10 @@ public class PersonalEnergyFragment extends Fragment{
   		XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
   		dataset.addSeries(incomeSeries);
   		
-  		GraphicalView chartView = ChartFactory.getLineChartView(getActivity(), dataset, mRenderer); 
+//  		GraphicalView chartView = ChartFactory.getBarChartView(getActivity(), dataset, mRenderer, BarChart.Type.DEFAULT);
   		
   		LinearLayout chart_container=(LinearLayout)getView().findViewById(R.id.chart);
-  		chart_container.addView(chartView,0);
+//  		chart_container.addView(chartView,0);
 	}
 	
 	public void onViewCreated(View view, Bundle savedInstanceState) {

@@ -14,11 +14,13 @@ import java.util.Date;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.Parcel;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class UploaderService extends Service{
@@ -69,10 +71,16 @@ public class UploaderService extends Service{
 	    	//Log.v("ELSERVICES","axlService stopped "+System.currentTimeMillis());	
 	        stopSelf();
 	    }
+	    
+	    public void getUpdatedPreferences(){
+			SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+			Common.changeServerUrl(sharedPref.getString("SERVER_URL", "http://192.168.20.217:9010/"));
+	    }
 
 	    @Override
 	    public int onStartCommand(Intent intent, int flags, int startId) {  
 	    	Log.v("ELSERVICES","Uploader started "+System.currentTimeMillis());
+	    	getUpdatedPreferences();
 	    	Thread thr = new Thread(null, mTask, "AlarmService_Service");
 	        thr.start();
 	       
