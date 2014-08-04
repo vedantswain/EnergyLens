@@ -26,25 +26,25 @@ public class WiFiService extends Service {
 	static String log;
 	public static List<ScanResult> wifiList;
 	private Timer timer;
-	
+
 	@Override
 	public IBinder onBind(Intent arg0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	public void onCreate() {
 		super.onCreate();
 		Log.v("ELSERVICES", "wifiService created");
 	}
-	
+
 	public void onDestroy() {
-		
+
 		stopSelf();
 		mTask=null;
-//		unregisterReceiver(wifiRcvr);
+		//		unregisterReceiver(wifiRcvr);
 	}
-	
+
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.v("ELSERVICES","wifiService started "+System.currentTimeMillis());
@@ -57,73 +57,81 @@ public class WiFiService extends Service {
 
 		return START_NOT_STICKY;
 	}
-	
+
 	class wifiUnregisterTask extends TimerTask {
 		public void run() {
-	    	Log.v("ELSERVICES","wifiService stopped "+System.currentTimeMillis());
-		    try{	
-	    		mTask=null;
-//				unregisterReceiver(wifiRcvr);
+			Log.v("ELSERVICES","wifiService stopped "+System.currentTimeMillis());
+			try{	
+				mTask=null;
+				//				unregisterReceiver(wifiRcvr);
 				timer.cancel();
 				stopSelf();
-		    }
-		    catch(Exception e){
-		    	e.printStackTrace();
-		    }
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
 		}
 	}
-	
+
 	Runnable mTask = new Runnable() {
 		public void run() {
-			
+
 			try{
 				synchronized(this){
-			wifiMgr = (WifiManager)getSystemService(Context.WIFI_SERVICE);
-			if (wifiMgr.isWifiEnabled()==false) 
-				wifiMgr.setWifiEnabled(true);
-				wifiRcvr = new WifiReceiver();
-				getApplicationContext().registerReceiver(wifiRcvr, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-				wifiMgr.startScan();
+					wifiMgr = (WifiManager)getSystemService(Context.WIFI_SERVICE);
+					if (wifiMgr.isWifiEnabled()==false) 
+						wifiMgr.setWifiEnabled(true);
+					wifiRcvr = new WifiReceiver();
+					getApplicationContext().registerReceiver(wifiRcvr, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+					wifiMgr.startScan();
 				}
-			
-		}catch(Exception e){
-			Log.v("ELSERVICES",e.toString());
+
+			}catch(Exception e){
+				Log.v("ELSERVICES",e.toString());
+			}
+			Log.i("ELSERVICES","Wifi scanning started on separate thread");
 		}
-		Log.i("ELSERVICES","Wifi scanning started on separate thread");
-	}
 
 	};
-	
 
-	static class WifiReceiver extends BroadcastReceiver {
+
+	public static class WifiReceiver extends BroadcastReceiver {
+		public WifiReceiver(){
+			super();
+		}
 		public void onReceive(Context c, Intent intent) {
-			long epoch = System.currentTimeMillis();
-			Log.i("ELSERVICES","Wifi received in MainActivity");
-			wifiList = wifiMgr.getScanResults();
-			
-			if (wifiList != null){
-				
-				for(ScanResult result:wifiList){
-
-				try {
-					log=epoch+","+result.BSSID+","+result.SSID+","+result.level;
-
-					synchronized(this){
-//							Log.v("ELSERVICES","wifi log "+log);
-							LogWriter.wifiLogWrite(log);
+			try{
+				long epoch = System.currentTimeMillis();
+//				Log.i("ELSERVICES","Wifi received in MainActivity");
+				wifiList = wifiMgr.getScanResults();
+	
+				if (wifiList != null){
+	
+					for(ScanResult result:wifiList){
+	
+						try {
+							log=epoch+","+result.BSSID+","+result.SSID+","+result.level;
+	
+							synchronized(this){
+								//							Log.v("ELSERVICES","wifi log "+log);
+								LogWriter.wifiLogWrite(log);
+							}
+						}
+						catch (Exception e) {
+							e.printStackTrace();
 						}
 					}
-				catch (Exception e) {
-					Log.v("ELSERVICES",e.toString());
-					}
 				}
+				else{
+					log=epoch+"," + "00:00:00:00:00" + ","+ "None" +","+ 1;
+					synchronized(this){
+						LogWriter.wifiLogWrite(log);
+					}			}
 			}
-			else{
-				log=epoch+"," + "00:00:00:00:00" + ","+ "None" +","+ 1;
-				synchronized(this){
-					LogWriter.wifiLogWrite(log);
-				}			}
-		}
+			catch(Exception e){
+				e.printStackTrace();
+			}
+	}
 
 	}
 

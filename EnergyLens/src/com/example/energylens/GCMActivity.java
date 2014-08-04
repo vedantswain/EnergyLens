@@ -59,9 +59,13 @@ public class GCMActivity extends FragmentActivity implements TryAgainDialogListe
     String regid,regName,regEmail,serverUrl;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) { 	
         super.onCreate(savedInstanceState);
 
+        if(Common.DOUBLE_BACK){
+    		finish();
+    	}
+        
         setContentView(R.layout.activity_gcm);
         context = getApplicationContext();
         
@@ -87,6 +91,9 @@ public class GCMActivity extends FragmentActivity implements TryAgainDialogListe
  // You need to do the Play Services APK check here too.
     @Override
     protected void onResume() {
+    	if(Common.DOUBLE_BACK){
+    		finish();
+    	}
         super.onResume();
         checkPlayServices();
     }
@@ -248,12 +255,17 @@ public void onRegister(View view){
 	else{
 		regName=name.getText().toString();
 		regEmail=email.getText().toString();
-		Common.changeServerUrl(email.getText().toString());
-		serverUrl=server_URL.getText().toString();
+		if(server_URL.getText().toString().matches(""))
+			serverUrl="http://192.168.20.217:9010/";
+		else
+			serverUrl=server_URL.getText().toString();
+		Common.changeServerUrl(serverUrl);
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 		SharedPreferences.Editor editor = sharedPref.edit();
 	    editor.putString("SERVER_URL", serverUrl);
 	    editor.commit();
+	    
+	    Log.i("ELSERVICES", "Name: "+regName+'\n'+"Server: "+serverUrl);
 		
 		registerInBackground();
 

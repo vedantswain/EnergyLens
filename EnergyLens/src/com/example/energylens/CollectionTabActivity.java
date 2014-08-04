@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v13.app.FragmentStatePagerAdapter;
@@ -23,8 +24,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -35,6 +36,7 @@ public class CollectionTabActivity extends FragmentActivity {
     AtomicInteger msgId = new AtomicInteger();
     Context context;
     String SENDER_ID = "166229175411";
+    Boolean doubleBackToExitPressedOnce=false;
 
     private AlarmManager axlAlarmMgr,wifiAlarmMgr,audioAlarmMgr,lightAlarmMgr,magAlarmMgr,uploaderAlarmMgr;
 	private PendingIntent axlServicePendingIntent,wifiServicePendingIntent,audioServicePendingIntent,lightServicePendingIntent,magServicePendingIntent,uploaderServicePendingIntent;
@@ -79,21 +81,30 @@ public class CollectionTabActivity extends FragmentActivity {
 		else if(Common.TRAINING_COUNT>0){
 				mViewPager.setCurrentItem(1);
 			  Log.v("ELSERVICES", "Switched");
+			  start();
 		}
 	}
+
 	
-//	protected void onResume(){
-//		super.onResume();
-//		if(Common.TRAINING_COUNT>0){
-//			TextView changeTxt=(TextView) findViewById(R.id.alreadyText);
-//			Log.i("ELSERVICES","View Id: "+Integer.toString(changeTxt.getId()));
-////			changeTxt.setVisibility(View.GONE);
-//			Button btn=(Button) findViewById(R.id.done);
-////			btn.setVisibility(View.GONE);
-//			btn=(Button) findViewById(R.id.notYet);
-////			btn.setVisibility(View.GONE);
-//		}
-//	}
+	@Override
+	public void onBackPressed() {
+		if (doubleBackToExitPressedOnce) {
+			Common.changeDoubleBack(true);
+	        finish();
+	        return;
+	    }
+
+	    this.doubleBackToExitPressedOnce = true;
+	    Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+
+	    new Handler().postDelayed(new Runnable() {
+
+	        @Override
+	        public void run() {
+	            doubleBackToExitPressedOnce=false;                       
+	        }
+	    }, 2000);
+	}
 	
 	public void getUpdatedPreferences(){
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -257,6 +268,25 @@ public class CollectionTabActivity extends FragmentActivity {
 		int id = item.getItemId();
 		if (id == R.id.appGroup) {
 			openSettings();
+			return true;
+		}
+		else if(id == android.R.id.home){
+			if (doubleBackToExitPressedOnce) {
+				Common.changeDoubleBack(true);
+		        finish();
+		        return true;
+		    }
+
+		    this.doubleBackToExitPressedOnce = true;
+		    Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+
+		    new Handler().postDelayed(new Runnable() {
+
+		        @Override
+		        public void run() {
+		            doubleBackToExitPressedOnce=false;                       
+		        }
+		    }, 2000);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

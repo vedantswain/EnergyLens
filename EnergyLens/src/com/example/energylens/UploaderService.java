@@ -13,6 +13,8 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.json.JSONObject;
+
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -233,10 +235,34 @@ public class UploaderService extends Service{
 				    	    outputStream.flush();
 				    	    outputStream.close();
 				    	    
-				    	    if(connection.getResponseCode()>=200 && connection.getResponseCode()<300){
+				    	    InputStream in=null;
+				    	    StringBuffer sb=new StringBuffer();
+				    	    				    	    
+				    	    try {
+				    	    	in=connection.getInputStream();
+				    	        int ch;
+				    	        while ((ch = in.read()) != -1) {
+				    	          sb.append((char) ch);
+				    	        }
+				    	        Log.v("ELSERVICES", "input stream: "+sb.toString());
+				    	      } catch (IOException e) {
+				    	        throw e;
+				    	      } finally {
+				    	        if (in != null) {
+				    	          in.close();
+				    	        }
+				    	      }
+				    	    
+				    	    JSONObject response=new JSONObject(sb.toString());
+				    	    String serverResponseType=response.getString("type");
+				    	    int serverResponseCode=response.getInt("code");
+				    	    String serverResponseMessage=response.getString("message");
+				    	    Log.v("ELSERVICES", "type: "+serverResponseType+'\n'+"code: "+serverResponseCode+'\n'+"message+: "+serverResponseMessage);
+				    	   
+				    	    if(connection.getResponseCode()>=200 && connection.getResponseCode()<300 && serverResponseCode==1){
 				    	    	upFile.delete();	    	    
 						    	Log.v("ELSERVICES", "Upload complete "+System.currentTimeMillis());
-
+						    	
 				    	    }
 				    	    else{
 				    	    	Log.i("ELSERVICES", "can't upload due to Code: "+Integer.toString(serverResponseCode)+serverResponseMessage);

@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import android.content.SharedPreferences;
 
 public class Common{
+	public static Boolean DOUBLE_BACK=false;
 	public static String SENDER_ID = "166229175411";
 	public static long INTERVAL = 30; //seconds between each scheduling of service
 	public static int SAMPLE_TIME=10; //seconds for which sensors will take data
@@ -46,6 +47,11 @@ public class Common{
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}};
+	
+	public static void changeDoubleBack(boolean status){
+		DOUBLE_BACK=status;
+	}
+	
 	public static void changeTrainingStatus(int status){
 		TRAINING_STATUS=status;
 	}
