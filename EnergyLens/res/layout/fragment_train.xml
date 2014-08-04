@@ -17,5 +17,45 @@
         android:layout_centerVertical="true"
         android:onClick="startTraining"
         android:text="Go to Training" />
+
+    <RelativeLayout
+        android:id="@+id/alreadyTrainGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp" >
+
+        <TextView
+            android:id="@+id/alreadyText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="Already performed a training?"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <Button
+            android:id="@+id/notYet"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/alreadyText"
+            android:onClick="onNotYet"
+            android:text="Not yet..." />
+
+        <Button
+            android:id="@+id/done"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/notYet"
+            android:layout_alignBottom="@+id/notYet"
+            android:layout_alignRight="@+id/alreadyText"
+            android:onClick="onDoneThat"
+            android:text="Done that!" />
+
+    </RelativeLayout>
     
 </RelativeLayout>

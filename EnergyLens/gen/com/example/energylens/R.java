@@ -407,13 +407,19 @@ containing a value of this type.
         public static final int powered_by_google_light=0x7f02001e;
     }
     public static final class id {
-        public static final int appGroup=0x7f080020;
+        public static final int alreadyText=0x7f080023;
+        public static final int alreadyTrainGroup=0x7f080022;
+        public static final int appGroup=0x7f08002d;
         public static final int book_now=0x7f080010;
+        public static final int btnRegister=0x7f08001e;
         public static final int buyButton=0x7f08000a;
         public static final int buy_now=0x7f08000f;
         public static final int buy_with_google=0x7f08000e;
-        public static final int chart=0x7f080016;
+        public static final int chart=0x7f08001b;
         public static final int classic=0x7f080011;
+        public static final int done=0x7f080025;
+        public static final int gcmEmail=0x7f080019;
+        public static final int gcmName=0x7f080018;
         public static final int grayscale=0x7f080012;
         public static final int holo_dark=0x7f080005;
         public static final int holo_light=0x7f080006;
@@ -422,23 +428,30 @@ containing a value of this type.
         public static final int monochrome=0x7f080013;
         public static final int none=0x7f080000;
         public static final int normal=0x7f080001;
+        public static final int notYet=0x7f080024;
         public static final int pager=0x7f080014;
         public static final int pager_title_strip=0x7f080015;
         public static final int production=0x7f080007;
-        public static final int progressBar1=0x7f08001a;
+        public static final int progressBar1=0x7f080027;
+        public static final int register=0x7f080017;
         public static final int sandbox=0x7f080008;
         public static final int satellite=0x7f080002;
-        public static final int section_label=0x7f080017;
+        public static final int section_label=0x7f08001f;
         public static final int selectionDetails=0x7f08000b;
-        public static final int setApp=0x7f08001d;
-        public static final int setDev=0x7f080018;
-        public static final int setLoc=0x7f08001e;
-        public static final int startButton=0x7f08001c;
-        public static final int stopButton=0x7f080019;
+        public static final int send=0x7f080020;
+        public static final int serverUrl=0x7f08001a;
+        public static final int setApp=0x7f08002a;
+        public static final int setDev=0x7f080021;
+        public static final int setLoc=0x7f08002b;
+        public static final int startButton=0x7f080029;
+        public static final int stopButton=0x7f080026;
         public static final int strict_sandbox=0x7f080009;
         public static final int terrain=0x7f080003;
-        public static final int trainingResume=0x7f08001f;
-        public static final int view_flipper=0x7f08001b;
+        public static final int trainingResume=0x7f08002c;
+        public static final int tryAgain=0x7f080016;
+        public static final int txtEmail=0x7f08001d;
+        public static final int txtName=0x7f08001c;
+        public static final int view_flipper=0x7f080028;
         public static final int wrap_content=0x7f08000d;
     }
     public static final class integer {
@@ -446,14 +459,16 @@ containing a value of this type.
     }
     public static final class layout {
         public static final int activity_collection_tab=0x7f030000;
-        public static final int activity_reassign=0x7f030001;
-        public static final int fragment_collection_tab=0x7f030002;
-        public static final int fragment_comparison=0x7f030003;
-        public static final int fragment_personalenergy=0x7f030004;
-        public static final int fragment_realtimepower=0x7f030005;
-        public static final int fragment_train=0x7f030006;
-        public static final int layout_testing=0x7f030007;
-        public static final int train_activity=0x7f030008;
+        public static final int activity_gcm=0x7f030001;
+        public static final int activity_reassign=0x7f030002;
+        public static final int activity_register=0x7f030003;
+        public static final int fragment_collection_tab=0x7f030004;
+        public static final int fragment_comparison=0x7f030005;
+        public static final int fragment_personalenergy=0x7f030006;
+        public static final int fragment_realtimepower=0x7f030007;
+        public static final int fragment_train=0x7f030008;
+        public static final int layout_testing=0x7f030009;
+        public static final int train_activity=0x7f03000a;
     }
     public static final class menu {
         public static final int collection_tab=0x7f0b0000;
@@ -569,13 +584,21 @@ containing a value of this type.
         public static final int dialog_appliances=0x7f06002d;
         public static final int dialog_locations=0x7f06002e;
         public static final int dialog_train_more=0x7f06002f;
+        public static final int dialog_try_again=0x7f06003c;
         public static final int hello_world=0x7f060023;
         public static final int no=0x7f060032;
         public static final int ok=0x7f06002b;
+        public static final int server_register_error=0x7f060038;
+        public static final int server_registered=0x7f060036;
+        public static final int server_registering=0x7f060035;
+        public static final int server_unregister_error=0x7f060037;
+        public static final int server_unregistered=0x7f060039;
         public static final int title_activity_axl_serv=0x7f060025;
         public static final int title_activity_collection_tab=0x7f060026;
+        public static final int title_activity_gcm=0x7f06003b;
         public static final int title_activity_main=0x7f060022;
         public static final int title_activity_reassign=0x7f060034;
+        public static final int title_activity_register=0x7f06003a;
         public static final int title_activity_settings=0x7f060031;
         public static final int title_activity_train=0x7f06002a;
         public static final int title_section1=0x7f060027;

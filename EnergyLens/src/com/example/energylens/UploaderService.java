@@ -175,7 +175,7 @@ public class UploaderService extends Service{
 	    public void upload(File upFile){
 	    	try
 	    	{
-	    		
+	    		Log.i("ELSERVICES", Common.SERVER_URL+Common.API);
     	    URL url = new URL(urlServer);
     	    connection = (HttpURLConnection) url.openConnection();
     		
