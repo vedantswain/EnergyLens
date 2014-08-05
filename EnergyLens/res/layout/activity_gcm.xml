@@ -23,7 +23,7 @@
         android:layout_alignParentRight="true"
         android:layout_marginBottom="122dp"
         android:onClick="onRegister"
-        android:text="Sign Up" />
+        android:text="Register Device" />
 
     <EditText
         android:id="@+id/gcmName"

@@ -5,10 +5,13 @@ import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HTTP;
 import org.json.JSONObject;
 
 import android.content.Context;
@@ -21,6 +24,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -55,7 +59,7 @@ public class GCMActivity extends FragmentActivity implements TryAgainDialogListe
     AtomicInteger msgId = new AtomicInteger();
     SharedPreferences prefs;
     Context context;
-
+    int devid,reg_success=0;
     String regid,regName,regEmail,serverUrl;
 
     @Override
@@ -92,6 +96,7 @@ public class GCMActivity extends FragmentActivity implements TryAgainDialogListe
     @Override
     protected void onResume() {
     	if(Common.DOUBLE_BACK){
+    		Common.changeDoubleBack(false);
     		finish();
     	}
         super.onResume();
@@ -213,13 +218,15 @@ private void registerInBackground() {
                 // message using the 'from' address in the message.
 
                 // Persist the regID - no need to register again.
-                storeRegistrationId(context, regid);
+//                storeRegistrationId(context, regid);
+                
                 
             } catch (IOException ex) {
                 msg = "Error :" + ex.getMessage();
                 // If there is an error, don't just keep trying to register.
                 // Require the user to click a button again, or perform
                 // exponential back-off.
+                reg_success=0;
                 tryAgain();
             }
             return msg;
@@ -229,7 +236,8 @@ private void registerInBackground() {
         protected void onPostExecute(String msg) {
             Log.i(TAG, msg);
             
-            toMain();
+            if(reg_success==1)
+            	toMain();
             
         }
     }.execute(null, null, null);
@@ -289,34 +297,78 @@ private void sendRegistrationIdToBackend() {
      String result = "";
      Log.i(TAG,"Server URL: "+ Common.SERVER_URL);
 	try {
+		TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+		devid=Integer.parseInt(telephonyManager.getDeviceId());
 
-        HttpClient httpclient = new DefaultHttpClient();
+        DefaultHttpClient httpclient = new DefaultHttpClient();
         HttpPost httpPost = new HttpPost(Common.SERVER_URL+Common.REG_API);
 
         String json = "";
 
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("'registration_id", regid);
+        jsonObject.put("registration_id", regid);
+        jsonObject.put("dev_id", devid);
+        jsonObject.put("user_name", regName);
+        jsonObject.put("email_id", regEmail);
         
         json = jsonObject.toString();
         
         StringEntity se = new StringEntity(json);
+//        se.setContentType("application/json;charset=UTF-8");
+        se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE,"application/json"));
         
         httpPost.setEntity(se);
         
-        httpPost.setHeader("host", serverUrl);
-        httpPost.setHeader("Accept", "application/json");
-        httpPost.setHeader("Content-type", "application/json");
+//        httpPost.addHeader("host", serverUrl);
+//        httpPost.addHeader("Accept", "application/json");
+//        httpPost.addHeader("Content-type", "application/json");
 
         HttpResponse httpResponse = httpclient.execute(httpPost);
 
         inputStream = httpResponse.getEntity().getContent();
+        StatusLine sl=httpResponse.getStatusLine();
+       
+        
+        Log.v(TAG, Integer.toString(sl.getStatusCode()));
+        
+        if(sl.getStatusCode()!=200 ){
+	    	reg_success=0;
+	    	regid="";
+	    	tryAgain();
+	    }
+        
+        StringBuffer sb=new StringBuffer();
+	    
+	    try {
+	    	int ch;
+	        while ((ch = inputStream.read()) != -1) {
+	          sb.append((char) ch);
+	        }
+	        Log.v("ELSERVICES", "input stream: "+sb.toString());
+	      } catch (IOException e) {
+	        throw e;
+	      } finally {
+	        if (inputStream != null) {
+	          inputStream.close();
+	        }
+	      }
 
-        if(inputStream != null)
-            result = inputStream.toString();
-        else
-            result = "Did not work!";
-
+	    JSONObject response=new JSONObject(sb.toString());
+	    String serverResponseType=response.getString("type");
+	    int serverResponseCode=response.getInt("code");
+	    String serverResponseMessage=response.getString("message");
+	    Log.v("ELSERVICES", "type: "+serverResponseType+'\n'+"code: "+serverResponseCode+'\n'+"message+: "+serverResponseMessage);
+	    
+	    if(serverResponseCode==4 ){
+	    	reg_success=0;
+	    	regid="";
+	    	tryAgain();
+	    }
+	    else if(serverResponseCode==3){
+	    	reg_success=1;
+	    	storeRegistrationId(context, regid);
+	    }
+	    
     } catch (Exception e) {
         Log.d("InputStream", e.getLocalizedMessage());
     }

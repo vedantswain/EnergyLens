@@ -15,4 +15,11 @@
         android:layout_height="382dp"
         android:orientation="vertical" />
 
+    <Button
+        android:id="@+id/toRsn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="toReassign"
+        android:text="Reassign" />
+
 </LinearLayout>

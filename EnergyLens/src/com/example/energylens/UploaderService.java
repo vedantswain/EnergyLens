@@ -16,6 +16,7 @@ import java.util.Date;
 import org.json.JSONObject;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
@@ -24,6 +25,7 @@ import android.os.IBinder;
 import android.os.Parcel;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 public class UploaderService extends Service{
@@ -159,10 +161,12 @@ public class UploaderService extends Service{
 	   }
 	   
 	   public void upload_setup(String filename){
+		TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+		String devId=telephonyManager.getDeviceId();
    		String pathToFile=path+filename;
    		String[] split=filename.split("\\.");
    		String uniqueID=getDate();
-   		String upPathToFile=path+"upload_"+split[0]+"_"+uniqueID+".csv"; 
+   		String upPathToFile=path+devId+'_'+"upload_"+split[0]+"_"+uniqueID+".csv"; 
 
    		File oldFile=new File(pathToFile);
    		File upFile=new File(upPathToFile);

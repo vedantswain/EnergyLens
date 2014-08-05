@@ -42,6 +42,8 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
         switch (item.getItemId()) {
         case android.R.id.home:
         	if(Common.TRAINING_STATUS==0){
+        		if(Common.TRAINING_COUNT>0)
+    				start();
     			super.onOptionsItemSelected(item);
     		}
         	else if(Common.TRAINING_STATUS==2){
@@ -58,6 +60,8 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 	@Override
 	public void onBackPressed() {
 		if(Common.TRAINING_STATUS==0){
+			if(Common.TRAINING_COUNT>0)
+				start();
 			super.onBackPressed();
 		}
 		else if(Common.TRAINING_STATUS==2){

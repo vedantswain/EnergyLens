@@ -1,12 +1,10 @@
 package com.example.energylens;
 
 import java.io.IOException;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.achartengine.ChartFactory;
-import org.achartengine.chart.BarChart;
-import org.achartengine.model.SeriesSelection;
 
 import android.app.AlarmManager;
 import android.app.Fragment;
@@ -129,6 +127,11 @@ public class CollectionTabActivity extends FragmentActivity {
 		
 	}
 	
+	public void toReassign(View view){
+		Intent intent=new Intent(this,ReassignActivity.class);
+		startActivity(intent);
+	}
+	
 	public void onNotYet(View view){
 		TextView changeTxt=(TextView) findViewById(R.id.alreadyText);
 		changeTxt.setText("Welcome to EnergyLens+,\n just press the button below to get started ");
@@ -240,6 +243,9 @@ public class CollectionTabActivity extends FragmentActivity {
 	                     data.putString("my_message", "Hello World");
 	                     data.putString("my_action",
 	                             "com.google.android.gcm.demo.app.ECHO_NOW");
+	                     SecureRandom random = new SecureRandom();
+	                     String randomId=new BigInteger(130, random).toString(32);
+	                     
 	                     String id = Long.toString(System.currentTimeMillis());
 	                     gcm.send(SENDER_ID + "@gcm.googleapis.com", id, data);
 	                     msg = "Sent message";

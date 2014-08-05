@@ -6,6 +6,7 @@ import java.util.Date;
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
 import org.achartengine.chart.BarChart;
+import org.achartengine.chart.LineChart;
 import org.achartengine.chart.PointStyle;
 import org.achartengine.model.SeriesSelection;
 import org.achartengine.model.XYMultipleSeriesDataset;
@@ -21,7 +22,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -69,12 +69,16 @@ public class PersonalEnergyFragment extends Fragment{
             mSeries.add(x[i], y[i]);
         }
         
-        XYSeriesRenderer renderer = new XYSeriesRenderer();
-  	  renderer.setLineWidth(1);
-  	  renderer.setColor(Color.DKGRAY);
-  	  renderer.setDisplayBoundingPoints(true);
-  	  renderer.setPointStyle(PointStyle.CIRCLE);
-  	  renderer.setPointStrokeWidth(2);
+        XYSeriesRenderer bar_renderer = new XYSeriesRenderer();
+  	  bar_renderer.setLineWidth(1);
+  	  bar_renderer.setColor(Color.DKGRAY);
+  	  bar_renderer.setDisplayBoundingPoints(true);
+  	  
+  	  XYSeriesRenderer line_renderer=new XYSeriesRenderer();
+  	  line_renderer.setPointStyle(PointStyle.CIRCLE);
+  	  line_renderer.setColor(Color.LTGRAY);
+  	  line_renderer.setLineWidth(0);
+	  line_renderer.setPointStrokeWidth(5);
 //  	  renderer.setDisplayChartValues(true);
   	  
 //  	  XYSeriesRenderer.FillOutsideLine fill=new XYSeriesRenderer.FillOutsideLine(XYSeriesRenderer.FillOutsideLine.Type.BELOW);
@@ -82,7 +86,8 @@ public class PersonalEnergyFragment extends Fragment{
 //  	  renderer.addFillOutsideLine(fill);
   	  
   	  
-  	  mRenderer.addSeriesRenderer(renderer);
+  	  mRenderer.addSeriesRenderer(bar_renderer);
+  	  mRenderer.addSeriesRenderer(line_renderer);
   	  
   	  mRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00)); 
   	  
@@ -100,47 +105,54 @@ public class PersonalEnergyFragment extends Fragment{
   		mRenderer.setYTitle("Energy");
   		mRenderer.setYLabelsAlign(Align.RIGHT);
   		mRenderer.setBarSpacing(1);
+  		mRenderer.setClickEnabled(true);
+  		mRenderer.setSelectableBuffer(30);
   		mRenderer.setShowGrid(true);
   		
   		
   		mDataset.addSeries(mSeries);
+  		mDataset.addSeries(mSeries);
   		
-  		chartView = ChartFactory.getBarChartView(getActivity(), mDataset, mRenderer, BarChart.Type.DEFAULT);
+//  		XYCombinedChartDef[] types = new XYCombinedChartDef[] {new XYCombinedChartDef(BarChart.TYPE, 0, 1), new XYCombinedChartDef(LineChart.TYPE, 2)};
   		
+//  		chartView = ChartFactory.getBarChartView(getActivity(), mDataset, mRenderer, BarChart.Type.DEFAULT);
+  		
+  		String[] types = new String[] { BarChart.TYPE,LineChart.TYPE };
+  		 
+		chartView = ChartFactory.getCombinedXYChartView(getActivity().getBaseContext(), mDataset, mRenderer, types);
   		LinearLayout chart_container=(LinearLayout)getView().findViewById(R.id.chart);
   		chart_container.addView(chartView,0);
+  		
+  		chartView.setOnClickListener(new View.OnClickListener() {
+	        public void onClick(View v) {
+	        	Log.v("ELSERVICES", "Graph clicked");
+	          // handle the click event on the chart
+	          SeriesSelection seriesSelection = chartView.getCurrentSeriesAndPoint();
+	          Log.v("ELSERVICES", Float.toString(chartView.getX())+" "+Float.toString(chartView.getY()));
+	          if (seriesSelection == null) {
+//	            Toast.makeText(getActivity(), "No chart element", Toast.LENGTH_SHORT).show();
+	          } else {
+	            // display information of the clicked point
+	            Toast.makeText(
+	                getActivity(),
+	                "Chart element in series index " + seriesSelection.getSeriesIndex()
+	                    + " data point index " + seriesSelection.getPointIndex() + " was clicked"
+	                    + " closest point value X=" + seriesSelection.getXValue() + ", Y="
+	                    + seriesSelection.getValue(), Toast.LENGTH_SHORT).show();
+	          }
+	        }
+	      });
 	}
 	
-//	@Override
-//	public void onResume() {
-//	    super.onResume();
-//	      LinearLayout layout = (LinearLayout) getActivity().findViewById(R.id.chart);
-//	      chartView = ChartFactory.getLineChartView(getActivity(), mDataset, mRenderer);
-//	      // enable the chart click events
-//	      mRenderer.setClickEnabled(true);
-//	      mRenderer.setSelectableBuffer(10);
-//	      chartView.setOnClickListener(new View.OnClickListener() {
-//	        public void onClick(View v) {
-//	          // handle the click event on the chart
-//	          SeriesSelection seriesSelection = chartView.getCurrentSeriesAndPoint();
-//	          if (seriesSelection == null) {
-//	            Toast.makeText(getActivity(), "No chart element", Toast.LENGTH_SHORT).show();
-//	          } else {
-//	            // display information of the clicked point
-//	            Toast.makeText(
-//	                getActivity(),
-//	                "Chart element in series index " + seriesSelection.getSeriesIndex()
-//	                    + " data point index " + seriesSelection.getPointIndex() + " was clicked"
-//	                    + " closest point value X=" + seriesSelection.getXValue() + ", Y="
-//	                    + seriesSelection.getValue(), Toast.LENGTH_SHORT).show();
-//	          }
-//	        }
-//	      });
-//	      layout.addView(chartView, new LayoutParams(LayoutParams.FILL_PARENT,
-//	          LayoutParams.FILL_PARENT));
-//	      boolean enabled = mDataset.getSeriesCount() > 0;
-//	    
-//	  }
+	
+	@Override
+	public void onResume() {
+	    super.onResume();
+	      LinearLayout layout = (LinearLayout) getActivity().findViewById(R.id.chart);
+	      chartView = ChartFactory.getLineChartView(getActivity(), mDataset, mRenderer);
+	      
+	    
+	  }
 	
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 	    // TODO Auto-generated method stub

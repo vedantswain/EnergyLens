@@ -14,12 +14,30 @@ public class Common{
 	public static String LOCATION="none";
 	public static long UPLOAD_INTERVAL = 2; //minutes between each upload
 	public static String FILE_PREFIX="";
-	public static String SERVER_URL="http://192.168.1.2:8080/";
+	public static String SERVER_URL="http://192.168.20.217:9010/";
 	public static String API="data/upload/";
 	public static String REG_API="device/register/";
 	public static int TRAINING_STATUS=0;
 	public static int TRAINING_COUNT=0;
 	public static String EL_PREFS="EnerglyLens_Prefs";
+	public static JSONObject REGISTER_SUCCESS =  new JSONObject();
+	static {try {
+		REGISTER_SUCCESS.put("type", "SUCCESS");
+		REGISTER_SUCCESS.put("code", 3);
+		REGISTER_SUCCESS.put("message", "User was successfully registered");
+	} catch (JSONException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}};
+	public static JSONObject REGISTER_UNSUCCESSFUL =  new JSONObject();
+	static {try {
+		REGISTER_SUCCESS.put("type", "MESSAGE");
+		REGISTER_SUCCESS.put("code", 4);
+		REGISTER_SUCCESS.put("message", "User was not registered");
+	} catch (JSONException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}};	
 	public static JSONObject UPLOAD_SUCCESS =  new JSONObject();
 	static {try {
 		UPLOAD_SUCCESS.put("type", "SUCCESS");

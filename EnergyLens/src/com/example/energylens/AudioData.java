@@ -24,7 +24,7 @@ public class AudioData {
 	private static int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
 	private static int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
 	private static int RECORDER_SAMPLERATE = 8000;
-	private static int[] mSampleRates = new int[] { 8000, 11025, 22050, 44100 };
+	private static int[] mSampleRates = new int[] { 8000 };
 
 	private static int FFT_SIZE = 8192;
 	private static int MFCCS_VALUE = 13;
@@ -271,11 +271,13 @@ public class AudioData {
 						long mfcc_diff=mfcc_current-mfcc_prev;
 	
 						data+=",";
-	
+						
+						synchronized(this){
+							
+						
 						for(int i=0;i<featureCepstrum.length;i++){
 	
-							synchronized(this){
-	
+							
 								data+=featureCepstrum[i];
 								if(i==(featureCepstrum.length)-1)
 									break;
@@ -283,11 +285,6 @@ public class AudioData {
 									data+=",";
 							}
 	
-						}
-	
-					
-	
-						synchronized(this){
 							LogWriter.audioLogWrite(data);
 							LogWriter.rawaudioLogWrite(raw_data);
 	
