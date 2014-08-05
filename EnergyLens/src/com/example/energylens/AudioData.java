@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.media.MediaRecorder.AudioSource;
 
 import android.os.Handler;
 import android.util.Log;
@@ -23,6 +24,7 @@ public class AudioData {
 	private static int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
 	private static int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
 	private static int RECORDER_SAMPLERATE = 8000;
+	private static int[] mSampleRates = new int[] { 8000, 11025, 22050, 44100 };
 
 	private static int FFT_SIZE = 8192;
 	private static int MFCCS_VALUE = 13;
@@ -48,28 +50,66 @@ public class AudioData {
 	Context c;
 	boolean state;
 
+	public AudioRecord findAudioRecord() {
+	    for (int rate : mSampleRates) {
+	        for (short audioFormat : new short[] { AudioFormat.ENCODING_PCM_8BIT, AudioFormat.ENCODING_PCM_16BIT }) {
+	            for (short channelConfig : new short[] { AudioFormat.CHANNEL_IN_MONO, AudioFormat.CHANNEL_IN_STEREO }) {
+	                try {
+	                    Log.d("ELSERVICES", "Attempting rate " + rate + "Hz, bits: " + audioFormat + ", channel: "
+	                            + channelConfig);
+	                    recorderBufferSize = AudioRecord.getMinBufferSize(rate, channelConfig, audioFormat);
+	                    
+	                    recorderBufferSize = Math.max(recorderBufferSize, rate);
+	        			recorderBufferSamples = recorderBufferSize/2;
+
+	                    if (recorderBufferSize != AudioRecord.ERROR_BAD_VALUE) {
+	                        // check if we can instantiate and have a success
+	                        try{
+	                    	AudioRecord mRecorder = new AudioRecord(AudioSource.DEFAULT, rate, channelConfig, audioFormat, recorderBufferSize);
+
+	                        if (mRecorder.getState() == AudioRecord.STATE_INITIALIZED){
+	                        	RECORDER_CHANNELS=channelConfig;
+	                        	RECORDER_AUDIO_ENCODING=audioFormat;
+	                        	RECORDER_SAMPLERATE=rate;
+	                        	return mRecorder;
+	                        }
+	                        }
+	                        catch(Exception e){
+	                        	e.printStackTrace();
+	                        }
+	                    }
+	                } catch (Exception e) {
+	                    Log.e("ELSERVICES", rate + "Exception, keep trying.",e);
+	                }
+	            }
+	        }
+	    }
+	    return null;
+	}
+	
 	public void start(){
 		
 		try{
-			recorderBufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,
-					RECORDER_CHANNELS,
-					RECORDER_AUDIO_ENCODING) ;
+//			recorderBufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,
+//					RECORDER_CHANNELS,
+//					RECORDER_AUDIO_ENCODING) ;
+//
+//			recorderBufferSize = Math.max(recorderBufferSize, RECORDER_SAMPLERATE);
+//			recorderBufferSamples = recorderBufferSize/2;
 
-			recorderBufferSize = Math.max(recorderBufferSize, RECORDER_SAMPLERATE);
-			recorderBufferSamples = recorderBufferSize/2;
-
+			recorder=findAudioRecord();
 
 			featureFFT = new FFT(FFT_SIZE);
 			featureWin = new Window(recorderBufferSamples);
 			featureMFCC = new MFCC(FFT_SIZE, MFCCS_VALUE, MEL_BANDS, RECORDER_SAMPLERATE);
 
-			recorder = new AudioRecord(RECORDER_SOURCE,
-					RECORDER_SAMPLERATE,
-					RECORDER_CHANNELS,
-					RECORDER_AUDIO_ENCODING,
-					recorderBufferSize);
+//			recorder = new AudioRecord(RECORDER_SOURCE,
+//					RECORDER_SAMPLERATE,
+//					RECORDER_CHANNELS,
+//					RECORDER_AUDIO_ENCODING,
+//					recorderBufferSize);
 
-			if(recorderBufferSize>0){
+			if(recorderBufferSize>0 && recorder!=null){
 
 				Thread thr = new Thread(null, mTask, "AlarmService_Service");
 				thr.start();

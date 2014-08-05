@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.achartengine.ChartFactory;
+import org.achartengine.chart.BarChart;
+import org.achartengine.model.SeriesSelection;
+
 import android.app.AlarmManager;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -85,6 +89,10 @@ public class CollectionTabActivity extends FragmentActivity {
 		}
 	}
 
+	protected void onResume(){
+		super.onResume();
+		getUpdatedPreferences();
+	}
 	
 	@Override
 	public void onBackPressed() {

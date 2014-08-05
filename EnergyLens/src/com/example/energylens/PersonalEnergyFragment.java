@@ -7,6 +7,7 @@ import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
 import org.achartengine.chart.BarChart;
 import org.achartengine.chart.PointStyle;
+import org.achartengine.model.SeriesSelection;
 import org.achartengine.model.XYMultipleSeriesDataset;
 import org.achartengine.model.XYSeries;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
@@ -16,20 +17,25 @@ import android.app.Fragment;
 import android.graphics.Color;
 import android.graphics.Paint.Align;
 import android.os.Bundle;
-import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 public class PersonalEnergyFragment extends Fragment{
+	GraphicalView chartView;
+	XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
+	XYMultipleSeriesDataset mDataset = new XYMultipleSeriesDataset();
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {	     
         View rootView = inflater.inflate(R.layout.fragment_personalenergy, container, false);
         return rootView;
+        
     }
 	
 	public void adjustTime(int[] x){
@@ -69,13 +75,13 @@ public class PersonalEnergyFragment extends Fragment{
   	  renderer.setDisplayBoundingPoints(true);
   	  renderer.setPointStyle(PointStyle.CIRCLE);
   	  renderer.setPointStrokeWidth(2);
-  	  renderer.setDisplayChartValues(true);
+//  	  renderer.setDisplayChartValues(true);
   	  
 //  	  XYSeriesRenderer.FillOutsideLine fill=new XYSeriesRenderer.FillOutsideLine(XYSeriesRenderer.FillOutsideLine.Type.BELOW);
 //  	  fill.setColor(Color.GRAY);
 //  	  renderer.addFillOutsideLine(fill);
   	  
-  	  XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
+  	  
   	  mRenderer.addSeriesRenderer(renderer);
   	  
   	  mRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00)); 
@@ -96,23 +102,51 @@ public class PersonalEnergyFragment extends Fragment{
   		mRenderer.setBarSpacing(1);
   		mRenderer.setShowGrid(true);
   		
-  		XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
-  		dataset.addSeries(mSeries);
   		
-  		GraphicalView chartView = ChartFactory.getBarChartView(getActivity(), dataset, mRenderer, BarChart.Type.DEFAULT);
+  		mDataset.addSeries(mSeries);
+  		
+  		chartView = ChartFactory.getBarChartView(getActivity(), mDataset, mRenderer, BarChart.Type.DEFAULT);
   		
   		LinearLayout chart_container=(LinearLayout)getView().findViewById(R.id.chart);
   		chart_container.addView(chartView,0);
 	}
 	
-	
+//	@Override
+//	public void onResume() {
+//	    super.onResume();
+//	      LinearLayout layout = (LinearLayout) getActivity().findViewById(R.id.chart);
+//	      chartView = ChartFactory.getLineChartView(getActivity(), mDataset, mRenderer);
+//	      // enable the chart click events
+//	      mRenderer.setClickEnabled(true);
+//	      mRenderer.setSelectableBuffer(10);
+//	      chartView.setOnClickListener(new View.OnClickListener() {
+//	        public void onClick(View v) {
+//	          // handle the click event on the chart
+//	          SeriesSelection seriesSelection = chartView.getCurrentSeriesAndPoint();
+//	          if (seriesSelection == null) {
+//	            Toast.makeText(getActivity(), "No chart element", Toast.LENGTH_SHORT).show();
+//	          } else {
+//	            // display information of the clicked point
+//	            Toast.makeText(
+//	                getActivity(),
+//	                "Chart element in series index " + seriesSelection.getSeriesIndex()
+//	                    + " data point index " + seriesSelection.getPointIndex() + " was clicked"
+//	                    + " closest point value X=" + seriesSelection.getXValue() + ", Y="
+//	                    + seriesSelection.getValue(), Toast.LENGTH_SHORT).show();
+//	          }
+//	        }
+//	      });
+//	      layout.addView(chartView, new LayoutParams(LayoutParams.FILL_PARENT,
+//	          LayoutParams.FILL_PARENT));
+//	      boolean enabled = mDataset.getSeriesCount() > 0;
+//	    
+//	  }
 	
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 	    // TODO Auto-generated method stub
 	    super.onViewCreated(view, savedInstanceState);
 	    setupChart();
-	  	   		
 	    }
-	   
+
 
 }
