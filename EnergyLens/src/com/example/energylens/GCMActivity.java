@@ -59,7 +59,8 @@ public class GCMActivity extends FragmentActivity implements TryAgainDialogListe
     AtomicInteger msgId = new AtomicInteger();
     SharedPreferences prefs;
     Context context;
-    int devid,reg_success=0;
+    long devid;
+    int reg_success=0;
     String regid,regName,regEmail,serverUrl;
 
     @Override
@@ -298,7 +299,7 @@ private void sendRegistrationIdToBackend() {
      Log.i(TAG,"Server URL: "+ Common.SERVER_URL);
 	try {
 		TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-		devid=Integer.parseInt(telephonyManager.getDeviceId());
+		devid=Long.parseLong(telephonyManager.getDeviceId());
 
         DefaultHttpClient httpclient = new DefaultHttpClient();
         HttpPost httpPost = new HttpPost(Common.SERVER_URL+Common.REG_API);

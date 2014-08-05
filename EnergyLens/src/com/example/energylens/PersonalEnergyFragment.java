@@ -78,7 +78,7 @@ public class PersonalEnergyFragment extends Fragment{
   	  line_renderer.setPointStyle(PointStyle.CIRCLE);
   	  line_renderer.setColor(Color.LTGRAY);
   	  line_renderer.setLineWidth(0);
-	  line_renderer.setPointStrokeWidth(5);
+	  line_renderer.setPointStrokeWidth(10);
 //  	  renderer.setDisplayChartValues(true);
   	  
 //  	  XYSeriesRenderer.FillOutsideLine fill=new XYSeriesRenderer.FillOutsideLine(XYSeriesRenderer.FillOutsideLine.Type.BELOW);
@@ -106,7 +106,7 @@ public class PersonalEnergyFragment extends Fragment{
   		mRenderer.setYLabelsAlign(Align.RIGHT);
   		mRenderer.setBarSpacing(1);
   		mRenderer.setClickEnabled(true);
-  		mRenderer.setSelectableBuffer(30);
+  		mRenderer.setSelectableBuffer(50);
   		mRenderer.setShowGrid(true);
   		
   		
