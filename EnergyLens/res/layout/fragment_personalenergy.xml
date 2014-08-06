@@ -1,25 +1,52 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.energylens.MainActivity" 
-    android:orientation="vertical">
-    
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+
     <LinearLayout
-        android:id="@+id/chart"
+        android:id="@+id/PEnGroup"
         android:layout_width="match_parent"
-        android:layout_height="382dp"
-        android:orientation="vertical" />
+        android:layout_height="464dp"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin" >
 
-    <Button
-        android:id="@+id/toRsn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="toReassign"
-        android:text="Reassign" />
+        <LinearLayout
+            android:id="@+id/chart"
+            android:layout_width="match_parent"
+            android:layout_height="282dp"
+            android:orientation="vertical" >
+        </LinearLayout>
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/TextView01"
+            android:layout_width="304dp"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:text="Total Consumption"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/toRsn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="toReassign"
+            android:text="Reassign" />
+
+        <TextView
+            android:id="@+id/distName"
+            android:layout_width="304dp"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:text="Appliance-wise Distribution:"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+</ScrollView>

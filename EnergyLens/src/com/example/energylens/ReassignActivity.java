@@ -14,12 +14,16 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 public class ReassignActivity extends Activity {
 
 	GraphicalView chartView;
+	boolean firstPointSet=false;
+	double xOfStart=0,xOfEnd=0;
+	int lastSet=0;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -88,15 +92,56 @@ public class ReassignActivity extends Activity {
 //	            Toast.makeText(getActivity(), "No chart element", Toast.LENGTH_SHORT).show();
 	          } else {
 	            // display information of the clicked point
-	            Toast.makeText(
-	                ReassignActivity.this,
-	                "Chart element in series index " + seriesSelection.getSeriesIndex()
-	                    + " data point index " + seriesSelection.getPointIndex() + " was clicked"
-	                    + " closest point value X=" + seriesSelection.getXValue() + ", Y="
-	                    + seriesSelection.getValue(), Toast.LENGTH_SHORT).show();
+	        	  setTimeSlice(seriesSelection.getXValue());
+//	            Toast.makeText(
+//	                ReassignActivity.this,
+//	                "Chart element in series index " + seriesSelection.getSeriesIndex()
+//	                    + " data point index " + seriesSelection.getPointIndex() + " was clicked"
+//	                    + " closest point value X=" + seriesSelection.getXValue() + ", Y="
+//	                    + seriesSelection.getValue(), Toast.LENGTH_SHORT).show();
 	          }
 	        }
 	      });
-	}		
+	}
+	
+	public void setTimeSlice(double xCoord){
+		EditText start=(EditText) findViewById(R.id.startTime);
+		EditText end=(EditText) findViewById(R.id.endTime);
+		
+		if(lastSet!=1){
+			if(!firstPointSet){
+				firstPointSet=true;
+				start.setText(Double.toString(xCoord));
+				xOfStart=xCoord;
+				lastSet=1;
+			}
+			else{
+				if(xCoord>xOfEnd){
+					start.setText(Double.toString(xOfEnd));
+					end.setText(Double.toString(xCoord));
+					xOfStart=xOfEnd;
+					xOfEnd=xCoord;
+				}
+				else{
+					start.setText(Double.toString(xCoord));
+					xOfStart=xCoord;
+				}
+				lastSet=1;
+				}
+		}
+		else{
+			if(xCoord<xOfStart){
+				start.setText(Double.toString(xCoord));
+				end.setText(Double.toString(xOfStart));
+				xOfEnd=xOfStart;
+				xOfStart=xCoord;
+			}
+			else{
+				end.setText(Double.toString(xCoord));
+				xOfEnd=xCoord;
+			}
+			lastSet=2;
+		}
+	}
 	
 }

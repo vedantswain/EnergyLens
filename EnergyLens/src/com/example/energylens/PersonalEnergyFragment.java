@@ -15,20 +15,29 @@ import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.graphics.Color;
 import android.graphics.Paint.Align;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 public class PersonalEnergyFragment extends Fragment{
 	GraphicalView chartView;
-	XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
-	XYMultipleSeriesDataset mDataset = new XYMultipleSeriesDataset();
+	XYMultipleSeriesRenderer appRenderer=new XYMultipleSeriesRenderer(),mRenderer = new XYMultipleSeriesRenderer();
+	XYMultipleSeriesDataset appDataset=new XYMultipleSeriesDataset(),mDataset = new XYMultipleSeriesDataset();
+	String[] appliances={"TV","Microwave","Computer","AC","Fan","Washing Machine"};
+	int[] distribution={30,10,40,40,5,2,2};
+	private String EXTRA_TITLE;
+	private String message;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -142,8 +151,66 @@ public class PersonalEnergyFragment extends Fragment{
 	          }
 	        }
 	      });
+  		
+  		chartView.setOnTouchListener(new View.OnTouchListener() {
+  			ViewPager mViewPager=CollectionTabActivity.mViewPager;
+  			ViewParent mParent= (ViewParent)getActivity().findViewById(R.id.PEnGroup);
+  		
+  			float mFirstTouchX,mFirstTouchY;
+
+			@Override
+			public boolean onTouch(View arg0, MotionEvent event) {
+				// save the position of the first touch so we can determine whether the user is dragging
+  			    // left or right
+  			    if (event.getAction() == MotionEvent.ACTION_DOWN) {
+  			        mFirstTouchX = event.getX();
+  			        mFirstTouchY = event.getY();
+  			    }
+
+  			    // when mViewPager.requestDisallowInterceptTouchEvent(true), the viewpager does not
+  			    // intercept the events, and the drag events (pan, pinch) are caught by the GraphicalView
+
+  			    // we want to keep the ViewPager from intercepting the event if:
+  			    // 1- there are 2 or more touches, i.e. the pinch gesture
+  			    // 2- the user is dragging to the left but there is no data to show to the right
+  			    // 3- the user is dragging to the right but there is no data to show to the left
+  			    if (event.getPointerCount() > 1
+  			            || (event.getX() < mFirstTouchX) 
+  			            || (event.getX() > mFirstTouchX)
+  			            || (event.getY() < mFirstTouchY)
+  			            || (event.getY() > mFirstTouchY)) {
+  			        mViewPager.requestDisallowInterceptTouchEvent(true);
+  			        mParent.requestDisallowInterceptTouchEvent(true);
+  			    }
+  			    else {
+  			        mViewPager.requestDisallowInterceptTouchEvent(false);
+  			        mParent.requestDisallowInterceptTouchEvent(true);
+  			    }
+				// TODO Auto-generated method stub
+				return false;
+			}
+  			
+  		});
 	}
 	
+	
+	
+	
+	public void setApps(){
+		FragmentManager fragmentManager = getFragmentManager();
+		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+		DistributionFragment fragment = new DistributionFragment();
+		fragment=DistributionFragment.newInstance("TV", 15);
+		fragmentTransaction.add(R.id.PEnGroup, fragment);
+		
+		fragment=DistributionFragment.newInstance("AC", 45);
+		fragmentTransaction.add(R.id.PEnGroup, fragment);
+
+		fragment=DistributionFragment.newInstance("Fan", 2);
+		fragmentTransaction.add(R.id.PEnGroup, fragment);
+		
+		fragmentTransaction.commit();
+	}
 	
 	@Override
 	public void onResume() {
@@ -154,11 +221,13 @@ public class PersonalEnergyFragment extends Fragment{
 	    
 	  }
 	
+	
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 	    // TODO Auto-generated method stub
 	    super.onViewCreated(view, savedInstanceState);
 	    setupChart();
-	    }
+	    setApps();
+	}
 
 
 }

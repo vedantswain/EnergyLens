@@ -14,7 +14,7 @@
         android:src="@android:drawable/ic_delete" />
 
     <ProgressBar
-        android:id="@+id/progressBar1"
+        android:id="@+id/distributionBar"
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

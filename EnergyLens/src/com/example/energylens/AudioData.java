@@ -218,7 +218,7 @@ public class AudioData {
 						}
 	
 	
-						raw_data+="\"";
+						raw_data+="\","+Common.LABEL+","+Common.LOCATION+"\n";
 	
 						 
 						// Convert shorts to 8-bit bytes for raw audio output
@@ -284,7 +284,10 @@ public class AudioData {
 								else
 									data+=",";
 							}
-	
+							
+							data+=","+Common.LABEL+","+Common.LOCATION+"\n";
+							
+//							Log.v("ELSERVICES", data+" audio");
 							LogWriter.audioLogWrite(data);
 							LogWriter.rawaudioLogWrite(raw_data);
 	

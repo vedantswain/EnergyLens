@@ -12,4 +12,31 @@
 
      </LinearLayout>
 
+     <EditText
+         android:id="@+id/endTime"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_alignBaseline="@+id/startTime"
+         android:layout_alignBottom="@+id/startTime"
+         android:layout_alignParentRight="true"
+         android:ems="10"
+         android:hint="end time"
+         android:inputType="time"
+         android:width="150dp" />
+
+     <EditText
+         android:id="@+id/startTime"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_alignParentLeft="true"
+         android:layout_below="@+id/chart"
+         android:layout_toLeftOf="@+id/endTime"
+         android:ems="10"
+         android:hint="start time"
+         android:inputType="time"
+         android:width="150dp" >
+
+         <requestFocus />
+     </EditText>
+
 </RelativeLayout>
