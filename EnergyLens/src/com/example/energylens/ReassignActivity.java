@@ -8,6 +8,7 @@ import org.achartengine.model.XYMultipleSeriesDataset;
 import org.achartengine.model.XYSeries;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
+import org.achartengine.renderer.XYSeriesRenderer.FillOutsideLine;
 
 import android.app.Activity;
 import android.graphics.Color;
@@ -16,7 +17,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 public class ReassignActivity extends Activity {
 
@@ -24,7 +24,16 @@ public class ReassignActivity extends Activity {
 	boolean firstPointSet=false;
 	double xOfStart=0,xOfEnd=0;
 	int lastSet=0;
-	
+	String oldApp="none";
+	int[] x = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23};
+	int[] y = { 2000,3000,2800,3500,2500,2700,3000,2800,3500,3700,3800,2800,3500,3700,3800,2800,3500,3700,3800,2800,2000,2500,2700,3000};
+	 XYSeriesRenderer renderer = new XYSeriesRenderer();
+	 String[] apps={"TV","Microwave"};
+	 int appCounter=0;
+	 int[] red={};
+	 int[] green={};
+	 int[] blue={};
+			
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -33,35 +42,58 @@ public class ReassignActivity extends Activity {
 	
 	protected void onStart(){
 		super.onStart();
-		setupChart();
+		setupChart(false);
 	}
 	
-	public void setupChart(){
-		int[] x = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23};
-		int[] y = { 2000,3000,2800,3500,2500,2700,3000,2800,3500,3700,3800,2800,3500,3700,3800,2800,3500,3700,3800,2800,2000,2500,2700,3000};
-		drawChart(x,y,"TV", Color.RED);
+	public void setupChart(boolean isSlice){
+		XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
+		 XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
+		 
+		
+		for(String app:apps){  
+			appCounter++;
+		XYSeries mSeries = new XYSeries(app);
+	        
+	        for(int i=0;i<x.length;i++){
+	            mSeries.add(i, y[i]/appCounter);
+	        }
+	        
+	       renderer.setLineWidth(2);
+			renderer.setColor(Color.DKGRAY);
+			// Include low and max value
+			renderer.setDisplayBoundingPoints(true);
+			renderer.setPointStyle(PointStyle.CIRCLE);
+			renderer.setPointStrokeWidth(3);
+			
+			mRenderer.addSeriesRenderer(renderer);
+			
+			dataset.addSeries(mSeries);
+		}
+		drawChart(mRenderer,dataset,isSlice);
+		appCounter=0;
 	}
 		
-	public void drawChart(int[] x, int[] y ,String app, int color){
+	public void drawChart(XYMultipleSeriesRenderer mRenderer,XYMultipleSeriesDataset dataset,boolean isSlice){
 		Log.v("ELSERVICES", "chart drawn");
 		
         // Creating an  XYSeries for Income
-        XYSeries mSeries = new XYSeries(app);
-        
-        for(int i=0;i<x.length;i++){
-            mSeries.add(i, y[i]);
-        }
-        
-        XYSeriesRenderer renderer = new XYSeriesRenderer();
-		renderer.setLineWidth(2);
-		renderer.setColor(color);
-		// Include low and max value
-		renderer.setDisplayBoundingPoints(true);
-		renderer.setPointStyle(PointStyle.CIRCLE);
-		renderer.setPointStrokeWidth(3);
+      
 		
-		XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
-		mRenderer.addSeriesRenderer(renderer);
+		if(isSlice){
+			XYSeries sliceSeries=new XYSeries("Time SLice");
+			sliceSeries.add(xOfStart, 5000);
+			sliceSeries.add(xOfEnd, 5000);
+			XYSeriesRenderer sliceRenderer = new XYSeriesRenderer();
+			sliceRenderer.setLineWidth(2);
+			sliceRenderer.setColor(Color.argb(127, 255, 255, 255));
+			// Include low and max value
+			sliceRenderer.setDisplayBoundingPoints(true);
+			FillOutsideLine fill = new FillOutsideLine(FillOutsideLine.Type.BOUNDS_ALL);
+			fill.setColor(Color.argb(127, 255, 255, 255));
+			sliceRenderer.addFillOutsideLine(fill);
+			mRenderer.addSeriesRenderer(sliceRenderer);
+			dataset.addSeries(sliceSeries);			
+		}
 		
 		
 		// We want to avoid black border
@@ -75,14 +107,16 @@ public class ReassignActivity extends Activity {
   		mRenderer.setZoomButtonsVisible(true);
 		mRenderer.setShowGrid(true); // we show the grid
 		
-		XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
-		dataset.addSeries(mSeries);
+		
 		
 		chartView = ChartFactory.getLineChartView(this, dataset, mRenderer);
 		
 		LinearLayout chart_container=(LinearLayout)findViewById(R.id.chart);
 		chart_container.addView(chartView,0);
 		
+//		mRenderer.removeAllRenderers();
+//		dataset=new XYMultipleSeriesDataset();
+//		
 		chartView.setOnClickListener(new View.OnClickListener() {
 	        public void onClick(View v) {
 	        	Log.v("ELSERVICES", "Graph clicked");
@@ -93,12 +127,6 @@ public class ReassignActivity extends Activity {
 	          } else {
 	            // display information of the clicked point
 	        	  setTimeSlice(seriesSelection.getXValue());
-//	            Toast.makeText(
-//	                ReassignActivity.this,
-//	                "Chart element in series index " + seriesSelection.getSeriesIndex()
-//	                    + " data point index " + seriesSelection.getPointIndex() + " was clicked"
-//	                    + " closest point value X=" + seriesSelection.getXValue() + ", Y="
-//	                    + seriesSelection.getValue(), Toast.LENGTH_SHORT).show();
 	          }
 	        }
 	      });
@@ -142,6 +170,7 @@ public class ReassignActivity extends Activity {
 			}
 			lastSet=2;
 		}
+		setupChart(true);
 	}
 	
 }
