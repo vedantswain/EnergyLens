@@ -20,7 +20,7 @@
          android:layout_alignBottom="@+id/startTime"
          android:layout_alignParentRight="true"
          android:ems="10"
-         android:hint="end time"
+         android:hint="00:00"
          android:inputType="time"
          android:width="150dp" />
 
@@ -32,21 +32,11 @@
          android:layout_below="@+id/chart"
          android:layout_toLeftOf="@+id/endTime"
          android:ems="10"
-         android:hint="start time"
+         android:hint="00:00"
          android:inputType="time"
          android:width="130dp" >
 
          <requestFocus />
      </EditText>
-
-     <TextView
-         android:id="@+id/appName"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_below="@+id/endTime"
-         android:layout_centerHorizontal="true"
-         android:text="Medium Text"
-         android:textAppearance="?android:attr/textAppearanceMedium"
-         android:visibility="invisible" />
 
 </RelativeLayout>

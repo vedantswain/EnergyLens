@@ -14,7 +14,9 @@ import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.View.OnKeyListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
@@ -37,8 +39,11 @@ public class ReassignActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_reassign);
+		setContentView(R.layout.activity_reassign);		
 	}
+	
+	
+	
 	
 	protected void onStart(){
 		super.onStart();
@@ -130,7 +135,34 @@ public class ReassignActivity extends Activity {
 	          }
 	        }
 	      });
+		
+		final EditText edittext = (EditText) findViewById(R.id.startTime);
+		edittext.setOnKeyListener(new OnKeyListener() {
+		    public boolean onKey(View v, int keyCode, KeyEvent event) {
+		        if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_DPAD_CENTER)) {
+		           xOfStart=Double.parseDouble(edittext.getText().toString());
+		           setupChart(true);
+		            return true;
+		        }
+		        return false;
+		        }
+		    });
+		
+		final EditText edittext2 = (EditText) findViewById(R.id.endTime);
+		edittext2.setOnKeyListener(new OnKeyListener() {
+		    public boolean onKey(View v, int keyCode, KeyEvent event) {
+		        if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_DPAD_CENTER)) {
+		           xOfEnd=Double.parseDouble(edittext2.getText().toString());
+		           setupChart(true);
+		            return true;
+		        }
+		        return false;
+		        }
+		    });
+		
 	}
+	
+	
 	
 	public void setTimeSlice(double xCoord){
 		EditText start=(EditText) findViewById(R.id.startTime);
