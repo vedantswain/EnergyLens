@@ -26,6 +26,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -128,6 +129,8 @@ public class CollectionTabActivity extends FragmentActivity {
 	}
 	
 	public void toReassign(View view){
+		
+//		Log.v("ELSERVICES", Boolean.toString(checkBox.isChecked()));
 		Intent intent=new Intent(this,ReassignActivity.class);
 		startActivity(intent);
 	}

@@ -1,46 +1,42 @@
 package com.example.energylens;
 
 import android.app.Fragment;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ClipDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-public class DistributionFragment extends Fragment {
+public class CompDistributionFragment extends Fragment {
+	
+	 int[] red={0,102,153,204,0,10,71,204,0,255,255,204,0,0,102,204};
+	 int[] green={0,0,0,0,102,10,71,0,204,255,255,102,204,204,204,204};
+	 int[] blue={204,204,153,102,204,255,255,0,204,71,10,0,102,0,0,0};
+	 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View inflateView=inflater.inflate(R.layout.fragment_app_distribution, container, false);
-        
+        View inflateView=inflater.inflate(R.layout.fragment_distribution, container, false);
         TextView appName=(TextView)inflateView.findViewById(R.id.distName);
-    	appName.setText(getArguments().getString("appliance"));
+    	appName.setText(getArguments().getString("user"));
     	TextView appPercent=(TextView)inflateView.findViewById(R.id.distPercent);
     	appPercent.setText(Integer.toString(getArguments().getInt("percent"))+"%");
     	
-    	final int color;
-    	final int percent=getArguments().getInt("percent");
-    	if(percent<10)
-    		color=Color.argb(255, 0, 255, 0);
-    	else if(percent<20)
-    		color=Color.argb(255, 255,255, 0);
-    		else
-    			color=Color.argb(255, 230, 0, 0);
+    	int color;
+    	int percent=getArguments().getInt("percent");
+    	int i=getArguments().getInt("index");
+    	color=Color.rgb(red[i],green[i],blue[i]);
     	
 //    	appPercent.setTextColor(color);
     	
-    	final ProgressBar progressBar=(ProgressBar)inflateView.findViewById(R.id.distBar);
+    	ProgressBar progressBar=(ProgressBar)inflateView.findViewById(R.id.distBar);
 
     	// Define a shape with rounded corners
         final float[] roundedCorners = new float[] { 5, 5, 5, 5, 5, 5, 5, 5 };
@@ -57,31 +53,17 @@ public class DistributionFragment extends Fragment {
         progressBar.setBackgroundColor(Color.LTGRAY);
     	
         progressBar.setProgress(percent);
-        
-        progressBar.setOnClickListener(new View.OnClickListener(){
-        	
-			@Override
-			public void onClick(View view) {
-				// TODO Auto-generated method stub
-					Bundle extras=new Bundle();
-					Log.v("ELSERVICES", "Distribution "+getArguments().getString("appliance"));
-					Intent intent=new Intent(getActivity(),ReassignActivity.class);
-					extras.putString("appliance", getArguments().getString("appliance"));
-					extras.putInt("color", color);
-					intent.putExtras(extras);
-					startActivity(intent);
-			}
-        });			
-			
+    	
     	return inflateView;
     }
     
-    public static DistributionFragment newInstance(String appliance,int percent) {
-        DistributionFragment myFragment = new DistributionFragment();
+    public static CompDistributionFragment newInstance(String appliance,int percent,int index) {
+        CompDistributionFragment myFragment = new CompDistributionFragment();
 
         Bundle args = new Bundle();
-        args.putString("appliance", appliance);
+        args.putString("user", appliance);
         args.putInt("percent", percent);
+        args.putInt("index",index);
         myFragment.setArguments(args);
 
         return myFragment;
@@ -92,3 +74,4 @@ public class DistributionFragment extends Fragment {
     }
     
 }
+

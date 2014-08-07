@@ -9,7 +9,7 @@
     tools:context="com.example.energylens.MainActivity" >
 
 	<LinearLayout
-        android:id="@+id/chart"
+        android:id="@+id/chartComparison"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical" >

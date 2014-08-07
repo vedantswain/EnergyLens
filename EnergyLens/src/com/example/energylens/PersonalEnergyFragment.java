@@ -13,6 +13,8 @@ import org.achartengine.model.XYMultipleSeriesDataset;
 import org.achartengine.model.XYSeries;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
+import org.achartengine.tools.ZoomEvent;
+import org.achartengine.tools.ZoomListener;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -27,6 +29,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -82,12 +85,13 @@ public class PersonalEnergyFragment extends Fragment{
   	  bar_renderer.setLineWidth(1);
   	  bar_renderer.setColor(Color.DKGRAY);
   	  bar_renderer.setDisplayBoundingPoints(true);
-  	  
-  	  XYSeriesRenderer line_renderer=new XYSeriesRenderer();
-  	  line_renderer.setPointStyle(PointStyle.CIRCLE);
-  	  line_renderer.setColor(Color.LTGRAY);
-  	  line_renderer.setLineWidth(0);
-	  line_renderer.setPointStrokeWidth(10);
+  	  bar_renderer.setDisplayChartValues(true);
+//  	  
+//  	  XYSeriesRenderer line_renderer=new XYSeriesRenderer();
+//  	  line_renderer.setPointStyle(PointStyle.CIRCLE);
+//  	  line_renderer.setColor(Color.LTGRAY);
+//  	  line_renderer.setLineWidth(0);
+//	  line_renderer.setPointStrokeWidth(10);
 //  	  renderer.setDisplayChartValues(true);
   	  
 //  	  XYSeriesRenderer.FillOutsideLine fill=new XYSeriesRenderer.FillOutsideLine(XYSeriesRenderer.FillOutsideLine.Type.BELOW);
@@ -96,7 +100,7 @@ public class PersonalEnergyFragment extends Fragment{
   	  
   	  
   	  mRenderer.addSeriesRenderer(bar_renderer);
-  	  mRenderer.addSeriesRenderer(line_renderer);
+//  	  mRenderer.addSeriesRenderer(line_renderer);
   	  
   	  mRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00)); 
   	  
@@ -118,38 +122,29 @@ public class PersonalEnergyFragment extends Fragment{
   		mRenderer.setSelectableBuffer(50);
   		mRenderer.setShowGrid(true);
   		
-  		
   		mDataset.addSeries(mSeries);
-  		mDataset.addSeries(mSeries);
+//  		mDataset.addSeries(mSeries);
   		
 //  		XYCombinedChartDef[] types = new XYCombinedChartDef[] {new XYCombinedChartDef(BarChart.TYPE, 0, 1), new XYCombinedChartDef(LineChart.TYPE, 2)};
   		
 //  		chartView = ChartFactory.getBarChartView(getActivity(), mDataset, mRenderer, BarChart.Type.DEFAULT);
   		
-  		String[] types = new String[] { BarChart.TYPE,LineChart.TYPE };
+//  		String[] types = new String[] { BarChart.TYPE,LineChart.TYPE };
   		 
-		chartView = ChartFactory.getCombinedXYChartView(getActivity().getBaseContext(), mDataset, mRenderer, types);
-  		LinearLayout chart_container=(LinearLayout)getView().findViewById(R.id.chart);
+//		chartView = ChartFactory.getCombinedXYChartView(getActivity().getBaseContext(), mDataset, mRenderer, types);
+  		chartView = ChartFactory.getBarChartView(getActivity().getApplicationContext(), mDataset, mRenderer, BarChart.Type.DEFAULT);
+  		LinearLayout chart_container=(LinearLayout)getView().findViewById(R.id.chartPEn);
   		chart_container.addView(chartView,0);
   		
+  	  		
   		chartView.setOnClickListener(new View.OnClickListener() {
 	        public void onClick(View v) {
 	        	Log.v("ELSERVICES", "Graph clicked");
 	          // handle the click event on the chart
 	          SeriesSelection seriesSelection = chartView.getCurrentSeriesAndPoint();
-	          Log.v("ELSERVICES", Float.toString(chartView.getX())+" "+Float.toString(chartView.getY()));
-	          if (seriesSelection == null) {
-//	            Toast.makeText(getActivity(), "No chart element", Toast.LENGTH_SHORT).show();
-	          } else {
-	            // display information of the clicked point
-	            Toast.makeText(
-	                getActivity(),
-	                "Chart element in series index " + seriesSelection.getSeriesIndex()
-	                    + " data point index " + seriesSelection.getPointIndex() + " was clicked"
-	                    + " closest point value X=" + seriesSelection.getXValue() + ", Y="
-	                    + seriesSelection.getValue(), Toast.LENGTH_SHORT).show();
-	          }
-	        }
+//	          Log.v("ELSERVICES", Float.toString(chartView.getX())+" "+Float.toString(chartView.getY()));
+//	          Log.v("ELSERVICES", Float.toString(chartView.getScaleX())+" "+chartView);
+	           }
 	      });
   		
   		chartView.setOnTouchListener(new View.OnTouchListener() {
@@ -160,6 +155,10 @@ public class PersonalEnergyFragment extends Fragment{
 
 			@Override
 			public boolean onTouch(View arg0, MotionEvent event) {
+				SeriesSelection seriesSelection = chartView.getCurrentSeriesAndPoint();
+				if(seriesSelection!=null)
+		          Log.v("ELSERVICES", Float.toString(chartView.getX())+" touch "+Float.toString(chartView.getY()));
+				
 				// save the position of the first touch so we can determine whether the user is dragging
   			    // left or right
   			    if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -215,10 +214,8 @@ public class PersonalEnergyFragment extends Fragment{
 	@Override
 	public void onResume() {
 	    super.onResume();
-	      LinearLayout layout = (LinearLayout) getActivity().findViewById(R.id.chart);
+	      LinearLayout layout = (LinearLayout) getActivity().findViewById(R.id.chartComp);
 	      chartView = ChartFactory.getLineChartView(getActivity(), mDataset, mRenderer);
-	      
-	    
 	  }
 	
 	
@@ -227,6 +224,21 @@ public class PersonalEnergyFragment extends Fragment{
 	    super.onViewCreated(view, savedInstanceState);
 	    setupChart();
 	    setApps();
+	}
+	
+	public class ChartZoomListener implements ZoomListener{
+
+		@Override
+		public void zoomApplied(ZoomEvent e) {
+			// TODO Auto-generated method stub
+		}
+
+		@Override
+		public void zoomReset() {
+			// TODO Auto-generated method stub
+			
+		}
+		
 	}
 
 

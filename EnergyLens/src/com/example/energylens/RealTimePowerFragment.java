@@ -93,7 +93,7 @@ public class RealTimePowerFragment extends Fragment{
             	GraphicalView chartView = ChartFactory.getLineChartView(getActivity(), dataset, mRenderer);
           		Log.i("ELSERVICES", "RTP "+chartView.toString());  
           		
-          		LinearLayout chart_container=(LinearLayout)getView().findViewById(R.id.chart);
+          		LinearLayout chart_container=(LinearLayout)getView().findViewById(R.id.chartComp);
           		
           		chart_container.addView(chartView,0);
 

@@ -9,6 +9,8 @@ import org.achartengine.renderer.DefaultRenderer;
 import org.achartengine.renderer.SimpleSeriesRenderer;
 
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -17,6 +19,18 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 public class ComparisonFragment extends Fragment{
+	// Pie Chart Section Names
+    String[] users = new String[] {
+        "Vedant", "Manaswi", "Amarjeet", "P.K.",
+        "Pushpendra", "Soumitra"
+    };
+
+    // Pie Chart Section Value
+    double[] distribution = { 3.9, 12.9, 55.8, 1.9, 23.7, 1.8 } ;
+	
+	int[] red={0,102,153,204,0,10,71,204,0,255,255,204,0,0,102,204};
+	 int[] green={0,0,0,0,102,10,71,0,204,255,255,102,204,204,204,204};
+	 int[] blue={204,204,153,102,204,255,255,0,204,71,10,0,102,0,0,0};
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -28,31 +42,28 @@ public class ComparisonFragment extends Fragment{
     }
 	
 	public void setupChart(){
-	    // Pie Chart Section Names
-        String[] code = new String[] {
-            "Eclair & Older", "Froyo", "Gingerbread", "Honeycomb",
-            "IceCream Sandwich", "Jelly Bean"
-        };
- 
-        // Pie Chart Section Value
-        double[] distribution = { 3.9, 12.9, 55.8, 1.9, 23.7, 1.8 } ;
- 
-        // Color of each Pie Chart Sections
-        int red=5,blue=5,green=5;
-        double color_var=0.75;
-        
-        int[] colors = new int[code.length];
+	     
+        int[] colors = new int[users.length];
         		
-        for(int i=0;i<code.length;i++){
-        		red=(int) ((255-red)*color_var);
-        		blue=(int) ((255-blue)*color_var);
-        		green=(int) ((255-green)*color_var);
+        for(int i=0;i<users.length;i++){
         	
-        	colors[i]=Color.argb(255, red, green, blue);
+        	colors[i]=Color.rgb(red[i], green[i], blue[i]);
         }
         
-        drawChart(code,distribution,colors);
+        drawChart(users,distribution,colors);
  
+	}
+	
+	public void setUsers(){
+		FragmentManager fragmentManager = getFragmentManager();
+		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+		CompDistributionFragment fragment = new CompDistributionFragment();
+		
+		for(int i=0;i<users.length;i++){
+			fragment=CompDistributionFragment.newInstance(users[i],(int)distribution[i],i);
+			fragmentTransaction.add(R.id.CompGroup, fragment);
+		}		
+		fragmentTransaction.commit();
 	}
 	
 	 private void drawChart(String[] users, double[] portion, int[] colors){
@@ -72,8 +83,8 @@ public class ComparisonFragment extends Fragment{
 	            // Adding a renderer for a slice
 	            defaultRenderer.addSeriesRenderer(seriesRenderer);
 	        }
-	 
-	        defaultRenderer.setChartTitle("Android version distribution as on October 1, 2012 ");
+	        
+	        defaultRenderer.setScale(0.75f);
 	        defaultRenderer.setChartTitleTextSize(20);
 	        defaultRenderer.setPanEnabled(false);
 	        defaultRenderer.setZoomButtonsVisible(true);
@@ -81,12 +92,12 @@ public class ComparisonFragment extends Fragment{
 	        defaultRenderer.setDisplayValues(true);
 	        defaultRenderer.setLabelsColor(Color.BLACK);
 	    	defaultRenderer.setChartTitleTextSize(18);
-	  		defaultRenderer.setLabelsTextSize(14);
-	       
+	  		defaultRenderer.setLabelsTextSize(18);
+	  		defaultRenderer.setShowLegend(false);	  			       
 	         		
 	  		GraphicalView chartView = ChartFactory.getDoughnutChartView(getActivity(), mSeries, defaultRenderer);
 	  		
-	  		LinearLayout chart_container=(LinearLayout)getView().findViewById(R.id.chart);
+	  		LinearLayout chart_container=(LinearLayout)getView().findViewById(R.id.chartComp);
 	  		chart_container.addView(chartView,0);
 
 	    }
@@ -95,7 +106,7 @@ public class ComparisonFragment extends Fragment{
 		    // TODO Auto-generated method stub
 		    super.onViewCreated(view, savedInstanceState);
 		    setupChart();
-		  	   		
+		  	setUsers();
 		    }
 		   
 	

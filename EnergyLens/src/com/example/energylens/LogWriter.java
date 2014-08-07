@@ -64,8 +64,12 @@ public class LogWriter {
 //						Log.v("ELSERVICES", "Before label");
 						if(isWifi==true)
 							buf.append(logstring+","+Common.LOCATION);
-						else if(isAudio==true)
+						else if(isAudio==true){
+							StringBuilder logstr=new StringBuilder(logstring);
+							logstr.replace(logstr.length()-1, logstr.length(), "");
+							logstring=logstr.toString();
 							buf.append(logstring);
+						}
 						else
 							buf.append(logstring+","+Common.LABEL+","+Common.LOCATION);
 						buf.newLine();

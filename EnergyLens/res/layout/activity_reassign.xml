@@ -3,40 +3,46 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="${relativePackage}.${activityClass}" >
-    
-     <LinearLayout
-         android:id="@+id/chart"
-         android:layout_width="match_parent"
-         android:layout_height="382dp"
-         android:orientation="vertical" >
 
-     </LinearLayout>
+    <LinearLayout
+        android:id="@+id/chartComparison"
+        android:layout_width="match_parent"
+        android:layout_height="382dp"
+        android:orientation="vertical" >
 
-     <EditText
-         android:id="@+id/endTime"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_alignBaseline="@+id/startTime"
-         android:layout_alignBottom="@+id/startTime"
-         android:layout_alignParentRight="true"
-         android:ems="10"
-         android:hint="00:00"
-         android:inputType="time"
-         android:width="150dp" />
+    </LinearLayout>
 
-     <EditText
-         android:id="@+id/startTime"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_alignParentLeft="true"
-         android:layout_below="@+id/chart"
-         android:layout_toLeftOf="@+id/endTime"
-         android:ems="10"
-         android:hint="00:00"
-         android:inputType="time"
-         android:width="130dp" >
+    <EditText
+        android:id="@+id/endTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/textGuide"
+        android:ems="10"
+        android:hint="00:00"
+        android:inputType="time"
+        android:width="150dp" >
 
-         <requestFocus />
-     </EditText>
+        <requestFocus />
+    </EditText>
+
+    <EditText
+        android:id="@+id/startTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/endTime"
+        android:layout_alignParentLeft="true"
+        android:ems="10"
+        android:hint="00:00"
+        android:inputType="time"
+        android:width="130dp" />
+
+    <TextView
+        android:id="@+id/textGuide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/chartComparison"
+        android:layout_centerHorizontal="true"
+        android:text="touch a point to select an end edge" />
 
 </RelativeLayout>
