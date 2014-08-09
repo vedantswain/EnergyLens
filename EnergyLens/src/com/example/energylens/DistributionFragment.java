@@ -32,11 +32,11 @@ public class DistributionFragment extends Fragment {
     	final int color;
     	final int percent=getArguments().getInt("percent");
     	if(percent<10)
-    		color=Color.argb(255, 0, 255, 0);
+    		color=Color.argb(195,0, 179,134);
     	else if(percent<20)
-    		color=Color.argb(255, 255,255, 0);
+    		color=Color.argb(195,240, 180, 0);
     		else
-    			color=Color.argb(255, 230, 0, 0);
+    			color=Color.argb(195, 179, 0, 45);
     	
 //    	appPercent.setTextColor(color);
     	

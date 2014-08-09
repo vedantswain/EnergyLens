@@ -2,15 +2,15 @@ package com.example.energylens;
 
 import android.app.Fragment;
 import android.graphics.Color;
-import android.graphics.drawable.ClipDrawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.RoundRectShape;
+import android.graphics.ColorFilter;
+import android.graphics.PorterDuff.Mode;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.view.Gravity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class CompDistributionFragment extends Fragment {
@@ -19,51 +19,65 @@ public class CompDistributionFragment extends Fragment {
 	 int[] green={0,0,0,0,102,10,71,0,204,255,255,102,204,204,204,204};
 	 int[] blue={204,204,153,102,204,255,255,0,204,71,10,0,102,0,0,0};
 	 
+	 int[]	textId={R.id.segText1,R.id.segText2,R.id.segText3,R.id.segText4,R.id.segText5};
+	 int[]	segId={R.id.seg1,R.id.seg2,R.id.seg3,R.id.seg4,R.id.seg5};
+	 int fullWidth=400;	
+ 	
+	 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View inflateView=inflater.inflate(R.layout.fragment_distribution, container, false);
-        TextView appName=(TextView)inflateView.findViewById(R.id.distName);
-    	appName.setText(getArguments().getString("user"));
-    	TextView appPercent=(TextView)inflateView.findViewById(R.id.distPercent);
-    	appPercent.setText(Integer.toString(getArguments().getInt("percent"))+"%");
-    	
-    	int color;
-    	int percent=getArguments().getInt("percent");
-    	int i=getArguments().getInt("index");
-    	color=Color.rgb(red[i],green[i],blue[i]);
-    	
-//    	appPercent.setTextColor(color);
-    	
-    	ProgressBar progressBar=(ProgressBar)inflateView.findViewById(R.id.distBar);
-
-    	// Define a shape with rounded corners
-        final float[] roundedCorners = new float[] { 5, 5, 5, 5, 5, 5, 5, 5 };
-        ShapeDrawable pgDrawable = new ShapeDrawable(new RoundRectShape(roundedCorners,     null, null));
-
-        // Sets the progressBar color
-        pgDrawable.getPaint().setColor(color);
-
-        // Adds the drawable to your progressBar
-        ClipDrawable progress = new ClipDrawable(pgDrawable, Gravity.LEFT, ClipDrawable.HORIZONTAL);
-        progressBar.setProgressDrawable(progress);
-
+        final View inflateView=inflater.inflate(R.layout.fragment_distribution, container, false);
+       
+//        DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
+//
+//        float fullWidth = displayMetrics.widthPixels / displayMetrics.density;
         
-        progressBar.setBackgroundColor(Color.LTGRAY);
+    	float[] distribution=getArguments().getFloatArray("distribution");
+    	String applianceName=getArguments().getString("appliance");
+    	TextView appName=(TextView)inflateView.findViewById(R.id.appName);
+    	appName.setText(applianceName);
     	
-        progressBar.setProgress(percent);
     	
+    	for(int i=0;i<distribution.length;i++){
+    		View segShape=inflateView.findViewById(segId[i]);
+    		float percentWidth=(float) (fullWidth*distribution[i]*0.01);
+    		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) segShape.getLayoutParams();
+    		params.width=(int) percentWidth;
+    		params.height=18;
+    		
+    		Drawable segShapeBG=(Drawable)segShape.getBackground();
+    		segShapeBG.setColorFilter(Color.argb(191, red[i], green[i], blue[i]),Mode.MULTIPLY);
+    		
+    		TextView percentage=(TextView)inflateView.findViewById(textId[i]);
+     		if((int)percentWidth<75)
+     			percentage.setVisibility(View.INVISIBLE);
+     		else
+     			percentage.setText(Double.toString(distribution[i])+"%");
+    		
+     		
+    		Log.v("ELSERVICES", "Dimensions: "+params.width+"x"+params.height);
+    		Log.v("ELSERVICES", "new width"+percentWidth+" full width"+fullWidth);
+    		segShape.setLayoutParams(params);
+    	}
+    	
+    	for(int i=distribution.length;i<segId.length;i++){
+    		View segShape=inflateView.findViewById(segId[i]);
+    		segShape.setVisibility(View.GONE);
+    		TextView percentage=(TextView)inflateView.findViewById(textId[i]);
+    		percentage.setVisibility(View.GONE);
+    	}
+
     	return inflateView;
     }
     
-    public static CompDistributionFragment newInstance(String appliance,int percent,int index) {
+    public static CompDistributionFragment newInstance(String appliance,float [] distribution) {
         CompDistributionFragment myFragment = new CompDistributionFragment();
 
         Bundle args = new Bundle();
-        args.putString("user", appliance);
-        args.putInt("percent", percent);
-        args.putInt("index",index);
+        args.putString("appliance", appliance);
+        args.putFloatArray("distribution", distribution);
         myFragment.setArguments(args);
 
         return myFragment;

@@ -1,12 +1,13 @@
 package com.example.energylens;
 
-import java.util.Random;
+import java.util.ArrayList;
 
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
 import org.achartengine.model.MultipleCategorySeries;
 import org.achartengine.renderer.DefaultRenderer;
 import org.achartengine.renderer.SimpleSeriesRenderer;
+import org.achartengine.renderer.XYMultipleSeriesRenderer;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -22,11 +23,19 @@ public class ComparisonFragment extends Fragment{
 	// Pie Chart Section Names
     String[] users = new String[] {
         "Vedant", "Manaswi", "Amarjeet", "P.K.",
-        "Pushpendra", "Soumitra"
-    };
+        "Pushpendra"};
+    
+    ArrayList user_dist=new ArrayList<int []>();
+    
+    int[] user1={4,9,1,10,5,2,8,3};
+    int[] user2={36,11,9,20,5,18,2,7};
+    
+    XYMultipleSeriesRenderer mRenderer=new XYMultipleSeriesRenderer();
 
     // Pie Chart Section Value
-    double[] distribution = { 3.9, 12.9, 55.8, 1.9, 23.7, 1.8 } ;
+    double[] distribution = { 5, 13, 56, 2, 24} ;
+    double[] distribution2 = {10,50,5,20,15};
+    double[] distribution3={20,20,20,20,20};
 	
 	int[] red={0,102,153,204,0,10,71,204,0,255,255,204,0,0,102,204};
 	 int[] green={0,0,0,0,102,10,71,0,204,255,255,102,204,204,204,204};
@@ -37,7 +46,8 @@ public class ComparisonFragment extends Fragment{
             Bundle savedInstanceState) {
  
         View rootView = inflater.inflate(R.layout.fragment_comparison, container, false);
-         
+        
+        
         return rootView;
     }
 	
@@ -47,7 +57,7 @@ public class ComparisonFragment extends Fragment{
         		
         for(int i=0;i<users.length;i++){
         	
-        	colors[i]=Color.rgb(red[i], green[i], blue[i]);
+        	colors[i]=Color.argb(191,red[i], green[i], blue[i]);
         }
         
         drawChart(users,distribution,colors);
@@ -59,11 +69,35 @@ public class ComparisonFragment extends Fragment{
 		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 		CompDistributionFragment fragment = new CompDistributionFragment();
 		
-		for(int i=0;i<users.length;i++){
-			fragment=CompDistributionFragment.newInstance(users[i],(int)distribution[i],i);
-			fragmentTransaction.add(R.id.CompGroup, fragment);
-		}		
+		float[] distribution_f=new float[distribution.length];
+		
+		for(int i=0;i<distribution.length;i++){
+			distribution_f[i]=(float)distribution[i];
+		}
+				
+		fragment=CompDistributionFragment.newInstance("TV",distribution_f);
+		fragmentTransaction.add(R.id.CompGroup, fragment,"TV");
+		
+		distribution_f=new float[distribution2.length];
+		
+		for(int i=0;i<distribution2.length;i++){
+			distribution_f[i]=(float)distribution2[i];
+		}
+				
+		fragment=CompDistributionFragment.newInstance("AC",distribution_f);
+		fragmentTransaction.add(R.id.CompGroup, fragment,"AC");
+				
+		distribution_f=new float[distribution3.length];
+		
+		for(int i=0;i<distribution2.length;i++){
+			distribution_f[i]=(float)distribution3[i];
+		}
+				
+		fragment=CompDistributionFragment.newInstance("Fan",distribution_f);
+		fragmentTransaction.add(R.id.CompGroup, fragment,"Fan");
+				
 		fragmentTransaction.commit();
+	
 	}
 	
 	 private void drawChart(String[] users, double[] portion, int[] colors){
@@ -105,7 +139,7 @@ public class ComparisonFragment extends Fragment{
 	 public void onViewCreated(View view, Bundle savedInstanceState) {
 		    // TODO Auto-generated method stub
 		    super.onViewCreated(view, savedInstanceState);
-		    setupChart();
+		    setupChart();		    
 		  	setUsers();
 		    }
 		   
