@@ -11,6 +11,10 @@ import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
 import android.app.Fragment;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -99,9 +103,7 @@ public class RealTimePowerFragment extends Fragment{
 
             }
         });
-  			}
-	
-	
+  			}	
 	
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 	    // TODO Auto-generated method stub
@@ -109,6 +111,19 @@ public class RealTimePowerFragment extends Fragment{
 	    Thread thr = new Thread(null, mTask, "RealTime_Power");
 //        thr.start();
 	    }
+	
+	@Override
+	public void onResume() {
+	    super.onResume();
+	    getActivity().registerReceiver(receiver, new IntentFilter(GcmIntentService.RECEIVER));
+	  }
+	
+	  @Override
+	public void onPause() {
+	    super.onPause();
+	    getActivity().unregisterReceiver(receiver);
+	  }
+
 	
 	 Runnable mTask = new Runnable() {
 	        public void run() {
@@ -123,4 +138,16 @@ public class RealTimePowerFragment extends Fragment{
 	            }
 	        }
 	      };
+	      
+	      private BroadcastReceiver receiver = new BroadcastReceiver() {
+
+	    	    @Override
+	    	    public void onReceive(Context context, Intent intent) {
+	    	      Bundle bundle = intent.getExtras();
+	    	      if (bundle != null) {
+	    	        String string = bundle.getString("Data");
+	    	        Log.i("ELSERVICES","RealTime receiver " +string);
+	    	      }
+	    	    }
+	    	  };
 }

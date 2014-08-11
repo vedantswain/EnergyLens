@@ -101,7 +101,8 @@
         </activity>
         <activity
             android:name=".ReassignActivity"
-            android:label="@string/title_activity_reassign" >
+            android:label="@string/title_activity_reassign"
+             >
         </activity>
         
         <receiver android:name=".BootupReceiver">  

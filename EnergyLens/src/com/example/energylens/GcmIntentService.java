@@ -17,6 +17,7 @@ public class GcmIntentService extends IntentService {
     private NotificationManager mNotificationManager;
     NotificationCompat.Builder builder;
 	private String TAG="GCMDemo";
+	public static String RECEIVER="com.example.energylens";
 	
 
     public GcmIntentService() {
@@ -67,9 +68,20 @@ public class GcmIntentService extends IntentService {
             else{
             	Log.i(TAG, "NOA");
             }
+            
+            Log.i("ELSERVICES", "publish data: "+extras.toString());
+            publishData(extras.toString());
         }
         // Release the wake lock provided by the WakefulBroadcastReceiver.
         GcmBroadcastReceiver.completeWakefulIntent(intent);
+    }
+    
+    
+    //Publish data for other activities to receive
+    public void publishData(String data){
+    	Intent intent = new Intent(RECEIVER);
+        intent.putExtra("Data", data);
+        sendBroadcast(intent);
     }
 
     // Put the message into a notification and post it.
