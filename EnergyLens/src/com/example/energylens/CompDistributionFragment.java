@@ -2,11 +2,12 @@ package com.example.energylens;
 
 import android.app.Fragment;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +22,7 @@ public class CompDistributionFragment extends Fragment {
 	 
 	 int[]	textId={R.id.segText1,R.id.segText2,R.id.segText3,R.id.segText4,R.id.segText5};
 	 int[]	segId={R.id.seg1,R.id.seg2,R.id.seg3,R.id.seg4,R.id.seg5};
-	 int fullWidth=400;	
+	 int fullWidth;	
  	
 	 
     @Override
@@ -30,9 +31,11 @@ public class CompDistributionFragment extends Fragment {
         // Inflate the layout for this fragment
         final View inflateView=inflater.inflate(R.layout.fragment_distribution, container, false);
        
-//        DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
-//
-//        float fullWidth = displayMetrics.widthPixels / displayMetrics.density;
+        DisplayMetrics displayMetrics = getActivity().getResources().getDisplayMetrics();
+        
+        float fullWidth = displayMetrics.widthPixels / displayMetrics.density;
+        
+        fullWidth-=40;
         
     	float[] distribution=getArguments().getFloatArray("distribution");
     	String applianceName=getArguments().getString("appliance");
@@ -44,14 +47,17 @@ public class CompDistributionFragment extends Fragment {
     		View segShape=inflateView.findViewById(segId[i]);
     		float percentWidth=(float) (fullWidth*distribution[i]*0.01);
     		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) segShape.getLayoutParams();
-    		params.width=(int) percentWidth;
+    		params.width=(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, percentWidth, getResources().getDisplayMetrics());
     		params.height=18;
     		
     		Drawable segShapeBG=(Drawable)segShape.getBackground();
     		segShapeBG.setColorFilter(Color.argb(191, red[i], green[i], blue[i]),Mode.MULTIPLY);
     		
+    		
     		TextView percentage=(TextView)inflateView.findViewById(textId[i]);
-     		if((int)percentWidth<75)
+    		int textSize=(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, percentage.getTextSize(), getResources().getDisplayMetrics());
+    		
+    		if((int)percentWidth<textSize)
      			percentage.setVisibility(View.INVISIBLE);
      		else
      			percentage.setText(Double.toString(distribution[i])+"%");

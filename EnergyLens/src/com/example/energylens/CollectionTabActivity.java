@@ -6,6 +6,9 @@ import java.security.SecureRandom;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.achartengine.GraphicalView;
+import org.achartengine.model.SeriesSelection;
+
 import android.app.AlarmManager;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -26,7 +29,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,6 +42,7 @@ public class CollectionTabActivity extends FragmentActivity {
     Context context;
     String SENDER_ID = "166229175411";
     Boolean doubleBackToExitPressedOnce=false;
+    GraphicalView chartView;
 
     private AlarmManager axlAlarmMgr,wifiAlarmMgr,audioAlarmMgr,lightAlarmMgr,magAlarmMgr,uploaderAlarmMgr;
 	private PendingIntent axlServicePendingIntent,wifiServicePendingIntent,audioServicePendingIntent,lightServicePendingIntent,magServicePendingIntent,uploaderServicePendingIntent;
@@ -88,6 +91,8 @@ public class CollectionTabActivity extends FragmentActivity {
 		}
 	}
 
+	
+	
 	protected void onResume(){
 		super.onResume();
 		getUpdatedPreferences();
