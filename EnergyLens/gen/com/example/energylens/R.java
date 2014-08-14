@@ -428,7 +428,6 @@ containing a value of this type.
         public static final int distPercent=0x7f080024;
         public static final int distributionBar=0x7f08003c;
         public static final int done=0x7f08003a;
-        public static final int endTime=0x7f08001c;
         public static final int gcmEmail=0x7f080019;
         public static final int gcmName=0x7f080018;
         public static final int grayscale=0x7f080012;
@@ -462,13 +461,14 @@ containing a value of this type.
         public static final int serverUrl=0x7f08001a;
         public static final int setApp=0x7f08003f;
         public static final int setDev=0x7f080036;
+        public static final int setEnd=0x7f08001d;
         public static final int setLoc=0x7f080040;
+        public static final int setStart=0x7f08001e;
         public static final int startButton=0x7f08003e;
-        public static final int startTime=0x7f08001e;
         public static final int stopButton=0x7f08003b;
         public static final int strict_sandbox=0x7f080009;
         public static final int terrain=0x7f080003;
-        public static final int textGuide=0x7f08001d;
+        public static final int textGuide=0x7f08001c;
         public static final int trainingResume=0x7f080041;
         public static final int tryAgain=0x7f080016;
         public static final int txtEmail=0x7f080020;

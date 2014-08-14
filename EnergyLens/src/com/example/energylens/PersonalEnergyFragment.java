@@ -1,13 +1,12 @@
 package com.example.energylens;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
 import org.achartengine.chart.BarChart;
-import org.achartengine.chart.LineChart;
-import org.achartengine.chart.PointStyle;
 import org.achartengine.model.SeriesSelection;
 import org.achartengine.model.XYMultipleSeriesDataset;
 import org.achartengine.model.XYSeries;
@@ -29,9 +28,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.widget.CheckBox;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 public class PersonalEnergyFragment extends Fragment{
 	GraphicalView chartView;
@@ -66,12 +63,14 @@ public class PersonalEnergyFragment extends Fragment{
 	
 	public void setupChart(){
 		int[] x = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24};
+		
 		int[] y = { 2000,3000,2800,3500,2500,2700,3000,2800,3500,3700,3800,2800,3500,3700,3800,2800,3500,3700,3800,2800,2000,2500,2700,3000};
  		drawChart(x,y);
 	}
 
 	
 	public void drawChart(int[] x, int[] y){
+		
 		Log.v("ELSERVICES", "chart drawn");
 		
         // Creating an  XYSeries for Income
@@ -80,6 +79,7 @@ public class PersonalEnergyFragment extends Fragment{
         for(int i=0;i<x.length;i++){
             mSeries.add(x[i], y[i]);
         }
+        
         
         XYSeriesRenderer bar_renderer = new XYSeriesRenderer();
   	  bar_renderer.setLineWidth(1);

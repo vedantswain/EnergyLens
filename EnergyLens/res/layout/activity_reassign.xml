@@ -9,33 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="382dp"
         android:orientation="vertical" >
-
     </LinearLayout>
-
-    <EditText
-        android:id="@+id/endTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/textGuide"
-        android:ems="10"
-        android:hint="00:00"
-        android:inputType="time"
-        android:width="150dp" >
-
-        <requestFocus />
-    </EditText>
-
-    <EditText
-        android:id="@+id/startTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/endTime"
-        android:layout_alignParentLeft="true"
-        android:ems="10"
-        android:hint="00:00"
-        android:inputType="time"
-        android:width="130dp" />
 
     <TextView
         android:id="@+id/textGuide"
@@ -44,5 +18,24 @@
         android:layout_below="@+id/chartComparison"
         android:layout_centerHorizontal="true"
         android:text="touch a point to select an end edge" />
+
+    <Button
+        android:id="@+id/setEnd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/textGuide"
+        android:text="00:00" 
+        android:onClick="selectEnd"/>
+
+    <Button
+        android:id="@+id/setStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/setEnd"
+        android:layout_alignBottom="@+id/setEnd"
+        android:layout_alignParentLeft="true"
+        android:text="00:00" 
+        android:onClick="selectStart"/>
 
 </RelativeLayout>

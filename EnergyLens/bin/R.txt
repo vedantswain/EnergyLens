@@ -111,7 +111,6 @@ int id distName 0x7f080023
 int id distPercent 0x7f080024
 int id distributionBar 0x7f08003c
 int id done 0x7f08003a
-int id endTime 0x7f08001c
 int id gcmEmail 0x7f080019
 int id gcmName 0x7f080018
 int id grayscale 0x7f080012
@@ -145,13 +144,14 @@ int id send 0x7f080035
 int id serverUrl 0x7f08001a
 int id setApp 0x7f08003f
 int id setDev 0x7f080036
+int id setEnd 0x7f08001d
 int id setLoc 0x7f080040
+int id setStart 0x7f08001e
 int id startButton 0x7f08003e
-int id startTime 0x7f08001e
 int id stopButton 0x7f08003b
 int id strict_sandbox 0x7f080009
 int id terrain 0x7f080003
-int id textGuide 0x7f08001d
+int id textGuide 0x7f08001c
 int id trainingResume 0x7f080041
 int id tryAgain 0x7f080016
 int id txtEmail 0x7f080020

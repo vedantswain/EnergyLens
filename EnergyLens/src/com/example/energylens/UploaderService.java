@@ -150,7 +150,10 @@ public class UploaderService extends Service{
 	   public void upload_pending(){
 
 		   File list[] = (new File(path)).listFiles();
-		   for(File file:list){
+		 
+//		   for(File file:list){
+		   for(int i=list.length-1;i>=0;i--){
+			   File file=list[i];
 			   String filename=file.getAbsolutePath().replace(path, "");
 			   Log.i("ELSERVICES", "pending "+filename);
 			   if(filename.contains("upload_")){
