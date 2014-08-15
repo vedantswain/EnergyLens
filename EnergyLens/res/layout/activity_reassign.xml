@@ -1,41 +1,108 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="${relativePackage}.${activityClass}" >
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content" >
 
-    <LinearLayout
-        android:id="@+id/chartComparison"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="382dp"
-        android:orientation="vertical" >
-    </LinearLayout>
+        android:layout_height="wrap_content" >
 
-    <TextView
-        android:id="@+id/textGuide"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/chartComparison"
-        android:layout_centerHorizontal="true"
-        android:text="touch a point to select an end edge" />
+        <Button
+            android:id="@+id/appLocation"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:onClick="launchLocDialog"
+            android:text="Location: " />
 
-    <Button
-        android:id="@+id/setEnd"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/textGuide"
-        android:text="00:00" 
-        android:onClick="selectEnd"/>
+        <TextView
+            android:id="@+id/textGuide"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/chartComparison"
+            android:layout_centerHorizontal="true"
+            android:text="touch a point to select a start time" />
 
-    <Button
-        android:id="@+id/setStart"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/setEnd"
-        android:layout_alignBottom="@+id/setEnd"
-        android:layout_alignParentLeft="true"
-        android:text="00:00" 
-        android:onClick="selectStart"/>
+        <Button
+            android:id="@+id/setEnd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/textGuide"
+            android:onClick="selectEnd"
+            android:text="--:--" />
 
-</RelativeLayout>
+        <Button
+            android:id="@+id/setStart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/setEnd"
+            android:layout_alignBottom="@+id/setEnd"
+            android:layout_alignParentLeft="true"
+            android:onClick="selectStart"
+            android:text="--:--" />
+
+        <RadioGroup
+            android:id="@+id/occupantGroup"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/reassignToText"
+            android:orientation="vertical" >
+
+            <RadioButton
+                android:id="@+id/radio_uname1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onRadioButtonClicked"
+                android:text="Occupant 1" />
+
+            <RadioButton
+                android:id="@+id/radio_uname2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onRadioButtonClicked"
+                android:text="Occupant 2" />
+
+            <Button
+                android:id="@+id/reassignBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="sendReassign"
+                android:padding="20dp"
+                android:text="Reassign" />
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/reassignToText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/setStart"
+            android:layout_centerHorizontal="true"
+            android:padding="10dp"
+            android:text="Reassign to?" />
+
+        <Button
+            android:id="@+id/resetSliceBtn"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/reassignToText"
+            android:layout_centerHorizontal="true"
+            android:onClick="resetSlice"
+            android:text="Reset" />
+
+        <LinearLayout
+            android:id="@+id/chartComparison"
+            android:layout_width="match_parent"
+            android:layout_height="382dp"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/appLocation"
+            android:orientation="vertical" >
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</ScrollView>

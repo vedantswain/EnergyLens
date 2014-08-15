@@ -67,8 +67,8 @@ public class GCMActivity extends FragmentActivity implements TryAgainDialogListe
     public void onCreate(Bundle savedInstanceState) { 	
         super.onCreate(savedInstanceState);
         
-        Intent intent1 = new Intent(this,CollectionTabActivity.class);
-		startActivity(intent1);
+//        Intent intent1 = new Intent(this,CollectionTabActivity.class);
+//		startActivity(intent1);
 
         if(Common.DOUBLE_BACK){
     		finish();

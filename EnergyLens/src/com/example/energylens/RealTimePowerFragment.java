@@ -25,18 +25,18 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 public class RealTimePowerFragment extends Fragment{
-	
+
 	private Handler mHandler = new Handler();
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
- 
-        View rootView = inflater.inflate(R.layout.fragment_realtimepower, container, false);
-         
-        return rootView;
-    }
-	
+			Bundle savedInstanceState) {
+
+		View rootView = inflater.inflate(R.layout.fragment_realtimepower, container, false);
+
+		return rootView;
+	}
+
 	public void setupChart(){
 		Random rnd=new Random();
 		int counter=0;
@@ -51,103 +51,103 @@ public class RealTimePowerFragment extends Fragment{
 			}
 		}
 	}
-	
-	 XYSeries mSeries = new XYSeries("Power");
-     
-	
+
+	XYSeries mSeries = new XYSeries("Power");
+
+
 	public void drawChart(int x, int y){
 		Log.i("ELSERVICES", "RTP");
-        mSeries.add(x, y);
-        if(x>60){
-        	mSeries.remove(0);
-        }
-        
-  	  XYSeriesRenderer renderer = new XYSeriesRenderer();
-	  renderer.setLineWidth(2);
-	  renderer.setColor(Color.RED);
-	 
-	  renderer.setDisplayBoundingPoints(true);
-	  renderer.setPointStyle(PointStyle.CIRCLE);
-	  renderer.setPointStrokeWidth(3);
-	  renderer.setDisplayChartValues(true);
-	  
-	  final XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
-	  mRenderer.addSeriesRenderer(renderer);
-	  
-	  mRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00)); 
-	  
+		mSeries.add(x, y);
+		if(x>60){
+			mSeries.remove(0);
+		}
+
+		XYSeriesRenderer renderer = new XYSeriesRenderer();
+		renderer.setLineWidth(2);
+		renderer.setColor(Color.RED);
+
+		renderer.setDisplayBoundingPoints(true);
+		renderer.setPointStyle(PointStyle.CIRCLE);
+		renderer.setPointStrokeWidth(3);
+		renderer.setDisplayChartValues(true);
+
+		final XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
+		mRenderer.addSeriesRenderer(renderer);
+
+		mRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00)); 
+
 		mRenderer.setPanEnabled(false, false);
 		mRenderer.setPanEnabled(true);
-  		mRenderer.setPanLimits(new double[] {0,24,0,5000});
+		mRenderer.setPanLimits(new double[] {0,24,0,5000});
 		mRenderer.setYAxisMax(5000);
 		mRenderer.setYAxisMin(0);
 		mRenderer.setChartTitleTextSize(14);
-  		mRenderer.setLabelsColor(Color.BLACK);
-  		mRenderer.setLabelsTextSize(18);
-  		mRenderer.setChartTitle("Real-Time Power Consumption");
+		mRenderer.setLabelsColor(Color.BLACK);
+		mRenderer.setLabelsTextSize(18);
+		mRenderer.setChartTitle("Real-Time Power Consumption");
 		mRenderer.setShowGrid(true);
-	
-  		final XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
-  		dataset.addSeries(mSeries);
-  		
-  		
-  		mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-            	GraphicalView chartView = ChartFactory.getLineChartView(getActivity(), dataset, mRenderer);
-          		Log.i("ELSERVICES", "RTP "+chartView.toString());  
-          		
-          		LinearLayout chart_container=(LinearLayout)getView().findViewById(R.id.chartComp);
-          		
-          		chart_container.addView(chartView,0);
 
-            }
-        });
-  			}	
-	
+		final XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
+		dataset.addSeries(mSeries);
+
+
+		mHandler.post(new Runnable() {
+			@Override
+			public void run() {
+				GraphicalView chartView = ChartFactory.getLineChartView(getActivity(), dataset, mRenderer);
+				Log.i("ELSERVICES", "RTP "+chartView.toString());  
+
+				LinearLayout chart_container=(LinearLayout)getView().findViewById(R.id.chartComp);
+
+				chart_container.addView(chartView,0);
+
+			}
+		});
+	}	
+
 	public void onViewCreated(View view, Bundle savedInstanceState) {
-	    // TODO Auto-generated method stub
-	    super.onViewCreated(view, savedInstanceState);
-	    Thread thr = new Thread(null, mTask, "RealTime_Power");
-//        thr.start();
-	    }
-	
+		// TODO Auto-generated method stub
+		super.onViewCreated(view, savedInstanceState);
+		Thread thr = new Thread(null, mTask, "RealTime_Power");
+		//        thr.start();
+	}
+
 	@Override
 	public void onResume() {
-	    super.onResume();
-	    getActivity().registerReceiver(receiver, new IntentFilter(GcmIntentService.RECEIVER));
-	  }
-	
-	  @Override
+		super.onResume();
+		getActivity().registerReceiver(receiver, new IntentFilter(GcmIntentService.RECEIVER));
+	}
+
+	@Override
 	public void onPause() {
-	    super.onPause();
-	    getActivity().unregisterReceiver(receiver);
-	  }
+		super.onPause();
+		getActivity().unregisterReceiver(receiver);
+	}
 
-	
-	 Runnable mTask = new Runnable() {
-	        public void run() {
-	        	
-	            synchronized (this) {
-	              try {
-	            	  setupChart();
-	               	  }
 
-	               catch (Exception e) {
-	              }
-	            }
-	        }
-	      };
-	      
-	      private BroadcastReceiver receiver = new BroadcastReceiver() {
+	Runnable mTask = new Runnable() {
+		public void run() {
 
-	    	    @Override
-	    	    public void onReceive(Context context, Intent intent) {
-	    	      Bundle bundle = intent.getExtras();
-	    	      if (bundle != null) {
-	    	        String string = bundle.getString("Data");
-	    	        Log.i("ELSERVICES","RealTime receiver " +string);
-	    	      }
-	    	    }
-	    	  };
+			synchronized (this) {
+				try {
+					setupChart();
+				}
+
+				catch (Exception e) {
+				}
+			}
+		}
+	};
+
+	private BroadcastReceiver receiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Bundle bundle = intent.getExtras();
+			if (bundle != null) {
+				String string = bundle.getString("Data");
+				Log.i("ELSERVICES","RealTime receiver " +string);
+			}
+		}
+	};
 }

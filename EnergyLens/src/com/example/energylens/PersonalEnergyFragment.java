@@ -102,7 +102,7 @@ public class PersonalEnergyFragment extends Fragment{
   	  mRenderer.addSeriesRenderer(bar_renderer);
 //  	  mRenderer.addSeriesRenderer(line_renderer);
   	  
-  	  mRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00)); 
+  	  mRenderer.setMarginsColor(Color.argb(0xff, 0xf0, 0xf0, 0xf0)); 
   	  
   		mRenderer.setPanEnabled(true);
   		mRenderer.setPanLimits(new double[] {0,24,0,5000});
