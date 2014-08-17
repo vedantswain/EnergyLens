@@ -241,40 +241,6 @@ public class CollectionTabActivity extends FragmentActivity {
 		startActivity(intent);
 	}
 	
-	public void sendMessage(){
-		 new AsyncTask<Void,String,String>() {
-	         @Override
-	         protected String doInBackground(Void... params) {
-	             String msg = "";
-	             try {
-	                 Bundle data = new Bundle();
-	                     data.putString("my_message", "Hello World");
-	                     data.putString("my_action",
-	                             "com.google.android.gcm.demo.app.ECHO_NOW");
-	                     SecureRandom random = new SecureRandom();
-	                     String randomId=new BigInteger(130, random).toString(32);
-	                     
-	                     String id = Long.toString(System.currentTimeMillis());
-	                     gcm.send(SENDER_ID + "@gcm.googleapis.com", id, data);
-	                     msg = "Sent message";
-	                     Log.i("ELSERVICES", "message sent");
-	             } catch (IOException ex) {
-	                 msg = "Error :" + ex.getMessage();
-	             }
-	             return msg;
-	         }
-
-	         @Override
-	         protected void onPostExecute(String msg) {
-	            Log.i("ELSERVICES", msg);
-	         }
-	     }.execute(null, null, null);
-	}
-
-	public void onSend(View view){
-		sendMessage();
-	}
-	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -312,6 +278,40 @@ public class CollectionTabActivity extends FragmentActivity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	public void sendMessage(){
+		 new AsyncTask<Void,String,String>() {
+	         @Override
+	         protected String doInBackground(Void... params) {
+	             String msg = "";
+	             try {
+	                 Bundle data = new Bundle();
+	                     data.putString("my_message", "Hello World");
+	                     data.putString("my_action",
+	                             "com.google.android.gcm.demo.app.ECHO_NOW");
+	                     SecureRandom random = new SecureRandom();
+	                     String randomId=new BigInteger(130, random).toString(32);
+	                     
+	                     String id = Long.toString(System.currentTimeMillis());
+	                     gcm.send(SENDER_ID + "@gcm.googleapis.com", id, data);
+	                     msg = "Sent message";
+	                     Log.i("ELSERVICES", "message sent");
+	             } catch (IOException ex) {
+	                 msg = "Error :" + ex.getMessage();
+	             }
+	             return msg;
+	         }
+
+	         @Override
+	         protected void onPostExecute(String msg) {
+	            Log.i("ELSERVICES", msg);
+	         }
+	     }.execute(null, null, null);
+	}
+
+	public void onSend(View view){
+		sendMessage();
 	}
 
 	/**

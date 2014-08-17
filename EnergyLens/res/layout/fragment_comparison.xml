@@ -14,9 +14,9 @@
             android:id="@+id/chartComp"
             android:layout_width="match_parent"
             android:layout_height="319dp"
+            android:layout_weight="0.89"
             android:orientation="vertical" >
         </LinearLayout>
-
     </LinearLayout>
     
 </ScrollView>

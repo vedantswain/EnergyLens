@@ -8,46 +8,22 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.energylens.MainActivity" >
 
+	<Button
+	    android:id="@+id/send"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:onClick="onSend"
+	    android:text="Send Message" />
+
 	<LinearLayout
-        android:id="@+id/chartComparison"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical" >
+	    android:id="@+id/chartComparison"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:layout_alignLeft="@+id/send"
+	    android:layout_alignParentBottom="true"
+	    android:layout_below="@+id/send"
+	    android:orientation="vertical" >
 
-		<Button
-		    android:id="@+id/send"
-		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content"
-		    android:onClick="onSend"
-		    android:text="Send Message" />
-
-		<SlidingDrawer
-		    android:id="@+id/slidingDrawer1"
-		    android:layout_width="match_parent"
-		    android:layout_height="match_parent"
-		    android:content="@+id/content"
-		    android:handle="@+id/handle" >
-
-		    <Button
-		        android:id="@+id/handle"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:text="Handle" />
-
-		    <LinearLayout
-		        android:id="@+id/content"
-		        android:layout_width="match_parent"
-		        android:layout_height="match_parent" >
-
-		        <ImageView
-		            android:id="@+id/imageView1"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/common_signin_btn_icon_focus_light" />
-
-		    </LinearLayout>
-		</SlidingDrawer>
-
-	</LinearLayout>   
+	</LinearLayout>
     
 </RelativeLayout>

@@ -1,14 +1,25 @@
 package com.example.energylens;
 
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
-import org.achartengine.chart.PointStyle;
+import org.achartengine.model.TimeSeries;
 import org.achartengine.model.XYMultipleSeriesDataset;
-import org.achartengine.model.XYSeries;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import android.app.Fragment;
 import android.content.BroadcastReceiver;
@@ -16,6 +27,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -27,38 +39,34 @@ import android.widget.LinearLayout;
 public class RealTimePowerFragment extends Fragment{
 
 	private Handler mHandler = new Handler();
+	GoogleCloudMessaging gcm;
+    String SENDER_ID = "166229175411";
+	
+	private int counter=0;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
 		View rootView = inflater.inflate(R.layout.fragment_realtimepower, container, false);
-
+		gcm = GoogleCloudMessaging.getInstance(getActivity());
+		
 		return rootView;
 	}
 
 	public void setupChart(){
 		Random rnd=new Random();
-		int counter=0;
-		while(true){
-			drawChart(counter,rnd.nextInt(3000));
-			counter++;
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		counter++;
+		Calendar c=Calendar.getInstance();
+		drawChart(c.getTime(),rnd.nextInt(3000));
 		}
-	}
 
-	XYSeries mSeries = new XYSeries("Power");
+	TimeSeries mSeries = new TimeSeries("Real-Time Power");
 
 
-	public void drawChart(int x, int y){
-		Log.i("ELSERVICES", "RTP");
+	public void drawChart(Date x, int y){
 		mSeries.add(x, y);
-		if(x>60){
+		if(counter>30){
 			mSeries.remove(0);
 		}
 
@@ -67,19 +75,16 @@ public class RealTimePowerFragment extends Fragment{
 		renderer.setColor(Color.RED);
 
 		renderer.setDisplayBoundingPoints(true);
-		renderer.setPointStyle(PointStyle.CIRCLE);
-		renderer.setPointStrokeWidth(3);
+//		renderer.setPointStyle(PointStyle.CIRCLE);
+//		renderer.setPointStrokeWidth(3);
 		renderer.setDisplayChartValues(true);
 
 		final XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
 		mRenderer.addSeriesRenderer(renderer);
 
 		mRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00)); 
-
-		mRenderer.setPanEnabled(false, false);
-		mRenderer.setPanEnabled(true);
-		mRenderer.setPanLimits(new double[] {0,24,0,5000});
-		mRenderer.setYAxisMax(5000);
+		
+		mRenderer.setZoomEnabled(false);
 		mRenderer.setYAxisMin(0);
 		mRenderer.setChartTitleTextSize(14);
 		mRenderer.setLabelsColor(Color.BLACK);
@@ -91,24 +96,29 @@ public class RealTimePowerFragment extends Fragment{
 		dataset.addSeries(mSeries);
 
 
-		mHandler.post(new Runnable() {
-			@Override
-			public void run() {
-				GraphicalView chartView = ChartFactory.getLineChartView(getActivity(), dataset, mRenderer);
-				Log.i("ELSERVICES", "RTP "+chartView.toString());  
+		GraphicalView chartView = ChartFactory.getTimeChartView(getActivity(), dataset, mRenderer,"Real Time Power");
 
-				LinearLayout chart_container=(LinearLayout)getView().findViewById(R.id.chartComp);
+		LinearLayout chart_container=(LinearLayout)getView().findViewById(R.id.chartComparison);
+//		Log.i("ELSERVICES", "RTP "+chart_container.toString()+" "+System.currentTimeMillis());  
 
-				chart_container.addView(chartView,0);
+		chart_container.addView(chartView,0);
 
-			}
-		});
+		
 	}	
-
+	
+	private void UpdateGUI() {
+	      mHandler.post(mTask);
+	   }
+	
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onViewCreated(view, savedInstanceState);
-		Thread thr = new Thread(null, mTask, "RealTime_Power");
+		 Timer myTimer = new Timer();
+	      myTimer.schedule(new TimerTask() {
+	         @Override
+	         public void run() {UpdateGUI();}
+	      }, 0, 1000);
+//		Thread thr = new Thread(null, mTask, "RealTime_Power");
 		//        thr.start();
 	}
 
@@ -123,13 +133,42 @@ public class RealTimePowerFragment extends Fragment{
 		super.onPause();
 		getActivity().unregisterReceiver(receiver);
 	}
+	
+	public void sendMessage(){
+		 new AsyncTask<Void,String,String>() {
+	         @Override
+	         protected String doInBackground(Void... params) {
+	             String msg = "";
+	             try {
+	                 Bundle data = new Bundle();
+	                     data.putString("msg_type", "request");
+	                     data.putString("api","power/real-time/");
+	                     SecureRandom random = new SecureRandom();
+	                     String randomId=new BigInteger(130, random).toString(32);
+	                     
+	                     gcm.send(SENDER_ID + "@gcm.googleapis.com", randomId, data);
+	                     msg = "RTP sent message";
+	                     Log.i("ELSERVICES", "message sent to RTP: "+randomId);
+	             } catch (IOException ex) {
+	                 msg = "Error :" + ex.getMessage();
+	             }
+	             return msg;
+	         }
 
+	         @Override
+	         protected void onPostExecute(String msg) {
+	            Log.i("ELSERVICES", msg);
+	         }
+	     }.execute(null, null, null);
+	}
 
 	Runnable mTask = new Runnable() {
 		public void run() {
 
 			synchronized (this) {
 				try {
+//					Log.v("ELSERVICES", "RTP ping: "+System.currentTimeMillis());
+//					sendMessage();
 					setupChart();
 				}
 
@@ -138,6 +177,14 @@ public class RealTimePowerFragment extends Fragment{
 			}
 		}
 	};
+	
+	private void parseData(Bundle data){
+		String msg_type, api;
+		if(data.getString("msg_type")=="response" && data.getString("api")=="power/real-time/")
+				Log.v("ELSERVICES", "RTP response: "+System.currentTimeMillis());
+			
+		} 
+
 
 	private BroadcastReceiver receiver = new BroadcastReceiver() {
 
@@ -145,8 +192,9 @@ public class RealTimePowerFragment extends Fragment{
 		public void onReceive(Context context, Intent intent) {
 			Bundle bundle = intent.getExtras();
 			if (bundle != null) {
-				String string = bundle.getString("Data");
-				Log.i("ELSERVICES","RealTime receiver " +string);
+				Bundle data = bundle.getBundle("Data");
+				parseData(data);
+				Log.i("ELSERVICES","RealTime receiver " +data.getString("api"));
 			}
 		}
 	};

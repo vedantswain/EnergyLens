@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.achartengine.ChartFactory;
@@ -17,10 +19,14 @@ import org.achartengine.model.XYMultipleSeriesDataset;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer.FillOutsideLine;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -50,11 +56,18 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 	int[] y1 = { 2000,3000,2800,3500,2500,2700,3000,2800,3500,3700,3800,2800,3500,3700,3800,2800,3500,3700,3800,2800,2000,2500,2700,3000};
 	int[] y2 = { 1000,4000,2500,5500,3500,700,3500,2000,1500,1700,4800,2900,3000,4000,2800,2800,5500,4700,4800,800,1000,1500,4000,1000};
 
+	ArrayList<Long> time=new ArrayList<Long>();
+	ArrayList<Long> usage=new ArrayList<Long>();
+	ArrayList<Long> ids=new ArrayList<Long>();
+	ArrayList<long[]> terminals=new ArrayList<long[]>();
+	
 	String[] apps={"TV","Microwave"};
 	int appCounter=0;
 	int[] red={0,102,153,204,0,10,71,204,0,255,255,204,0,0,102,204};
 	int[] green={0,0,0,0,102,10,71,0,204,255,255,102,204,204,204,204};
 	int[] blue={204,204,153,102,204,255,255,0,204,71,10,0,102,0,0,0};
+	
+	String initLoc;
 
 	String app="none";
 	int color=Color.LTGRAY;
@@ -66,10 +79,9 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 	String SENDER_ID = "166229175411";
 
 	Button start,end;
+	JSONArray activities;
 
 	Calendar c=Calendar.getInstance();
-	private boolean firstPick=true;
-
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +99,9 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 
 		app=extras.getString("appliance");
 		color=extras.getInt("color");
+		
+		gcm = GoogleCloudMessaging.getInstance(this);
+		sendMessage();
 	}
 
 
@@ -94,7 +109,14 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 
 	protected void onStart(){
 		super.onStart();
+		this.registerReceiver(receiver, new IntentFilter(GcmIntentService.RECEIVER));
 		setupChart(false);
+	}
+	
+	@Override
+	public void onPause() {
+		super.onPause();
+		this.unregisterReceiver(receiver);
 	}
 
 	public void setupChart( boolean isSlice){
@@ -106,22 +128,12 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 		TimeSeries mSeries = new TimeSeries("Reassign");
 
 		XYSeriesRenderer renderer = new XYSeriesRenderer();
-		//			XYSeries mSeries = new XYSeries(app);
-
-		//			Date date=new Date();
-		SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
 
 		for (int i = 0; i < y.length; i++) {
 			long diff=Calendar.getInstance().getTimeInMillis()-(i*60*60*1000);
 			c.setTimeInMillis(diff);
-			//					mSeries.add(dateFormat.parse(dateFormat.format(c.getTime())), y[i]/appCounter);
-			mSeries.add(c.getTime(), y[i]/appCounter);
+			mSeries.add(c.getTime(), (y[i]*10)/appCounter);
 		}
-		//			
-		//	        for(int i=0;i<x.length;i++){
-		//	            mSeries.add(i, y[i]/appCounter);
-		//	        }
-
 
 		renderer.setLineWidth(2);
 		renderer.setColor(color);
@@ -172,7 +184,7 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 		mRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00)); // transparent margins
 		mRenderer.setClickEnabled(true);
 		mRenderer.setSelectableBuffer(20);
-		mRenderer.setYAxisMax(5000);
+		mRenderer.setYAxisMax(10000);
 		mRenderer.setYAxisMin(0);
 		mRenderer.setXAxisMax(Calendar.getInstance().getTimeInMillis());
 		mRenderer.setXAxisMin(Calendar.getInstance().getTimeInMillis()-(24*60*60*1000));
@@ -212,16 +224,29 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 				String msg = "";
 				try {
 					Bundle data = new Bundle();
-					data.putString("my_message", "Hello World");
-					data.putString("my_action",
-							"com.google.android.gcm.demo.app.ECHO_NOW");
+					data.putString("msg_type", "request");
+					data.putString("api","energy/disaggregated/");
+
+					JSONObject options=new JSONObject();
+					
+					try {
+						options.put("start_time", "now");
+						options.put("end_time", "last 12 hours");
+						options.put("activity_name", app);
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					data.putString("options", options.toString());
+					
 					SecureRandom random = new SecureRandom();
 					String randomId=new BigInteger(130, random).toString(32);
 
-					String id = Long.toString(System.currentTimeMillis());
-					gcm.send(SENDER_ID + "@gcm.googleapis.com", id, data);
-					msg = "Sent message";
-					Log.i("ELSERVICES", "message sent");
+					gcm.send(SENDER_ID + "@gcm.googleapis.com", randomId, data);
+					msg = "PersonalEnergy sent message";
+					Log.i("ELSERVICES", "message sent to disaggregated: "+data.toString());
+					
 				} catch (IOException ex) {
 					msg = "Error :" + ex.getMessage();
 				}
@@ -294,6 +319,7 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 	public void onResume(){
 		super.onResume();
 		setupChart(true);
+		this.registerReceiver(receiver, new IntentFilter(GcmIntentService.RECEIVER));
 	}
 
 
@@ -420,5 +446,78 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 			setupChart(false);
 		}
 	}
+	
+	private void parseActivities(String loc){
+		Log.v("ELSERVICES", "parseactivities");
+		long[] terminalPoints=new long[2];
+		for(int i=0;i<activities.length();i++){
+			JSONObject activity;
+			try {
+				activity = activities.getJSONObject(i);
+				if(activity.getString("location").equals(initLoc)){
+					ids.add(activity.getLong("id"));
+					terminalPoints[0]=activity.getLong("start_time");
+					terminalPoints[1]=activity.getLong("end_time");
+					terminals.add(terminalPoints);
+					
+					//render 4 points for each activity
+				}
+				
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
 
+	
+	private void parseData(Bundle data){
+		Log.v("ELSERVICES", "parsedata");
+
+		if(data.getString("api").equals("energy/disaggregated/")){
+			try {
+				Set<String> keys=data.keySet();
+				JSONObject response=new JSONObject();
+				if(response!=null)
+					Log.v("ELSERVICES", "Reassign not null");
+
+				for(String key:keys){
+					response.put(key, data.get(key));
+				}
+
+				JSONObject options=new JSONObject(response.getString("options"));
+
+				if(options!=null){
+					activities=options.getJSONArray("activities");
+
+					if(activities!=null){
+						Log.v("ELSERVICES","Reassign Activities: "+ activities.getString(0));
+						TextView textView=(TextView) findViewById(R.id.appLocation);
+						textView.setText(app+" at "+activities.getJSONObject(0).getString("location"));
+						initLoc=activities.getJSONObject(0).getString("location");
+						parseActivities(initLoc);
+					}
+				}
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	} 
+
+
+
+	private BroadcastReceiver receiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Bundle bundle = intent.getExtras();
+			if (bundle != null) {
+				Bundle data = bundle.getBundle("Data");
+				parseData(data);
+
+				Log.i("ELSERVICES","Reassign receiver " +data.getString("api"));
+			}
+		}
+	};
 }

@@ -160,8 +160,10 @@ public class ComparisonFragment extends Fragment{
 
 		}
 
-		mRenderer.setMarginsColor(Color.argb(0xff, 0xf0, 0xf0, 0xf0)); 
-
+		int[] margins={20,40,20,5};
+		mRenderer.setMarginsColor(Color.argb(0xff, 0xf0, 0xf0, 0xf0));
+				
+		mRenderer.setMargins(margins);
 		mRenderer.setPanEnabled(true);
 		mRenderer.setPanLimits(new double[] {0,24,0,15000});
 		mRenderer.setZoomButtonsVisible(true);
@@ -180,6 +182,7 @@ public class ComparisonFragment extends Fragment{
 		mRenderer.setClickEnabled(true);
 		mRenderer.setSelectableBuffer(50);
 		mRenderer.setShowGrid(true);
+		
 		//
 		chartView = ChartFactory.getBarChartView(getActivity().getApplicationContext(), mDataset, mRenderer, Type.STACKED );
 		LinearLayout chart_container=(LinearLayout)getView().findViewById(R.id.chartComp);
