@@ -6,13 +6,13 @@ import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
-import org.achartengine.chart.PointStyle;
 import org.achartengine.model.SeriesSelection;
 import org.achartengine.model.TimeSeries;
 import org.achartengine.model.XYMultipleSeriesDataset;
@@ -27,11 +27,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -47,6 +49,7 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 	GraphicalView chartView;
 	boolean firstPointSet=false;
 	long xOfStart=0,xOfEnd=0;
+	long maxY=0;
 	int lastSet=1;
 	boolean firstTime=true;
 	String oldApp="none";
@@ -60,13 +63,16 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 	ArrayList<Long> usage=new ArrayList<Long>();
 	ArrayList<Long> ids=new ArrayList<Long>();
 	ArrayList<long[]> terminals=new ArrayList<long[]>();
-	
+
+	long activity_ID;
+	String activityLoc;
+
 	String[] apps={"TV","Microwave"};
 	int appCounter=0;
 	int[] red={0,102,153,204,0,10,71,204,0,255,255,204,0,0,102,204};
 	int[] green={0,0,0,0,102,10,71,0,204,255,255,102,204,204,204,204};
 	int[] blue={204,204,153,102,204,255,255,0,204,71,10,0,102,0,0,0};
-	
+
 	String initLoc;
 
 	String app="none";
@@ -99,7 +105,7 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 
 		app=extras.getString("appliance");
 		color=extras.getInt("color");
-		
+
 		gcm = GoogleCloudMessaging.getInstance(this);
 		sendMessage();
 	}
@@ -110,9 +116,11 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 	protected void onStart(){
 		super.onStart();
 		this.registerReceiver(receiver, new IntentFilter(GcmIntentService.RECEIVER));
-		setupChart(false);
+
+		if(time!=null && usage!=null)
+			setupChart(false);
 	}
-	
+
 	@Override
 	public void onPause() {
 		super.onPause();
@@ -126,21 +134,21 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 
 		// Creating an  XYSeries for Income
 		TimeSeries mSeries = new TimeSeries("Reassign");
+		Date date=new Date();
 
 		XYSeriesRenderer renderer = new XYSeriesRenderer();
 
-		for (int i = 0; i < y.length; i++) {
-			long diff=Calendar.getInstance().getTimeInMillis()-(i*60*60*1000);
-			c.setTimeInMillis(diff);
-			mSeries.add(c.getTime(), (y[i]*10)/appCounter);
+		for (int i = 0; i < time.size(); i++) {
+			c.setTimeInMillis(time.get(i).longValue()*1000);
+			mSeries.add(c.getTime(), usage.get(i));
+			Log.v("ELSERVICES", "usage: "+usage.get(i)+" time: "+c.getTime().toString()
+					+"\n timeinmillis: "+time.get(i)+" v/s: "+c.getTimeInMillis()+" now: "+System.currentTimeMillis());
 		}
 
 		renderer.setLineWidth(2);
 		renderer.setColor(color);
 		// Include low and max value
 		renderer.setDisplayBoundingPoints(true);
-		renderer.setPointStyle(PointStyle.CIRCLE);
-		renderer.setPointStrokeWidth(3);
 
 		mRenderer.addSeriesRenderer(renderer);
 
@@ -161,10 +169,10 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 			c.setTimeInMillis(xOfStart);
 
 			TimeSeries sliceSeries=new TimeSeries("Time SLice");
-			sliceSeries.add(c.getTime(), 5000);
+			sliceSeries.add(c.getTime(), maxY*1.5);
 			Log.v("ELSERVICES", "time-slice start: "+c.getTime());
 			c.setTimeInMillis(xOfEnd);
-			sliceSeries.add(c.getTime(), 5000);
+			sliceSeries.add(c.getTime(), maxY*1.5);
 			Log.v("ELSERVICES", "time-slice end: "+c.getTime());
 
 			XYSeriesRenderer sliceRenderer = new XYSeriesRenderer();
@@ -184,10 +192,10 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 		mRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00)); // transparent margins
 		mRenderer.setClickEnabled(true);
 		mRenderer.setSelectableBuffer(20);
-		mRenderer.setYAxisMax(10000);
+		mRenderer.setYAxisMax(maxY*1.5);
 		mRenderer.setYAxisMin(0);
-		mRenderer.setXAxisMax(Calendar.getInstance().getTimeInMillis());
-		mRenderer.setXAxisMin(Calendar.getInstance().getTimeInMillis()-(24*60*60*1000));
+		//		mRenderer.setXAxisMax(Calendar.getInstance().getTimeInMillis());
+		//		mRenderer.setXAxisMin(Calendar.getInstance().getTimeInMillis()-(24*60*60*1000));
 		mRenderer.setPanEnabled(false);
 		mRenderer.setZoomEnabled(false);
 		mRenderer.setShowGrid(true); // we show the grid
@@ -198,9 +206,6 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 		LinearLayout chart_container=(LinearLayout)findViewById(R.id.chartComparison);
 		chart_container.addView(chartView,0);
 
-		//		mRenderer.removeAllRenderers();
-		//		dataset=new XYMultipleSeriesDataset();
-		//		
 		chartView.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Log.v("ELSERVICES", "Graph clicked");
@@ -228,7 +233,7 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 					data.putString("api","energy/disaggregated/");
 
 					JSONObject options=new JSONObject();
-					
+
 					try {
 						options.put("start_time", "now");
 						options.put("end_time", "last 12 hours");
@@ -237,16 +242,16 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					
+
 					data.putString("options", options.toString());
-					
+
 					SecureRandom random = new SecureRandom();
 					String randomId=new BigInteger(130, random).toString(32);
 
 					gcm.send(SENDER_ID + "@gcm.googleapis.com", randomId, data);
 					msg = "PersonalEnergy sent message";
 					Log.i("ELSERVICES", "message sent to disaggregated: "+data.toString());
-					
+
 				} catch (IOException ex) {
 					msg = "Error :" + ex.getMessage();
 				}
@@ -268,7 +273,7 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 	public void resetSlice(View view){
 		reset();
 	}
-	
+
 	public void reset(){
 		start.setText("--:--");
 		end.setText("--:--");
@@ -284,7 +289,19 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 	}
 
 	public void sendReassign(View view){
+		findId();
+		Log.v("ELSERVICES", "id: "+activity_ID+" location: "+activityLoc+" start_time: "+xOfStart+" end_time: "+xOfEnd);
 		sendMessage();
+	}
+
+	private void findId(){
+		int i=0;
+		for(long[] terminalPoints:terminals){
+			if(xOfStart>=terminalPoints[0] && xOfEnd<=terminalPoints[1]){
+				activity_ID=ids.get(i);
+			}
+			i++;
+		}
 	}
 
 	public void onRadioButtonClicked(View view) {
@@ -325,7 +342,7 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 
 
 	public void setTimeSlice(long xCoord){
-		
+
 		TextView guide=(TextView) findViewById(R.id.textGuide);
 		SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
 
@@ -378,14 +395,13 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 	@Override
 	public void onSetTime(int hourOfDay, int minute) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
-		TextView guide=(TextView) findViewById(R.id.textGuide);
-		
+
 		if(firstTime==true){
 			c=Calendar.getInstance();
 		}
-		
+
 		Log.v("ELSERVICES","set slice: " +c.getTime()+" before set");
-		
+
 		c.set(Calendar.HOUR_OF_DAY, hourOfDay);
 		c.set(Calendar.MINUTE, minute);
 
@@ -393,7 +409,7 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 		Log.v("ELSERVICES","set slice: " +c.getTime()+" "+changeTimeOf);
 
 		// TODO Auto-generated method stub
-		//		Log.v("ELSERVICES", "time picker works "+hourOfDay+":"+minute);
+		//		Log.v("ELSERVICES", "time picker works "+hourOfDay+":"+minute);	
 		if(changeTimeOf=="start"){
 			Log.v("ELSERVICES", "Set in end");
 			if(firstTime==true){
@@ -437,40 +453,58 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 		TextView textView=(TextView) findViewById(R.id.appLocation);
 		textView.setText(app+" at "+loc);
 		reset();
-		if(index%2==0){
-			y=y1;
-			setupChart(false);
-		}
-		else{
-			y=y2;
-			setupChart(false);
-		}
+		parseActivities(loc);
+		setupChart(false);
 	}
-	
+
+	private void findYMax(){
+		for(long i:usage){
+			if(i>maxY)
+				maxY=i;
+		}
+		Log.v("ELSERVICES", "MaxY: "+maxY);
+	}
+
 	private void parseActivities(String loc){
 		Log.v("ELSERVICES", "parseactivities");
+		activityLoc=loc;
 		long[] terminalPoints=new long[2];
+		ids=new ArrayList<Long>();
+		terminals=new ArrayList<long[]>();
+		time=new ArrayList<Long>();
 		for(int i=0;i<activities.length();i++){
 			JSONObject activity;
 			try {
 				activity = activities.getJSONObject(i);
-				if(activity.getString("location").equals(initLoc)){
+				if(activity.getString("location").equals(loc)){
 					ids.add(activity.getLong("id"));
 					terminalPoints[0]=activity.getLong("start_time");
 					terminalPoints[1]=activity.getLong("end_time");
 					terminals.add(terminalPoints);
-					
+
 					//render 4 points for each activity
+					time.add(terminalPoints[0]);usage.add((long) 0);
+					time.add(terminalPoints[0]);usage.add(activity.getLong("usage"));
+					time.add(terminalPoints[1]);usage.add(activity.getLong("usage"));
+					time.add(terminalPoints[1]);usage.add((long) 0);
 				}
-				
+
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
+		Log.v("ELSERVICES", "parseactivities complete");
+		if(ids!=null){
+			updateViews();
+			findYMax();
+			setupChart(false);
+		}
+		else
+			Toast.makeText(getApplicationContext(), "no activity in this location", 1000).show();
 	}
 
-	
+
 	private void parseData(Bundle data){
 		Log.v("ELSERVICES", "parsedata");
 
@@ -505,6 +539,12 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 		}
 	} 
 
+	private void updateViews(){
+		DateFormat df=new DateFormat();
+		String lastSyncTime=df.format("dd/MM/yy HH:mm", System.currentTimeMillis()).toString();
+		TextView textView=(TextView) findViewById(R.id.lastSyncReassign);
+		textView.setText("Last synced on: "+lastSyncTime);
+	}
 
 
 	private BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -515,7 +555,7 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 			if (bundle != null) {
 				Bundle data = bundle.getBundle("Data");
 				parseData(data);
-
+				SharedPreferences dataPrefs;
 				Log.i("ELSERVICES","Reassign receiver " +data.getString("api"));
 			}
 		}

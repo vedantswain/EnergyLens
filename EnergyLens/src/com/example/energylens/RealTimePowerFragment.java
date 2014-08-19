@@ -35,6 +35,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 public class RealTimePowerFragment extends Fragment{
 
@@ -102,8 +103,9 @@ public class RealTimePowerFragment extends Fragment{
 //		Log.i("ELSERVICES", "RTP "+chart_container.toString()+" "+System.currentTimeMillis());  
 
 		chart_container.addView(chartView,0);
-
 		
+		TextView textView=(TextView) getView().findViewById(R.id.RealTimeText);
+		textView.setText(y+"Wh");
 	}	
 	
 	private void UpdateGUI() {

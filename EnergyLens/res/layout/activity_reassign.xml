@@ -6,15 +6,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
-        <Button
-            android:id="@+id/appLocation"
-            style="?android:attr/buttonStyleSmall"
+        <TextView
+            android:id="@+id/lastSyncReassign"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:onClick="launchLocDialog"
-            android:text="Location: " />
+            android:layout_height="wrap_content" />
 
         <TextView
             android:id="@+id/textGuide"
@@ -102,6 +97,17 @@
             android:layout_below="@+id/appLocation"
             android:orientation="vertical" >
         </LinearLayout>
+
+        <Button
+            android:id="@+id/appLocation"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/lastSyncReassign"
+            android:onClick="launchLocDialog"
+            android:text="Location: " />
 
     </RelativeLayout>
 

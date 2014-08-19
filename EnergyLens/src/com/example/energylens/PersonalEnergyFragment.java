@@ -30,11 +30,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Paint.Align;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -54,20 +56,24 @@ public class PersonalEnergyFragment extends Fragment{
 	int[] distribution={30,10,40,40,5,2,2};
 	GoogleCloudMessaging gcm;
 	String SENDER_ID = "166229175411";
-	
+
 	long totalConsumption;
 	long[] hourlyConsumption;
 	JSONArray activities;
 	ArrayList<String> activity_names=new ArrayList<String>();
 	ArrayList<Integer> activity_usage=new ArrayList<Integer>();
 
+	String lastSyncTime;
+	private Bundle latestData;
+	private String LAST_SYNC_TIME="lastPEnSync";
+	private String LAST_DATA="lastPEnData";
+	private long lastSyncInMillis;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {	     
 		View rootView = inflater.inflate(R.layout.fragment_personalenergy, container, false);
 		gcm = GoogleCloudMessaging.getInstance(getActivity());
-		sendMessage();
-
 		return rootView;
 
 	}
@@ -146,6 +152,7 @@ public class PersonalEnergyFragment extends Fragment{
 				Log.v("ELSERVICES", "Graph clicked");
 				// handle the click event on the chart
 				SeriesSelection seriesSelection = chartView.getCurrentSeriesAndPoint();
+//				Log.v("ELSERVICES", "Selected: "+seriesSelection.getSeriesIndex());
 			}
 		});
 
@@ -200,13 +207,13 @@ public class PersonalEnergyFragment extends Fragment{
 		FragmentManager fragmentManager = getFragmentManager();
 		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 		DistributionFragment fragment = new DistributionFragment();
-		
+
 		int index=0;
 		for(String activity:apps){
-		fragment=DistributionFragment.newInstance(activity, use.get(index++));
-		fragmentTransaction.add(R.id.PEnGroup, fragment);
+			fragment=DistributionFragment.newInstance(activity, use.get(index++));
+			fragmentTransaction.add(R.id.PEnGroup, fragment);
 		}
-		
+
 		fragmentTransaction.commit();
 	}
 
@@ -226,8 +233,31 @@ public class PersonalEnergyFragment extends Fragment{
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onViewCreated(view, savedInstanceState);
-		setupChart();
-//		setApps(appliances,distribution);
+		if(savedInstanceState!=null){
+			Log.v("ELSERVICES", "Loading from savedInstance");
+			Bundle data = savedInstanceState.getBundle(LAST_DATA);
+			lastSyncInMillis=savedInstanceState.getLong(LAST_SYNC_TIME);
+			if(data!=null){
+				parseData(data);
+				updateChart();
+				updateApps();
+				updateViews(lastSyncInMillis);
+			}
+		}
+		sendMessage();
+	}
+
+
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+		// Always call the superclass so it can save the view hierarchy state
+		super.onSaveInstanceState(savedInstanceState);
+		
+		// Save the last sync time and last data received
+		savedInstanceState.putLong(LAST_SYNC_TIME, lastSyncInMillis);
+		if(latestData!=null)
+			savedInstanceState.putBundle(LAST_DATA,latestData);
+		Log.v("ELSERVICES", "Instance saved");
+
 	}
 
 	public class ChartZoomListener implements ZoomListener{
@@ -306,26 +336,27 @@ public class PersonalEnergyFragment extends Fragment{
 
 	public void parseConsumption(String arr){
 		Log.v("ELSERVICES", "parseconsumption");
-		
+
 		String[] items = arr.replaceAll("\\[", "").replaceAll("\\]", "").split(",");
 
 		hourlyConsumption = new long[items.length];
 
 		for (int i = 0; i < items.length; i++) {
-		    try {
-		        hourlyConsumption[i] = Long.parseLong(items[i]);
-		    } catch (NumberFormatException nfe) {};
+			try {
+				hourlyConsumption[i] = Long.parseLong(items[i]);
+			} catch (NumberFormatException nfe) {};
 		}
-		
+
 		Log.v("ELSERVICES", "parseconsumption: "+Arrays.toString(hourlyConsumption));
 	}
-	
+
 	private void parseData(Bundle data){
 		Log.v("ELSERVICES", "parsedata");
 		String msg_type, api;
 
 		if(data.getString("api").equals("energy/personal/")){
 			try {
+				latestData=data;
 				Set<String> keys=data.keySet();
 				JSONObject response=new JSONObject();
 				if(response!=null)
@@ -340,7 +371,7 @@ public class PersonalEnergyFragment extends Fragment{
 				if(options!=null){
 					totalConsumption=options.getLong("total_consumption");
 					parseConsumption(options.getString("hourly_consumption"));
-					
+
 					Log.v("ELSERVICES", "Response Options: "+options.getLong("total_consumption")+" "+options.getString("hourly_consumption"));	
 					activities=options.getJSONArray("activities");
 
@@ -362,9 +393,21 @@ public class PersonalEnergyFragment extends Fragment{
 
 		drawChart(hourlyConsumption);
 	}
-	
+
 	private void updateApps(){
 		setApps(activity_names,activity_usage);
+	}
+
+	private void updateViews(long syncTime){
+		TextView totalVal=(TextView)getActivity().findViewById(R.id.totalVal);
+		totalVal.setText(Long.toString(totalConsumption)+"Wh");
+
+		DateFormat df=new DateFormat();
+		lastSyncTime=df.format("dd/MM/yy HH:mm", syncTime).toString();
+		TextView textView=(TextView)getActivity().findViewById(R.id.lastSyncText);
+		textView.setText("Last synced on: "+lastSyncTime);
+
+		lastSyncInMillis=System.currentTimeMillis();
 	}
 
 	private BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -377,8 +420,7 @@ public class PersonalEnergyFragment extends Fragment{
 				parseData(data);
 				updateChart();
 				updateApps();
-				TextView totalVal=(TextView)getActivity().findViewById(R.id.totalVal);
-				totalVal.setText(Long.toString(totalConsumption));
+				updateViews(System.currentTimeMillis());
 			}
 		}
 	};
