@@ -11,6 +11,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 
 import org.json.JSONObject;
@@ -150,8 +152,14 @@ public class UploaderService extends Service{
 	public void upload_pending(){
 
 		File list[] = (new File(path)).listFiles();
+		
+		Arrays.sort(list, new Comparator<File>(){
+		    public int compare(File f1, File f2)
+		    {
+		        return Long.valueOf(f1.lastModified()).compareTo(f2.lastModified());
+		    } });
 
-		//		   for(File file:list){
+//
 		for(int i=list.length-1;i>=0;i--){
 			File file=list[i];
 			String filename=file.getAbsolutePath().replace(path, "");

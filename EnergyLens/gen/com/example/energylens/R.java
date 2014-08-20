@@ -410,10 +410,10 @@ containing a value of this type.
     public static final class id {
         public static final int CompGroup=0x7f08002e;
         public static final int PEnGroup=0x7f08003b;
-        public static final int RealTimeText=0x7f080040;
-        public static final int alreadyText=0x7f080043;
-        public static final int alreadyTrainGroup=0x7f080042;
-        public static final int appGroup=0x7f08004d;
+        public static final int RealTimeText=0x7f08003f;
+        public static final int alreadyText=0x7f080042;
+        public static final int alreadyTrainGroup=0x7f080041;
+        public static final int appGroup=0x7f08004c;
         public static final int appLocation=0x7f080026;
         public static final int appName=0x7f08003a;
         public static final int book_now=0x7f080010;
@@ -428,8 +428,8 @@ containing a value of this type.
         public static final int distBar=0x7f08002a;
         public static final int distName=0x7f08002b;
         public static final int distPercent=0x7f08002c;
-        public static final int distributionBar=0x7f080047;
-        public static final int done=0x7f080045;
+        public static final int distributionBar=0x7f080046;
+        public static final int done=0x7f080044;
         public static final int gcmEmail=0x7f080019;
         public static final int gcmName=0x7f080018;
         public static final int grayscale=0x7f080012;
@@ -442,7 +442,7 @@ containing a value of this type.
         public static final int monochrome=0x7f080013;
         public static final int none=0x7f080000;
         public static final int normal=0x7f080001;
-        public static final int notYet=0x7f080044;
+        public static final int notYet=0x7f080043;
         public static final int occupantGroup=0x7f080020;
         public static final int pager=0x7f080014;
         public static final int pager_title_strip=0x7f080015;
@@ -467,24 +467,23 @@ containing a value of this type.
         public static final int segText4=0x7f080037;
         public static final int segText5=0x7f080039;
         public static final int selectionDetails=0x7f08000b;
-        public static final int send=0x7f08003f;
         public static final int serverUrl=0x7f08001a;
-        public static final int setApp=0x7f08004a;
-        public static final int setDev=0x7f080041;
+        public static final int setApp=0x7f080049;
+        public static final int setDev=0x7f080040;
         public static final int setEnd=0x7f08001e;
-        public static final int setLoc=0x7f08004b;
+        public static final int setLoc=0x7f08004a;
         public static final int setStart=0x7f08001f;
-        public static final int startButton=0x7f080049;
-        public static final int stopButton=0x7f080046;
+        public static final int startButton=0x7f080048;
+        public static final int stopButton=0x7f080045;
         public static final int strict_sandbox=0x7f080009;
         public static final int terrain=0x7f080003;
         public static final int textGuide=0x7f08001c;
         public static final int totalVal=0x7f08003e;
-        public static final int trainingResume=0x7f08004c;
+        public static final int trainingResume=0x7f08004b;
         public static final int tryAgain=0x7f080016;
         public static final int txtEmail=0x7f080028;
         public static final int txtName=0x7f080027;
-        public static final int view_flipper=0x7f080048;
+        public static final int view_flipper=0x7f080047;
         public static final int wrap_content=0x7f08000d;
     }
     public static final class integer {

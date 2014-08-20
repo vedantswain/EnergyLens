@@ -107,7 +107,7 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 		color=extras.getInt("color");
 
 		gcm = GoogleCloudMessaging.getInstance(this);
-		sendMessage();
+		setupMessage();
 	}
 
 
@@ -221,30 +221,34 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 		});
 
 	}
+	
+	public void setupMessage(){
+		Bundle data = new Bundle();
+		data.putString("msg_type", "request");
+		data.putString("api","energy/disaggregated/");
 
-	public void sendMessage(){
+		JSONObject options=new JSONObject();
+
+		try {
+			options.put("start_time", "now");
+			options.put("end_time", "last 12 hours");
+			options.put("activity_name", app);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		data.putString("options", options.toString());
+
+		sendMessage(data);
+	}
+
+	public void sendMessage(final Bundle data){
 		new AsyncTask<Void,String,String>() {
 			@Override
 			protected String doInBackground(Void... params) {
 				String msg = "";
 				try {
-					Bundle data = new Bundle();
-					data.putString("msg_type", "request");
-					data.putString("api","energy/disaggregated/");
-
-					JSONObject options=new JSONObject();
-
-					try {
-						options.put("start_time", "now");
-						options.put("end_time", "last 12 hours");
-						options.put("activity_name", app);
-					} catch (JSONException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-					data.putString("options", options.toString());
-
 					SecureRandom random = new SecureRandom();
 					String randomId=new BigInteger(130, random).toString(32);
 
@@ -291,7 +295,7 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 	public void sendReassign(View view){
 		findId();
 		Log.v("ELSERVICES", "id: "+activity_ID+" location: "+activityLoc+" start_time: "+xOfStart+" end_time: "+xOfEnd);
-		sendMessage();
+		setupMessage();
 	}
 
 	private void findId(){
@@ -472,10 +476,16 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 		ids=new ArrayList<Long>();
 		terminals=new ArrayList<long[]>();
 		time=new ArrayList<Long>();
+		ArrayList<String> locs=new ArrayList<String>();
+
 		for(int i=0;i<activities.length();i++){
 			JSONObject activity;
 			try {
 				activity = activities.getJSONObject(i);
+				if(locs.indexOf(activity.getString("location"))==-1){
+					Log.v("ELSERVICES", "Location added: "+activity.getString("location"));
+					locs.add(activity.getString("location"));
+				}
 				if(activity.getString("location").equals(loc)){
 					ids.add(activity.getLong("id"));
 					terminalPoints[0]=activity.getLong("start_time");
@@ -488,12 +498,15 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 					time.add(terminalPoints[1]);usage.add(activity.getLong("usage"));
 					time.add(terminalPoints[1]);usage.add((long) 0);
 				}
-
+				String[] currLocs=new String[locs.size()];
+				Common.changeActivityLocs(locs.toArray(currLocs));
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
+		for(String loc_name: Common.ACTIVITY_LOCS)
+			Log.v("ELSERVICES","locations: "+loc_name);
 		Log.v("ELSERVICES", "parseactivities complete");
 		if(ids!=null){
 			updateViews();

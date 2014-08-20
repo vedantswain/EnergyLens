@@ -68,6 +68,7 @@ public class PersonalEnergyFragment extends Fragment{
 	private String LAST_SYNC_TIME="lastPEnSync";
 	private String LAST_DATA="lastPEnData";
 	private long lastSyncInMillis;
+	private long maxY=0;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -124,10 +125,11 @@ public class PersonalEnergyFragment extends Fragment{
 		mRenderer.setMarginsColor(Color.argb(0xff, 0xf0, 0xf0, 0xf0)); 
 
 		mRenderer.setPanEnabled(true);
-		mRenderer.setPanLimits(new double[] {0,y.length+1,0,5000});
+		mRenderer.setPanLimits(new double[] {0,y.length+1,0,maxY*1.5});
 		mRenderer.setZoomButtonsVisible(true);
 		mRenderer.setYAxisMin(0);
 		mRenderer.setXAxisMin(0);
+		mRenderer.setYAxisMax(maxY*1.5);
 		mRenderer.setXAxisMax(y.length+1);
 		mRenderer.setChartTitle("Your Energy Consumption for the Last 12 hours");
 		mRenderer.setChartTitleTextSize(18);
@@ -211,7 +213,10 @@ public class PersonalEnergyFragment extends Fragment{
 		int index=0;
 		for(String activity:apps){
 			fragment=DistributionFragment.newInstance(activity, use.get(index++));
-			fragmentTransaction.add(R.id.PEnGroup, fragment);
+			if(fragment.isAdded())
+				fragmentTransaction.replace(R.id.PEnGroup, fragment, activity);
+			else
+				fragmentTransaction.add(R.id.PEnGroup, fragment,activity);
 		}
 
 		fragmentTransaction.commit();
@@ -274,7 +279,8 @@ public class PersonalEnergyFragment extends Fragment{
 		}
 
 	}
-
+	
+	
 	public void sendMessage(){
 		new AsyncTask<Void,String,String>() {
 			@Override
@@ -344,6 +350,8 @@ public class PersonalEnergyFragment extends Fragment{
 		for (int i = 0; i < items.length; i++) {
 			try {
 				hourlyConsumption[i] = Long.parseLong(items[i]);
+				if(hourlyConsumption[i]>maxY)
+					maxY=hourlyConsumption[i];
 			} catch (NumberFormatException nfe) {};
 		}
 

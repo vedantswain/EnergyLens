@@ -31,6 +31,8 @@ public class AppLocDialogFragment extends DialogFragment {
 	 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
+		if(Common.ACTIVITY_LOCS!=null)
+			locations=Common.ACTIVITY_LOCS;
 	    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 	    builder.setTitle(R.string.dialog_locations)
 	           .setItems(locations, new DialogInterface.OnClickListener() {

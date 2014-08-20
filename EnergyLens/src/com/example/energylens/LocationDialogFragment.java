@@ -10,7 +10,7 @@ import android.support.v4.app.DialogFragment;
 import com.example.energylens.ApplianceDialogFragment.ApplianceDialogListener;
 
 public class LocationDialogFragment extends DialogFragment {
-	private String[] locations={"Kitchen","Dining Room","Bedroom","Bedroom1","Bedroom2","Bedroom3","Study","Corridor"};
+	private String[] locations={"Kitchen","Dining Room","Bedroom1","Bedroom2","Bedroom3","Study","Corridor"};
 	
 	 public interface LocationDialogListener {
 	        public void onLocSelected(String loc);

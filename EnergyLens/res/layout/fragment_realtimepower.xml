@@ -8,19 +8,10 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.energylens.MainActivity" >
 
-	<Button
-	    android:id="@+id/send"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:onClick="onSend"
-	    android:text="Send Message" />
-
 	<LinearLayout
 	    android:id="@+id/chartComparison"
 	    android:layout_width="match_parent"
 	    android:layout_height="match_parent"
-	    android:layout_alignLeft="@+id/send"
-	    android:layout_below="@+id/send"
 	    android:orientation="vertical" >
 
 	</LinearLayout>

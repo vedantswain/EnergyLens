@@ -27,6 +27,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.graphics.Paint.Align;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -90,6 +91,9 @@ public class RealTimePowerFragment extends Fragment{
 		mRenderer.setChartTitleTextSize(14);
 		mRenderer.setLabelsColor(Color.BLACK);
 		mRenderer.setLabelsTextSize(18);
+		mRenderer.setYTitle("Power");
+		mRenderer.setXTitle("Time");
+		mRenderer.setYLabelsAlign(Align.RIGHT);
 		mRenderer.setChartTitle("Real-Time Power Consumption");
 		mRenderer.setShowGrid(true);
 
@@ -105,7 +109,7 @@ public class RealTimePowerFragment extends Fragment{
 		chart_container.addView(chartView,0);
 		
 		TextView textView=(TextView) getView().findViewById(R.id.RealTimeText);
-		textView.setText(y+"Wh");
+		textView.setText("Current power consumption: "+y+"W");
 	}	
 	
 	private void UpdateGUI() {

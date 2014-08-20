@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import android.content.SharedPreferences;
 
 public class Common{
+	public static String[] ACTIVITY_LOCS;
 	public static Boolean DOUBLE_BACK=false;
 	public static String SENDER_ID = "166229175411";
 	public static long INTERVAL = 30; //seconds between each scheduling of service
@@ -109,6 +110,11 @@ public class Common{
 	public static void changeUploadInterval(long interval){
 		UPLOAD_INTERVAL=interval; 
 		// Restore preferences
+	}
+	
+	public static void changeActivityLocs(String[] locs){
+		ACTIVITY_LOCS=new String[locs.length];
+		ACTIVITY_LOCS=locs;
 	}
 	
 	

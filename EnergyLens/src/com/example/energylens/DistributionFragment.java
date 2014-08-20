@@ -23,11 +23,16 @@ public class DistributionFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View inflateView=inflater.inflate(R.layout.fragment_app_distribution, container, false);
-        
+        final String appliance=getArguments().getString("appliance");
         TextView appName=(TextView)inflateView.findViewById(R.id.distName);
-    	appName.setText(getArguments().getString("appliance"));
+    	appName.setText(appliance);
     	TextView appPercent=(TextView)inflateView.findViewById(R.id.distPercent);
     	appPercent.setText(Integer.toString(getArguments().getInt("percent"))+"%");
+    	
+    	if(appliance.equals("Unknown")){
+    		appName.setTextColor(Color.GRAY);
+    		appPercent.setTextColor(Color.GRAY);
+    	}
     	
     	final int color;
     	final int percent=getArguments().getInt("percent");
@@ -38,8 +43,6 @@ public class DistributionFragment extends Fragment {
     		else
     			color=Color.argb(195, 179, 0, 45);
     	
-//    	appPercent.setTextColor(color);
-    	
     	final ProgressBar progressBar=(ProgressBar)inflateView.findViewById(R.id.distBar);
 
     	// Define a shape with rounded corners
@@ -47,8 +50,11 @@ public class DistributionFragment extends Fragment {
         ShapeDrawable pgDrawable = new ShapeDrawable(new RoundRectShape(roundedCorners,     null, null));
 
         // Sets the progressBar color
-        pgDrawable.getPaint().setColor(color);
-
+        if(appliance.equals("Unknown"))
+        	pgDrawable.getPaint().setColor(Color.DKGRAY);
+        else
+       		pgDrawable.getPaint().setColor(color);
+            
         // Adds the drawable to your progressBar
         ClipDrawable progress = new ClipDrawable(pgDrawable, Gravity.LEFT, ClipDrawable.HORIZONTAL);
         progressBar.setProgressDrawable(progress);
@@ -64,12 +70,13 @@ public class DistributionFragment extends Fragment {
 			public void onClick(View view) {
 				// TODO Auto-generated method stub
 					Bundle extras=new Bundle();
-					Log.v("ELSERVICES", "Distribution "+getArguments().getString("appliance"));
+					Log.v("ELSERVICES", "Distribution "+appliance);
 					Intent intent=new Intent(getActivity(),ReassignActivity.class);
-					extras.putString("appliance", getArguments().getString("appliance"));
+					extras.putString("appliance", appliance);
 					extras.putInt("color", color);
 					intent.putExtras(extras);
-					startActivity(intent);
+					if(!appliance.equals("Unknown"))
+						startActivity(intent);
 			}
         });			
 			
