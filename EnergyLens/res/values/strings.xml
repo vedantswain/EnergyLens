@@ -29,5 +29,6 @@
     <string name="title_activity_register">RegisterActivity</string>
     <string name="title_activity_gcm">GCMActivity</string>
     <string name="dialog_try_again">Registration failed. Give it another try?</string>
+    <string name="title_activity_time_select">TimeSelectActivity</string>
 
 </resources>

@@ -213,8 +213,10 @@ public class PersonalEnergyFragment extends Fragment{
 		int index=0;
 		for(String activity:apps){
 			fragment=DistributionFragment.newInstance(activity, use.get(index++));
-			if(fragment.isAdded())
+			if(fragment.isAdded()){
 				fragmentTransaction.replace(R.id.PEnGroup, fragment, activity);
+				Log.v("ELSERVICES", "fragment replaced");
+			}
 			else
 				fragmentTransaction.add(R.id.PEnGroup, fragment,activity);
 		}

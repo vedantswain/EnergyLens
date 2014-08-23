@@ -29,7 +29,6 @@
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    
 
     <permission
         android:name="com.example.gcm.permission.C2D_MESSAGE"
@@ -51,7 +50,6 @@
             android:name=".CollectionTabActivity"
             android:label="@string/title_activity_collection_tab"
             android:screenOrientation="portrait" >
-            
         </activity>
         <activity
             android:name=".AxlServ"
@@ -80,9 +78,9 @@
         <meta-data
             android:name="com.crashlytics.ApiKey"
             android:value="089ec5b2bd9235f5f2655bfa69944ad4a889004a" />
-        
-        <meta-data android:name="com.google.android.gms.version"
-        android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
         <activity
             android:name=".TrainActivity"
@@ -101,15 +99,14 @@
         </activity>
         <activity
             android:name=".ReassignActivity"
-            android:label="@string/title_activity_reassign"
-             >
+            android:label="@string/title_activity_reassign" >
         </activity>
-        
-        <receiver android:name=".BootupReceiver">  
-		    <intent-filter>  
-		        <action android:name="android.intent.action.BOOT_COMPLETED" />  
-		    </intent-filter>  
-		</receiver>
+
+        <receiver android:name=".BootupReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
         <receiver android:name=".WiFiService$WifiReceiver" >
             <intent-filter>
                 <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
@@ -118,8 +115,8 @@
         </receiver>
         <receiver
             android:name=".GcmBroadcastReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND"
-            android:exported="true" >
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
 
@@ -137,6 +134,14 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".TimeSelectActivity"
+            android:label="@string/title_activity_time_select"
+            android:parentActivityName=".CollectionTabActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.energylens.CollectionTabActivity" />
         </activity>
     </application>
 

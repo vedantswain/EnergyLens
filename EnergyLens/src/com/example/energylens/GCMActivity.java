@@ -6,7 +6,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -27,6 +26,8 @@ import android.support.v4.app.FragmentActivity;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,7 +62,7 @@ public class GCMActivity extends FragmentActivity implements TryAgainDialogListe
     Context context;
     long devid;
     int reg_success=0;
-    String regid,regName,regEmail,serverUrl;
+    String regid,regName,regEmail,serverUrl,regAppt="";
 
     @Override
     public void onCreate(Bundle savedInstanceState) { 	
@@ -77,6 +78,23 @@ public class GCMActivity extends FragmentActivity implements TryAgainDialogListe
         setContentView(R.layout.activity_gcm);
         context = getApplicationContext();
         
+        final CheckBox checkBox = (CheckBox) findViewById(R.id.firstInstall);
+        checkBox.setOnClickListener(new OnClickListener(){
+        	 @Override
+             public void onClick(View v) {
+                 // TODO Auto-generated method stub
+                 if(checkBox.isChecked()){
+                	 Log.v("ELSERVICES", "Checked");
+                     EditText apptNo=(EditText) findViewById(R.id.apptNo);
+                     apptNo.setVisibility(View.VISIBLE);
+                 }else{
+                	 Log.v("ELSERVICES", "unChecked");
+                     EditText apptNo=(EditText) findViewById(R.id.apptNo);
+                     apptNo.setVisibility(View.INVISIBLE);
+                 }
+             }
+        });
+
         getUpdatedPreferences();
 
          // Check device for Play Services APK. If check succeeds, proceed with
@@ -99,6 +117,7 @@ public class GCMActivity extends FragmentActivity implements TryAgainDialogListe
  // You need to do the Play Services APK check here too.
     @Override
     protected void onResume() {
+    	
     	if(Common.DOUBLE_BACK){
     		Common.changeDoubleBack(false);
     		finish();
@@ -248,16 +267,22 @@ public void onRegister(View view){
 	EditText name=(EditText)findViewById(R.id.gcmName);
 	EditText email=(EditText)findViewById(R.id.gcmEmail);
 	EditText server_URL=(EditText)findViewById(R.id.serverUrl);
+	EditText apptNo=(EditText)findViewById(R.id.apptNo);
+	CheckBox checkBox=(CheckBox) findViewById(R.id.firstInstall);
 	
 	if(name.getText().toString().matches("")){
 		Toast.makeText(context, "we need to call you something", 1000).show();
 	}
-//	else if(name.getText().toString().matches("")){
-//		Toast.makeText(context, "can't get started without a server", 1000).show();
-//	}
+	else if(checkBox.isChecked() && apptNo.getText().toString().matches("")){
+		Toast.makeText(context, "you forgot to give your appartment number", 1000).show();
+	}
 	else{
 		regName=name.getText().toString();
 		regEmail=email.getText().toString();
+		if(checkBox.isChecked()){
+			regAppt=apptNo.getText().toString();
+		}
+
 		if(server_URL.getText().toString().matches(""))
 			serverUrl="http://192.168.20.217:9010/";
 		else
@@ -305,8 +330,11 @@ private void sendRegistrationIdToBackend() {
         jsonObject.put("dev_id", devid);
         jsonObject.put("user_name", regName);
         jsonObject.put("email_id", regEmail);
+        jsonObject.put("apt_no", regAppt);
         
         json = jsonObject.toString();
+        
+        Log.v(TAG, "registration_id: "+regid+" dev_id: "+devid);
         
         StringEntity se = new StringEntity(json);
 //        se.setContentType("application/json;charset=UTF-8");
@@ -402,13 +430,4 @@ public void onCancel() {
 	finish();	
 }
 
-//public void onClick(final View view) {
-//    if (view == findViewById(R.id.send)) {
-//       sendMessage();
-//    } else if (view == findViewById(R.id.clear)) {
-//        mDisplay.setText("Response: ");
-//    } else if (view == findViewById(R.id.tryAgain)) {
-//        tryAgain();
-//    }
-//}
 }

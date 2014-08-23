@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 public class Common{
 	public static String[] ACTIVITY_LOCS;
 	public static Boolean DOUBLE_BACK=false;
+	public static Boolean RTP_VISIBLE=false;
 	public static String SENDER_ID = "166229175411";
 	public static long INTERVAL = 30; //seconds between each scheduling of service
 	public static int SAMPLE_TIME=10; //seconds for which sensors will take data
@@ -18,6 +19,8 @@ public class Common{
 	public static String SERVER_URL="http://192.168.20.217:9010/";
 	public static String API="data/upload/";
 	public static String REG_API="device/register/";
+	public static String REALTIME_API="power/real-time/";
+	public static String TRAINDATA_API="data/training/";
 	public static int TRAINING_STATUS=0;
 	public static int TRAINING_COUNT=0;
 	public static String EL_PREFS="EnerglyLens_Prefs";
@@ -115,6 +118,9 @@ public class Common{
 	public static void changeActivityLocs(String[] locs){
 		ACTIVITY_LOCS=new String[locs.length];
 		ACTIVITY_LOCS=locs;
+	}
+	public static void changeRTPVisible(boolean isVisible){
+		RTP_VISIBLE=isVisible;
 	}
 	
 	

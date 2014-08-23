@@ -63,8 +63,8 @@ public class CompDistributionFragment extends Fragment {
      			percentage.setText(Double.toString(distribution[i])+"%");
     		
      		
-    		Log.v("ELSERVICES", "Dimensions: "+params.width+"x"+params.height);
-    		Log.v("ELSERVICES", "new width"+percentWidth+" full width"+fullWidth);
+//    		Log.v("ELSERVICES", "Dimensions: "+params.width+"x"+params.height);
+//    		Log.v("ELSERVICES", "new width"+percentWidth+" full width"+fullWidth);
     		segShape.setLayoutParams(params);
     	}
     	

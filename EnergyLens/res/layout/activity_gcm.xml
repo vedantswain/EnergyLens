@@ -9,21 +9,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginTop="48dp"
+        android:layout_alignParentTop="true"
         android:text="Try Again"
         android:visibility="invisible" />
-
-    <Button
-        android:id="@+id/register"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginBottom="122dp"
-        android:onClick="onRegister"
-        android:text="Register Device" />
 
     <EditText
         android:id="@+id/gcmName"
@@ -34,10 +22,7 @@
         android:layout_below="@+id/tryAgain"
         android:ems="10"
         android:hint="What should we call you?"
-        android:inputType="textPersonName" >
-
-        <requestFocus />
-    </EditText>
+        android:inputType="textPersonName" />
 
     <EditText
         android:id="@+id/gcmEmail"
@@ -46,7 +31,6 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/gcmName"
-        android:layout_marginTop="29dp"
         android:ems="10"
         android:hint="How do we reach you by mail?"
         android:inputType="textEmailAddress" />
@@ -58,9 +42,43 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/gcmEmail"
-        android:layout_marginTop="28dp"
         android:ems="10"
         android:hint="Which server do we connect to?"
         android:visibility="invisible" />
+
+    <Button
+        android:id="@+id/register"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="44dp"
+        android:onClick="onRegister"
+        android:text="Register Device" />
+
+    <CheckBox
+        android:id="@+id/firstInstall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/serverUrl"
+        android:layout_marginTop="74dp"
+        android:text="First Install?" />
+
+    <EditText
+        android:id="@+id/apptNo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/firstInstall"
+        android:layout_marginTop="17dp"
+        android:ems="10"
+        android:hint="Which appartment do you live in?"
+        android:visibility="invisible" >
+
+        <requestFocus />
+    </EditText>
 
 </RelativeLayout>
