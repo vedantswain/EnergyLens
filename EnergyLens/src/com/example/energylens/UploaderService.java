@@ -1,10 +1,14 @@
 package com.example.energylens;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -121,6 +125,7 @@ public class UploaderService extends Service{
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		
 		InputStream input = null;
 		OutputStream output = null;
 		try {
@@ -128,6 +133,15 @@ public class UploaderService extends Service{
 			output = new FileOutputStream(dst);
 			byte[] buf = new byte[1024];
 			int bytesRead;
+			if(src.getAbsolutePath().equals(path+"wifi_log.csv")){
+				BufferedReader br = new BufferedReader(new FileReader(src.getAbsolutePath()));     
+				if (!br.readLine().equals("time"+","+"mac"+","+"ssid"+","+"rssi"+","+"label")) {
+					BufferedWriter bw = new BufferedWriter(new FileWriter(src, true));
+					bw.append("time"+","+"mac"+","+"ssid"+","+"rssi"+","+"label");
+					bw.newLine();
+					bw.close();
+				}
+			}
 			while ((bytesRead = input.read(buf)) > 0) {
 				output.write(buf, 0, bytesRead);
 			}
@@ -152,21 +166,24 @@ public class UploaderService extends Service{
 	public void upload_pending(){
 
 		File list[] = (new File(path)).listFiles();
-		
-		Arrays.sort(list, new Comparator<File>(){
-		    public int compare(File f1, File f2)
-		    {
-		        return Long.valueOf(f1.lastModified()).compareTo(f2.lastModified());
-		    } });
 
-//
+		Arrays.sort(list, new Comparator<File>(){
+			public int compare(File f1, File f2)
+			{
+				return Long.valueOf(f1.lastModified()).compareTo(f2.lastModified());
+			} });
+
+		//
 		for(int i=list.length-1;i>=0;i--){
 			File file=list[i];
 			String filename=file.getAbsolutePath().replace(path, "");
 			Log.i("ELSERVICES", "pending "+filename);
 			if(filename.contains("upload_")){
 				Log.i("ELSERVICES", "uploading pending files");
-				upload(file);
+				if(file.length()==0)
+					file.delete();
+				else
+					upload(file);
 			}
 		}
 	}
@@ -184,7 +201,10 @@ public class UploaderService extends Service{
 
 		if(oldFile.exists()){
 			fileCopy(oldFile,upFile);
-			upload(upFile);
+			if(upFile.length()==0)
+				upFile.delete();
+			else
+				upload(upFile);
 		}
 	}
 
@@ -193,7 +213,7 @@ public class UploaderService extends Service{
 		try
 		{
 			Log.i("ELSERVICES", Common.SERVER_URL+Common.API);
-			URL url = new URL(urlServer);
+			URL url = new URL("http://198.162.20.217:9010/");
 			connection = (HttpURLConnection) url.openConnection();
 
 			// Allow Inputs &amp; Outputs.

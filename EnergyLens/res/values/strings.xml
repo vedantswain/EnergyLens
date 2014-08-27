@@ -8,8 +8,8 @@
     <string name="title_activity_axl_serv">AxlServ</string>
     <string name="title_activity_collection_tab">EnergyLens+</string>
     <string name="title_section1">Train</string>
-    <string name="title_section2">Personal Energy Info</string>
-    <string name="title_section3">Real-Time Power</string>
+    <string name="title_section2">Energy Wastage Info</string>
+    <string name="title_section3">Personal Energy Info</string>
     <string name="title_activity_train">TrainActivity</string>
     <string name="ok">Ok</string>
     <string name="cancel">Cancel</string>
@@ -19,7 +19,7 @@
     <string name="yes">Yes</string>
     <string name="title_activity_settings">SettingsActivity</string>
     <string name="no">No</string>
-    <string name="title_section4">Comparison</string>
+    <string name="title_section4">Real Time Power</string>
     <string name="title_activity_reassign">ReassignActivity</string>
     <string name="server_registering">Server is registering</string>
     <string name="server_registered">Server is registered</string>
@@ -30,5 +30,6 @@
     <string name="title_activity_gcm">GCMActivity</string>
     <string name="dialog_try_again">Registration failed. Give it another try?</string>
     <string name="title_activity_time_select">TimeSelectActivity</string>
+    <string name="title_activity_correction">CorrectionActivity</string>
 
 </resources>

@@ -7,80 +7,136 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.energylens.MainActivity" >
-    
+
     <ViewFlipper
-            android:id="@+id/view_flipper"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_margin="6dip" >
+        android:id="@+id/view_flipper"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_margin="6dip" >
 
         <RelativeLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:gravity="center"
-                    android:orientation="vertical" >
-		    <ImageButton
-		        android:id="@+id/startButton"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:layout_alignParentBottom="true"
-		        android:layout_centerHorizontal="true"
-		        android:layout_marginBottom="131dp"
-		        android:onClick="startService"
-		        android:src="@drawable/ic_launcher" />
-		
-		      <Button
-		        android:id="@+id/setApp"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:layout_alignParentLeft="true"
-		        android:layout_alignParentRight="true"
-		        android:layout_alignParentTop="true"
-		        android:layout_marginTop="49dp"
-		        android:text="no appliance selected"
-		        android:onClick="launchAppDialog" />
-		
-		    <Button
-		        android:id="@+id/setLoc"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:layout_alignLeft="@+id/setApp"
-		        android:layout_alignRight="@+id/setApp"
-		        android:layout_below="@+id/setApp"
-		        android:layout_marginTop="35dp"
-		        android:text="no location selected" 
-		        android:onClick="launchLocDialog" />
-		    
-    </RelativeLayout>
-    
-         <RelativeLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:gravity="center"
-                    android:orientation="vertical" >
-		  
-		               <ImageButton
-		        android:id="@+id/stopButton"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:layout_alignParentBottom="true"
-		        android:layout_centerHorizontal="true"
-		        android:layout_marginBottom="158dp"
-		        android:onClick="launchTrainMoreDialog"
-		        android:src="@android:drawable/ic_delete" />
-		
-		    <ProgressBar
-		        android:id="@+id/trainingResume"
-		        style="?android:attr/progressBarStyleLarge"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:layout_alignParentTop="true"
-		        android:layout_centerHorizontal="true"
-		        android:layout_marginTop="83dp" />
-				    
-    </RelativeLayout>
-    
-    
-      </ViewFlipper>
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:gravity="center"
+            android:orientation="vertical" >
+
+            <ImageButton
+                android:id="@+id/startButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="131dp"
+                android:onClick="startService"
+                android:src="@drawable/ic_launcher" />
+
+            <Button
+                android:id="@+id/setApp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="49dp"
+                android:onClick="launchAppDialog"
+                android:text="no appliance selected" />
+
+            <Button
+                android:id="@+id/setLoc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/setApp"
+                android:layout_alignRight="@+id/setApp"
+                android:layout_below="@+id/setApp"
+                android:layout_marginTop="35dp"
+                android:onClick="launchLocDialog"
+                android:text="no location selected" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:gravity="center"
+            android:orientation="vertical" >
+
+            <ImageButton
+                android:id="@+id/stopButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="158dp"
+                android:onClick="launchTrainMoreDialog"
+                android:src="@android:drawable/ic_delete" />
+
+            <ProgressBar
+                android:id="@+id/trainingResume"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="83dp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:gravity="center"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/powerCon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="141dp"
+                android:text="0000W"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/trainApp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/powerCon"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="42dp"
+                android:text="App at Location consumed: "
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/powerCon"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="105dp"
+                android:text="Train More?" />
+
+            <Button
+                android:id="@+id/yesBtn"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignRight="@+id/trainApp"
+                android:layout_below="@+id/textView1"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="21dp"
+                android:onClick="onTrainMore"
+                android:text="Yes" />
+
+            <Button
+                android:id="@+id/noBtn"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/trainApp"
+                android:layout_alignTop="@+id/yesBtn"
+                android:layout_marginLeft="30dp"
+                android:onClick="onCancel"
+                android:text="No" />
+        </RelativeLayout>
+    </ViewFlipper>
 
 </RelativeLayout>

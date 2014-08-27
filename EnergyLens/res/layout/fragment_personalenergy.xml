@@ -13,6 +13,14 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin" >
 
+        <Button
+            android:id="@+id/timeSelectBtn"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:onClick="toTimeSelect"
+            android:text="Change Time Period " />
+
         <TextView
             android:id="@+id/lastSyncText"
             android:layout_width="wrap_content"
@@ -45,7 +53,6 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="40dp"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
-
         </LinearLayout>
 
         <TextView
@@ -57,6 +64,13 @@
             android:text="Appliance-wise Distribution:"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textSize="14sp" />
+
+        <LinearLayout
+            android:id="@+id/PEnDist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+        </LinearLayout>
 
     </LinearLayout>
 

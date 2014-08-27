@@ -143,6 +143,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.energylens.CollectionTabActivity" />
         </activity>
+        <activity
+            android:name=".CorrectionActivity"
+            android:label="@string/title_activity_correction"
+            android:parentActivityName=".CollectionTabActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.energylens.CollectionTabActivity" />
+        </activity>
     </application>
 
 </manifest>

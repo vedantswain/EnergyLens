@@ -230,8 +230,14 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 		JSONObject options=new JSONObject();
 
 		try {
-			options.put("start_time", "now");
-			options.put("end_time", "last 12 hours");
+			if(Common.TIME_PERIOD_CHANGED){
+				options.put("start_time", Common.TIME_PERIOD_START);
+				options.put("end_time", Common.TIME_PERIOD_END);
+			}
+			else{
+				options.put("start_time", "now");
+				options.put("end_time", "last 12 hours");
+			}
 			options.put("activity_name", app);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -253,7 +259,7 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 					String randomId=new BigInteger(130, random).toString(32);
 
 					gcm.send(SENDER_ID + "@gcm.googleapis.com", randomId, data);
-					msg = "PersonalEnergy sent message";
+					msg = "Reassign sent message";
 					Log.i("ELSERVICES", "message sent to disaggregated: "+data.toString());
 
 				} catch (IOException ex) {
@@ -333,7 +339,7 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 
 	public void selectEnd(View view){
 		TimePickerDialogFragment newFragment = new TimePickerDialogFragment();
-		newFragment.show(getFragmentManager(), "Appliances");
+		newFragment.show(getFragmentManager(), "Time Picker");
 		changeTimeOf="end";
 	}
 

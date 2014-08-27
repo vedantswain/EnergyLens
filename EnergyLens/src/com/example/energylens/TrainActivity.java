@@ -33,7 +33,7 @@ import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 
-public class TrainActivity extends FragmentActivity implements ApplianceDialogFragment.ApplianceDialogListener,LocationDialogFragment.LocationDialogListener,TrainMoreDialogFragment.TrainMoreDialogListener{
+public class TrainActivity extends FragmentActivity implements ApplianceDialogFragment.ApplianceDialogListener,LocationDialogFragment.LocationDialogListener{
 	private static final int LENGTH_SHORT = 1000;
 	private AlarmManager axlAlarmMgr,wifiAlarmMgr,audioAlarmMgr,lightAlarmMgr,magAlarmMgr,uploaderAlarmMgr;
 	private PendingIntent axlServicePendingIntent,wifiServicePendingIntent,audioServicePendingIntent,lightServicePendingIntent,magServicePendingIntent,uploaderServicePendingIntent;
@@ -42,7 +42,11 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 	Double power;
 	long startTime,stopTime;
 	private Handler mHandler = new Handler();
-
+	private Object lastLocation;
+	private Object lastLabel;
+	private String[] locations={"Kitchen","Dining Room","Bedroom1","Bedroom2","Bedroom3","Study","Corridor"};
+	private String[] labels={"Fan","AC","Microwave","TV","Computer","Printer","Washing Machine","Fan+AC"};
+	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
@@ -108,8 +112,8 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 			jsonObject.put("dev_id", devid);
 			jsonObject.put("start_time", startTime);
 			jsonObject.put("end_time", stopTime);
-			jsonObject.put("location", Common.LOCATION);
-			jsonObject.put("appliance", Common.LABEL);
+			jsonObject.put("location", lastLocation);
+			jsonObject.put("appliance", lastLabel);
 
 			json = jsonObject.toString();
 
@@ -147,6 +151,7 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 			power=Double.parseDouble(response.getString("power"));
 
 			Log.v("ELSERVICES", "power: "+power);		
+			
 			return "Training Data retrieved";
 
 		} catch (Exception e) {
@@ -157,27 +162,30 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 	}
 
 	public void launchAppDialog(View view){
+		Common.changeActivityApps(labels);
 		DialogFragment newFragment = new ApplianceDialogFragment();
 		newFragment.show(getSupportFragmentManager(), "Appliances");
 	}
 
 	public void launchTrainMoreDialog(View view){
-
-		View prog_view=findViewById(R.id.trainingResume);
-		prog_view.setVisibility(View.GONE);
+		viewFlipper.showNext();
+		lastLabel=Common.LABEL;
+		lastLocation=Common.LOCATION;
+		mHandler.post(mTask);
+//		View prog_view=findViewById(R.id.trainingResume);
+//		prog_view.setVisibility(View.GONE);
 		if(Common.TRAINING_STATUS==1){
 			Toast.makeText(TrainActivity.this, "Training data collection stopped", LENGTH_SHORT).show();
 		}
 		Common.changeTrainingStatus(2);
-		DialogFragment newFragment = new TrainMoreDialogFragment();
-		newFragment.show(getSupportFragmentManager(), "TrainMore");
+//		DialogFragment newFragment = new TrainMoreDialogFragment();
+//		newFragment.show(getSupportFragmentManager(), "TrainMore");
 		Common.changeLabel("none");
 		Common.changeLocation("none");
 		Common.changePrefix("");
 		Common.changeTrainingCount(Common.TRAINING_COUNT+1);
 
 		try {
-			mHandler.post(mTask);
 			stop();
 		} catch (Throwable e) {
 			// TODO Auto-generated catch block
@@ -186,6 +194,7 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 	}
 
 	public void launchLocDialog(View view){
+		Common.changeActivityLocs(locations);
 		DialogFragment newFragment = new LocationDialogFragment();
 		newFragment.show(getSupportFragmentManager(), "Locations");
 
@@ -298,7 +307,7 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 		 new AsyncTask<Void,String,String>() {
 	         @Override
 	         protected String doInBackground(Void... params) {
-	             String msg = "Realtime Data retrieved";
+	             String msg = "Training Data retrieved";
 	             msg=getTrainingData();
 	             Log.v("ELSERVICES", "Training: "+msg);
 	             return msg;
@@ -306,6 +315,11 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 
 	         @Override
 	         protected void onPostExecute(String msg) {
+	        	 TextView trainingPower=(TextView) findViewById(R.id.powerCon);
+	 			trainingPower.setText(power.toString());
+	 			TextView trainingText=(TextView) findViewById(R.id.trainApp);
+	 			trainingText.setText(lastLabel+" at "+lastLocation+"\n consumed: ");
+	 			
 	            Log.i("ELSERVICES", msg);
 	         }
 	     }.execute(null, null, null);
@@ -341,11 +355,11 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 		textView.setText(Common.LOCATION);
 	}
 
-	@Override
-	public void onTrainMore() {
+	public void onTrainMore(View view) {
 		// TODO Auto-generated method stub
 		Common.changeTrainingStatus(0);
 		updatePreferences(Common.TRAINING_STATUS);
+		viewFlipper.showPrevious();
 		viewFlipper.showPrevious();
 		TextView textView=(TextView) findViewById(R.id.setApp);
 		textView.setText("no appliance selected");
@@ -353,8 +367,7 @@ public class TrainActivity extends FragmentActivity implements ApplianceDialogFr
 		textView.setText("no location selected");
 	}
 
-	@Override
-	public void onCancel() {
+	public void onCancel(View view) {
 		// TODO Auto-generated method stub
 		try {
 			Common.changeTrainingStatus(0);

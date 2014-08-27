@@ -34,6 +34,8 @@ public class ApplianceDialogFragment extends DialogFragment {
 	 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
+		if(Common.ACTIVITY_APPS!=null)
+			labels=Common.ACTIVITY_APPS;
 	    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 	    builder.setTitle(R.string.dialog_appliances)
 	           .setItems(labels, new DialogInterface.OnClickListener() {

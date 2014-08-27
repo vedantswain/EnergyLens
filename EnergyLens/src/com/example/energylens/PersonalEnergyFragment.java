@@ -31,6 +31,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
 import android.graphics.Paint.Align;
 import android.os.AsyncTask;
@@ -63,12 +64,15 @@ public class PersonalEnergyFragment extends Fragment{
 	ArrayList<String> activity_names=new ArrayList<String>();
 	ArrayList<Integer> activity_usage=new ArrayList<Integer>();
 
+	ArrayList<Fragment> fragmentList=new ArrayList<Fragment>();
+
 	String lastSyncTime;
 	private Bundle latestData;
 	private String LAST_SYNC_TIME="lastPEnSync";
 	private String LAST_DATA="lastPEnData";
 	private long lastSyncInMillis;
 	private long maxY=0;
+	private String PREFS_NAME="PEN_PREFS";
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -79,19 +83,6 @@ public class PersonalEnergyFragment extends Fragment{
 
 	}
 
-	public void adjustTime(int[] x){
-
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(new Date());
-
-		int curr_hour=calendar.get(Calendar.HOUR_OF_DAY);
-		for(int i=0;i<x.length;i++){
-			x[i]=x[i]-curr_hour;
-			if(x[i]<0){
-				x[i]=24+x[i];
-			}
-		}
-	}
 
 	public void setupChart(){
 		int[] x = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24};
@@ -154,7 +145,7 @@ public class PersonalEnergyFragment extends Fragment{
 				Log.v("ELSERVICES", "Graph clicked");
 				// handle the click event on the chart
 				SeriesSelection seriesSelection = chartView.getCurrentSeriesAndPoint();
-//				Log.v("ELSERVICES", "Selected: "+seriesSelection.getSeriesIndex());
+				//				Log.v("ELSERVICES", "Selected: "+seriesSelection.getSeriesIndex());
 			}
 		});
 
@@ -213,15 +204,11 @@ public class PersonalEnergyFragment extends Fragment{
 		int index=0;
 		for(String activity:apps){
 			fragment=DistributionFragment.newInstance(activity, use.get(index++));
-			if(fragment.isAdded()){
-				fragmentTransaction.replace(R.id.PEnGroup, fragment, activity);
-				Log.v("ELSERVICES", "fragment replaced");
-			}
-			else
-				fragmentTransaction.add(R.id.PEnGroup, fragment,activity);
+			fragmentTransaction.add(R.id.PEnDist, fragment,activity);
+			fragmentList.add(fragment);
 		}
-
 		fragmentTransaction.commit();
+		fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 	}
 
 	@Override
@@ -230,6 +217,10 @@ public class PersonalEnergyFragment extends Fragment{
 		LinearLayout layout = (LinearLayout) getActivity().findViewById(R.id.chartComp);
 		chartView = ChartFactory.getLineChartView(getActivity(), mDataset, mRenderer);
 		getActivity().registerReceiver(receiver, new IntentFilter(GcmIntentService.RECEIVER));
+		Date start=new Date(Common.TIME_PERIOD_START);
+		Date end=new Date(Common.TIME_PERIOD_END);
+		Log.v("ELSERVICES", "From: "+start.toString()+" To: "+end.toString());
+		sendMessage();
 	}
 
 	public void onPause(){
@@ -240,32 +231,42 @@ public class PersonalEnergyFragment extends Fragment{
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onViewCreated(view, savedInstanceState);
-		if(savedInstanceState!=null){
-			Log.v("ELSERVICES", "Loading from savedInstance");
-			Bundle data = savedInstanceState.getBundle(LAST_DATA);
-			lastSyncInMillis=savedInstanceState.getLong(LAST_SYNC_TIME);
-			if(data!=null){
-				parseData(data);
+		
+		SharedPreferences sp=getActivity().getSharedPreferences(PREFS_NAME,0);
+		
+		if(sp.contains("LAST_SYNC")){
+			Log.v("ELSERVICES", "Loading PEn from saved data");
+			lastSyncInMillis=sp.getLong("LAST_SYNC",System.currentTimeMillis());
+				parsePref(sp.getString("JSON_RESPONSE", ""));
 				updateChart();
 				updateApps();
 				updateViews(lastSyncInMillis);
-			}
 		}
-		sendMessage();
+	}
+	
+	public void parsePref(String resp){
+		try {
+			JSONObject response=new JSONObject(resp);
+			JSONObject options=new JSONObject(response.getString("options"));
+
+			if(options!=null){
+				totalConsumption=options.getLong("total_consumption");
+				parseConsumption(options.getString("hourly_consumption"));
+
+				Log.v("ELSERVICES", "Response Options: "+options.getLong("total_consumption")+" "+options.getString("hourly_consumption"));	
+				activities=options.getJSONArray("activities");
+
+				if(activities!=null){
+					Log.v("ELSERVICES","Response Activities: "+ activities.getString(0));
+					parseActivities();
+				}
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
-
-	public void onSaveInstanceState(Bundle savedInstanceState) {
-		// Always call the superclass so it can save the view hierarchy state
-		super.onSaveInstanceState(savedInstanceState);
-		
-		// Save the last sync time and last data received
-		savedInstanceState.putLong(LAST_SYNC_TIME, lastSyncInMillis);
-		if(latestData!=null)
-			savedInstanceState.putBundle(LAST_DATA,latestData);
-		Log.v("ELSERVICES", "Instance saved");
-
-	}
 
 	public class ChartZoomListener implements ZoomListener{
 
@@ -281,8 +282,8 @@ public class PersonalEnergyFragment extends Fragment{
 		}
 
 	}
-	
-	
+
+
 	public void sendMessage(){
 		new AsyncTask<Void,String,String>() {
 			@Override
@@ -296,8 +297,14 @@ public class PersonalEnergyFragment extends Fragment{
 					JSONObject options=new JSONObject();
 
 					try {
-						options.put("start_time", "now");
-						options.put("end_time", "last 12 hours");
+						if(Common.TIME_PERIOD_CHANGED){
+							options.put("start_time", Common.TIME_PERIOD_START);
+							options.put("end_time", Common.TIME_PERIOD_END);
+						}
+						else{
+							options.put("start_time", "now");
+							options.put("end_time", "last 12 hours");
+						}
 					} catch (JSONException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -363,8 +370,17 @@ public class PersonalEnergyFragment extends Fragment{
 	private void parseData(Bundle data){
 		Log.v("ELSERVICES", "parsedata");
 		String msg_type, api;
-
+ 
 		if(data.getString("api").equals("energy/personal/")){
+			
+			LinearLayout appDist = (LinearLayout)getActivity().findViewById(R.id.PEnDist);
+			Log.v("ELSERVICES","before Remove all views: " + appDist.getChildCount());
+			appDist.removeAllViews();
+			Log.v("ELSERVICES","Remove all views: " + appDist.getChildCount());
+			
+			activity_names.clear();
+			activity_usage.clear();
+			
 			try {
 				latestData=data;
 				Set<String> keys=data.keySet();
@@ -375,7 +391,13 @@ public class PersonalEnergyFragment extends Fragment{
 				for(String key:keys){
 					response.put(key, data.get(key));
 				}
-
+				
+				SharedPreferences bundleData=getActivity().getSharedPreferences(PREFS_NAME,0);
+				Editor editor=bundleData.edit();
+				editor.putString("JSON_RESPONSE", response.toString());
+				editor.putLong("LAST_SYNC", lastSyncInMillis);
+				editor.commit();
+				
 				JSONObject options=new JSONObject(response.getString("options"));
 
 				if(options!=null){
@@ -428,9 +450,11 @@ public class PersonalEnergyFragment extends Fragment{
 			if (bundle != null) {
 				Bundle data = bundle.getBundle("Data");
 				parseData(data);
-				updateChart();
-				updateApps();
-				updateViews(System.currentTimeMillis());
+				if(data.getString("api").equals("energy/personal/")){
+					updateChart();
+					updateApps();
+					updateViews(System.currentTimeMillis());
+				}
 			}
 		}
 	};

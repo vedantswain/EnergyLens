@@ -1,0 +1,132 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/textGuide"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/chartComparison"
+            android:layout_centerHorizontal="true"
+            android:text="touch a point to select a start time" />
+
+        <Button
+            android:id="@+id/setEnd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/textGuide"
+            android:onClick="selectEnd"
+            android:visibility="invisible"
+            android:text="--:--" />
+
+        <Button
+            android:id="@+id/setStart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/setEnd"
+            android:layout_alignBottom="@+id/setEnd"
+            android:layout_alignParentLeft="true"
+            android:onClick="selectStart"
+             android:visibility="invisible"
+            android:text="--:--" />
+
+        <TextView
+            android:id="@+id/correctToText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/setStart"
+            android:layout_centerHorizontal="true"
+            android:padding="10dp"
+            android:text="Corrected Activity?" />
+
+        <TextView
+            android:id="@+id/lastSyncCorrect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/appLocation" />
+
+        <LinearLayout
+            android:id="@+id/chartComparison"
+            android:layout_width="match_parent"
+            android:layout_height="382dp"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/lastSyncCorrect"
+            android:orientation="vertical" >
+
+        </LinearLayout>
+        
+        <LinearLayout
+            android:id="@+id/chartSlice"
+            android:layout_width="match_parent"
+            android:layout_height="382dp"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/lastSyncCorrect"
+            android:orientation="vertical" >
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/appLocation"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/lastSyncReassign"
+            android:onClick="launchLocDialog"
+            android:text="Location: " />
+
+        <Button
+            android:id="@+id/resetSliceBtn"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/setEnd"
+            android:layout_alignBottom="@+id/setEnd"
+            android:layout_centerHorizontal="true"
+            android:onClick="resetSlice"
+            android:text="Reset" />
+
+        <Button
+            android:id="@+id/correctLoc"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/correctToText"
+            android:layout_toLeftOf="@+id/resetSliceBtn"
+            android:onClick="correctLoc"
+            android:text="Location" />
+
+        <Button
+            android:id="@+id/correctApp"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/correctLoc"
+            android:layout_alignBottom="@+id/correctLoc"
+            android:layout_alignParentRight="true"
+            android:layout_toRightOf="@+id/resetSliceBtn"
+            android:onClick="correctApp"
+            android:text="Appliance" />
+
+        <Button
+            android:id="@+id/correct"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/correctApp"
+            android:onClick="toCorrect"
+            android:text="Correct" />
+
+    </RelativeLayout>
+
+</ScrollView>

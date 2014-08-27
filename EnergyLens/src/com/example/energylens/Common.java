@@ -4,11 +4,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.SharedPreferences;
+import android.os.Bundle;
 
 public class Common{
+	public static String apiToSend="energy/personal/";
+	public static String chartTitle="Your Energy Consumption";
+	public static Bundle PEN_SIS;
+	public static Boolean TIME_PERIOD_CHANGED=false;
 	public static String[] ACTIVITY_LOCS;
+	public static String[] ACTIVITY_APPS;
 	public static Boolean DOUBLE_BACK=false;
-	public static Boolean RTP_VISIBLE=false;
+	public static int CURRENT_VISIBLE=1;
 	public static String SENDER_ID = "166229175411";
 	public static long INTERVAL = 30; //seconds between each scheduling of service
 	public static int SAMPLE_TIME=10; //seconds for which sensors will take data
@@ -23,6 +29,8 @@ public class Common{
 	public static String TRAINDATA_API="data/training/";
 	public static int TRAINING_STATUS=0;
 	public static int TRAINING_COUNT=0;
+	public static long TIME_PERIOD_START=System.currentTimeMillis()-12*60*60*1000;
+	public static long TIME_PERIOD_END=System.currentTimeMillis();
 	public static String EL_PREFS="EnerglyLens_Prefs";
 	public static JSONObject REGISTER_SUCCESS =  new JSONObject();
 	static {try {
@@ -119,9 +127,24 @@ public class Common{
 		ACTIVITY_LOCS=new String[locs.length];
 		ACTIVITY_LOCS=locs;
 	}
-	public static void changeRTPVisible(boolean isVisible){
-		RTP_VISIBLE=isVisible;
+	public static void changeActivityApps(String[] apps){
+		ACTIVITY_APPS=new String[apps.length];
+		ACTIVITY_APPS=apps;
 	}
-	
+	public static void changeCurrentVisible(int which){
+		CURRENT_VISIBLE=which;
+	}
+	public static void changeTimePeriodStart(long timeInMillis){
+		TIME_PERIOD_START=timeInMillis;
+	}
+	public static void changeTimePeriodEnd(long timeInMillis){
+		TIME_PERIOD_END=timeInMillis;
+	}
+	public static void changeTimePeriod(boolean changed){
+		TIME_PERIOD_CHANGED=changed;
+	}
+	public static void changePEnSIS(Bundle src){
+		PEN_SIS=src;
+	}
 	
 }

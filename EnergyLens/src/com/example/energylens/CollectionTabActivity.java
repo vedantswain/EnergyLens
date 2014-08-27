@@ -31,6 +31,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -68,7 +69,6 @@ public class CollectionTabActivity extends FragmentActivity {
 		Crashlytics.start(this);
 		setContentView(R.layout.activity_collection_tab);
 
-		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the activity.
 		mSectionsPagerAdapter = new SectionsPagerAdapter(getFragmentManager());
 
@@ -90,17 +90,22 @@ public class CollectionTabActivity extends FragmentActivity {
 			  start();
 		}
 		
+		if(savedInstanceState!=null){
+//			Common.changePEnSIS(savedInstanceState.getBundle("PEN_SIS"));
+			Log.v("ELSERVICES", "loaded from main");
+			Log.v("ELSERVICES", savedInstanceState.getString("Message"));
+		}
+		
 		mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 			
 			@Override
 			public void onPageSelected(int arg0) {
 				// TODO Auto-generated method stub
-				if(arg0==2){
-					Common.changeRTPVisible(true);
+				Common.changeCurrentVisible(arg0);
+				if(arg0==3){
 					Log.v("ELSERVICES", "RTP Visible");
 				}
-				else
-					Common.changeRTPVisible(false);
+				
 			}
 			
 			@Override
@@ -144,6 +149,21 @@ public class CollectionTabActivity extends FragmentActivity {
 	    }, 2000);
 	}
 	
+	public void onToggleClicked(View view) {
+	    // Is the toggle on?
+	    boolean on = ((ToggleButton) view).isChecked();
+	    
+	    if (on) {
+	        Common.apiToSend="energy/wastage/";
+	        Common.chartTitle="Your Energy Wastage";
+	        sendMessage();
+	    } else {
+	        Common.apiToSend="energy/personal/";
+	        Common.chartTitle="Your Energy Consumption";
+	        sendMessage();
+	    }
+	}
+	
 	public void getUpdatedPreferences(){
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 		Common.changeServerUrl(sharedPref.getString("SERVER_URL", "http://192.168.20.217:9010/"));
@@ -157,6 +177,11 @@ public class CollectionTabActivity extends FragmentActivity {
 		
 		Log.v("ELSERVICES", "Training onresume "+Common.TRAINING_STATUS+"\n Label "+Common.LABEL+"\n Location "+Common.LOCATION);
 		
+	}
+	
+	public void toTimeSelect(View view){
+		Intent intent=new Intent(this,TimeSelectActivity.class);
+		startActivity(intent);
 	}
 	
 	public void toReassign(View view){
@@ -306,6 +331,17 @@ public class CollectionTabActivity extends FragmentActivity {
 		return super.onOptionsItemSelected(item);
 	}
 	
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+		// Always call the superclass so it can save the view hierarchy state
+		super.onSaveInstanceState(savedInstanceState);
+
+		// Save the last sync time and last data received
+//		savedInstanceState.putBundle("PEN_SIS", Common.PEN_SIS);
+		savedInstanceState.putString("Message", "main message restored");
+		Log.v("ELSERVICES", "Main Instance saved");
+
+	}
+	
 	public void sendMessage(){
 		 new AsyncTask<Void,String,String>() {
 	         @Override
@@ -361,13 +397,13 @@ public class CollectionTabActivity extends FragmentActivity {
 			fragment=new TrainFragment();
 			break;
 		case 1:
-			fragment=new PersonalEnergyFragment();
+			fragment=new EnergyWastageFragment();
 			break;
 		case 2:
-			fragment=new RealTimePowerFragment();
+			fragment=new PersonalEnergyFragment();
 			break;
 		case 3:
-			fragment=new ComparisonFragment();
+			fragment=new RealTimePowerFragment();
 			break;
 		}
 			return fragment;
