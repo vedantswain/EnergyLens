@@ -23,14 +23,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -38,14 +36,14 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.format.DateFormat;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 public class CorrectionActivity extends FragmentActivity implements ApplianceDialogFragment.ApplianceDialogListener,AppLocDialogFragment.LocationDialogListener,TimePickerDialogFragment.TimePickerDialogListener{
 
@@ -98,6 +96,7 @@ public class CorrectionActivity extends FragmentActivity implements ApplianceDia
 	Calendar c=Calendar.getInstance();
 	private boolean forCorrection=false;
 	private String toLocation,toApp;
+	private long lastSyncInMillis;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -119,7 +118,16 @@ public class CorrectionActivity extends FragmentActivity implements ApplianceDia
 		if(savedInstanceState!=null){
 			Log.v("ELSERVICES", "Loading from savedInstance");
 		}
-		
+
+		SharedPreferences sp=getSharedPreferences(app+"CORRECTION_PREFS",0);
+
+		if(sp.contains("LAST_SYNC")){
+			Log.v("ELSERVICES", "Loading PEn from saved data");
+			lastSyncInMillis=sp.getLong("LAST_SYNC",System.currentTimeMillis());
+			parsePref(sp.getString("JSON_RESPONSE", ""));
+			updateViews(lastSyncInMillis);
+		}
+
 		gcm = GoogleCloudMessaging.getInstance(this);
 		setupMessage();
 	}
@@ -575,12 +583,12 @@ public class CorrectionActivity extends FragmentActivity implements ApplianceDia
 					//render points for each activity
 					time.add(terminalPoints[0]);usage.add((long) 0);
 					time.add(terminalPoints[0]);usage.add(activity.getLong("usage"));
-										
-//					for(long j=activity.getLong("start_time");j<activity.getLong("end_time");j+=60){
-//						time.add(j);usage.add(activity.getLong("usage"));
-//						Log.v("ELSERVICES", "Rendered: "+time.get(k)+", "+usage.get(k++)+", id: "+activity.getLong("id"));
-//					}
-					
+
+					//					for(long j=activity.getLong("start_time");j<activity.getLong("end_time");j+=60){
+					//						time.add(j);usage.add(activity.getLong("usage"));
+					//						Log.v("ELSERVICES", "Rendered: "+time.get(k)+", "+usage.get(k++)+", id: "+activity.getLong("id"));
+					//					}
+
 					time.add(terminalPoints[1]);usage.add(activity.getLong("usage"));
 					time.add(terminalPoints[1]);usage.add((long) 0);
 				}
@@ -595,7 +603,7 @@ public class CorrectionActivity extends FragmentActivity implements ApplianceDia
 			Log.v("ELSERVICES","locations: "+loc_name);
 		Log.v("ELSERVICES", "parseactivities complete");
 		if(ids!=null){
-			updateViews();
+			updateViews(System.currentTimeMillis());
 			findYMax();
 			setupChart(false);
 		}
@@ -652,6 +660,12 @@ public class CorrectionActivity extends FragmentActivity implements ApplianceDia
 
 				JSONObject options=new JSONObject(response.getString("options"));
 
+				SharedPreferences bundleData=getSharedPreferences(app+"CORRECTION_PREFS",0);
+				Editor editor=bundleData.edit();
+				editor.putString("JSON_RESPONSE", response.toString());
+				editor.putLong("LAST_SYNC", lastSyncInMillis);
+				editor.commit();
+
 				if(options!=null){
 					activities=options.getJSONArray("activities");
 
@@ -699,11 +713,41 @@ public class CorrectionActivity extends FragmentActivity implements ApplianceDia
 		} 
 	}
 
-	private void updateViews(){
+	public void parsePref(String resp){
+		try {
+			JSONObject response=new JSONObject(resp);
+			JSONObject options=new JSONObject(response.getString("options"));
+
+			if(options!=null){
+				activities=options.getJSONArray("activities");
+
+				if(activities!=null){
+					Log.v("ELSERVICES","Reassign Activities: "+ activities.getString(0));
+					TextView textView=(TextView) findViewById(R.id.appLocation);
+					textView.setText(app+" at "+activities.getJSONObject(0).getString("location"));
+					initLoc=activities.getJSONObject(0).getString("location");
+					parseActivities(initLoc);
+				}
+
+				appliances=options.getJSONArray("appliances");
+
+				if(appliances!=null){
+					parseAppLoc();
+				}
+			}
+
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void updateViews(long time){
 		DateFormat df=new DateFormat();
-		String lastSyncTime=df.format("dd/MM/yy HH:mm", System.currentTimeMillis()).toString();
+		String lastSyncTime=df.format("dd/MM/yy HH:mm", time).toString();
 		TextView textView=(TextView) findViewById(R.id.lastSyncCorrect);
 		textView.setText("Last synced on: "+lastSyncTime);
+		lastSyncInMillis=time;
 	}
 
 
@@ -715,7 +759,6 @@ public class CorrectionActivity extends FragmentActivity implements ApplianceDia
 			if (bundle != null) {
 				Bundle data = bundle.getBundle("Data");
 				parseData(data);
-				SharedPreferences dataPrefs;
 				Log.i("ELSERVICES","Correction receiver " +data.getString("api"));
 			}
 		}
@@ -728,5 +771,5 @@ public class CorrectionActivity extends FragmentActivity implements ApplianceDia
 		textView.setText(Common.LABEL);
 		toApp=label;
 	}
-	
+
 }

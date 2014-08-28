@@ -7,7 +7,6 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.achartengine.GraphicalView;
-import org.achartengine.model.SeriesSelection;
 
 import android.app.AlarmManager;
 import android.app.Fragment;
@@ -16,9 +15,11 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v13.app.FragmentStatePagerAdapter;
@@ -37,18 +38,18 @@ import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 public class CollectionTabActivity extends FragmentActivity {
-	
-	GoogleCloudMessaging gcm;
-    AtomicInteger msgId = new AtomicInteger();
-    Context context;
-    String SENDER_ID = "166229175411";
-    Boolean doubleBackToExitPressedOnce=false;
-    GraphicalView chartView;
 
-    private AlarmManager axlAlarmMgr,wifiAlarmMgr,audioAlarmMgr,lightAlarmMgr,magAlarmMgr,uploaderAlarmMgr;
+	GoogleCloudMessaging gcm;
+	AtomicInteger msgId = new AtomicInteger();
+	Context context;
+	String SENDER_ID = "166229175411";
+	Boolean doubleBackToExitPressedOnce=false;
+	GraphicalView chartView;
+
+	private AlarmManager axlAlarmMgr,wifiAlarmMgr,audioAlarmMgr,lightAlarmMgr,magAlarmMgr,uploaderAlarmMgr;
 	private PendingIntent axlServicePendingIntent,wifiServicePendingIntent,audioServicePendingIntent,lightServicePendingIntent,magServicePendingIntent,uploaderServicePendingIntent;
 	private Intent axlServiceIntent,wifiServiceIntent,audioServiceIntent,lightServiceIntent,magServiceIntent,uploaderServiceIntent;
-	
+
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
 	 * fragments for each of the sections. We use a {@link FragmentPagerAdapter}
@@ -62,7 +63,7 @@ public class CollectionTabActivity extends FragmentActivity {
 	 * The {@link ViewPager} that will host the section contents.
 	 */
 	static ViewPager mViewPager;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -75,29 +76,30 @@ public class CollectionTabActivity extends FragmentActivity {
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
-		
+
 		gcm = GoogleCloudMessaging.getInstance(this);
-		
+
 		getUpdatedPreferences();
-		
+		addShortcut();
+
 		if(Common.TRAINING_STATUS==1){
 			Intent intent = new Intent(this,TrainActivity.class);
 			startActivity(intent);
 		}
 		else if(Common.TRAINING_COUNT>0){
-				mViewPager.setCurrentItem(1);
-			  Log.v("ELSERVICES", "Switched");
-			  start();
+			mViewPager.setCurrentItem(1);
+			Log.v("ELSERVICES", "Switched");
+			start();
 		}
-		
+
 		if(savedInstanceState!=null){
-//			Common.changePEnSIS(savedInstanceState.getBundle("PEN_SIS"));
+			//			Common.changePEnSIS(savedInstanceState.getBundle("PEN_SIS"));
 			Log.v("ELSERVICES", "loaded from main");
 			Log.v("ELSERVICES", savedInstanceState.getString("Message"));
 		}
-		
+
 		mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-			
+
 			@Override
 			public void onPageSelected(int arg0) {
 				// TODO Auto-generated method stub
@@ -105,92 +107,110 @@ public class CollectionTabActivity extends FragmentActivity {
 				if(arg0==3){
 					Log.v("ELSERVICES", "RTP Visible");
 				}
-				
+
 			}
-			
+
 			@Override
 			public void onPageScrolled(int arg0, float arg1, int arg2) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void onPageScrollStateChanged(int arg0) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
+	} 
+
+	public void addShortcut(){
+
+		SharedPreferences shortcutPref = getSharedPreferences(Common.EL_PREFS,0);
+
+		if(!shortcutPref.getBoolean("SHORTCUT_INSTALLED", false)){
+			Editor editor=shortcutPref.edit();
+			editor.putBoolean("SHORTCUT_INSTALLED", true);
+			editor.commit();
+			Intent shortcutintent=new Intent("com.android.launcher.action.INSTALL_SHORTCUT");
+
+			shortcutintent.putExtra("duplicate", false);
+			shortcutintent.putExtra(Intent.EXTRA_SHORTCUT_NAME, getString(R.string.title_activity_main));
+			Parcelable icon = Intent.ShortcutIconResource.fromContext(getApplicationContext(), R.drawable.ic_launcher);
+			shortcutintent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, icon);
+			shortcutintent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, new Intent(getApplicationContext(), CollectionTabActivity.class));
+
+			sendBroadcast(shortcutintent);
+		}
 	}
 
-	
-	
 	protected void onResume(){
 		super.onResume();
 		getUpdatedPreferences();
 	}
-	
+
 	@Override
 	public void onBackPressed() {
 		if (doubleBackToExitPressedOnce) {
 			Common.changeDoubleBack(true);
-	        finish();
-	        return;
-	    }
+			finish();
+			return;
+		}
 
-	    this.doubleBackToExitPressedOnce = true;
-	    Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+		this.doubleBackToExitPressedOnce = true;
+		Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
 
-	    new Handler().postDelayed(new Runnable() {
+		new Handler().postDelayed(new Runnable() {
 
-	        @Override
-	        public void run() {
-	            doubleBackToExitPressedOnce=false;                       
-	        }
-	    }, 2000);
+			@Override
+			public void run() {
+				doubleBackToExitPressedOnce=false;                       
+			}
+		}, 2000);
 	}
-	
+
 	public void onToggleClicked(View view) {
-	    // Is the toggle on?
-	    boolean on = ((ToggleButton) view).isChecked();
-	    
-	    if (on) {
-	        Common.apiToSend="energy/wastage/";
-	        Common.chartTitle="Your Energy Wastage";
-	        sendMessage();
-	    } else {
-	        Common.apiToSend="energy/personal/";
-	        Common.chartTitle="Your Energy Consumption";
-	        sendMessage();
-	    }
+		// Is the toggle on?
+		boolean on = ((ToggleButton) view).isChecked();
+
+		if (on) {
+			Common.apiToSend="energy/wastage/";
+			Common.chartTitle="Your Energy Wastage";
+			sendMessage();
+		} else {
+			Common.apiToSend="energy/personal/";
+			Common.chartTitle="Your Energy Consumption";
+			sendMessage();
+		}
 	}
-	
+
 	public void getUpdatedPreferences(){
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 		Common.changeServerUrl(sharedPref.getString("SERVER_URL", "http://192.168.20.217:9010/"));
-		
+
 		SharedPreferences trainingPref = getSharedPreferences(Common.EL_PREFS,0);
 		Common.changeTrainingStatus(trainingPref.getInt("TRAINING_STATUS", 0));
 		Common.changeLabel(trainingPref.getString("LABEL","none"));
-	    Common.changeLocation(trainingPref.getString("LOCATION", "none"));
-	    Common.changePrefix(trainingPref.getString("FILE_PREFIX", ""));
-	    Common.changeTrainingCount(trainingPref.getInt("TRAINING_COUNT", 0));
-		
+		Common.changeLocation(trainingPref.getString("LOCATION", "none"));
+		Common.changePrefix(trainingPref.getString("FILE_PREFIX", ""));
+		Common.changeTrainingCount(trainingPref.getInt("TRAINING_COUNT", 0));
+
 		Log.v("ELSERVICES", "Training onresume "+Common.TRAINING_STATUS+"\n Label "+Common.LABEL+"\n Location "+Common.LOCATION);
-		
+
 	}
-	
+
 	public void toTimeSelect(View view){
 		Intent intent=new Intent(this,TimeSelectActivity.class);
 		startActivity(intent);
 	}
-	
+
 	public void toReassign(View view){
-		
-//		Log.v("ELSERVICES", Boolean.toString(checkBox.isChecked()));
+
+		//		Log.v("ELSERVICES", Boolean.toString(checkBox.isChecked()));
 		Intent intent=new Intent(this,ReassignActivity.class);
 		startActivity(intent);
 	}
-	
+
 	public void onNotYet(View view){
 		TextView changeTxt=(TextView) findViewById(R.id.alreadyText);
 		changeTxt.setText("Welcome to EnergyLens+,\n just press the button below to get started ");
@@ -199,7 +219,7 @@ public class CollectionTabActivity extends FragmentActivity {
 		btn=(Button) findViewById(R.id.notYet);
 		btn.setVisibility(View.GONE);
 	}
-	
+
 	public void onDoneThat(View view){
 		Common.changeTrainingCount(Common.TRAINING_COUNT+1);
 		TextView changeTxt=(TextView) findViewById(R.id.alreadyText);
@@ -212,45 +232,45 @@ public class CollectionTabActivity extends FragmentActivity {
 		start();
 		Log.i("ELSERVICES", "Training count: "+Common.TRAINING_COUNT);
 	}
-	
+
 	public void start(){
 		Log.v("ELSERVICES","Service started");
-		
+
 		axlServiceIntent = new Intent(CollectionTabActivity.this, AxlService.class);
 		axlServicePendingIntent = PendingIntent.getService(CollectionTabActivity.this,
 				26194, axlServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-	    axlAlarmMgr= (AlarmManager)CollectionTabActivity.this.getSystemService(CollectionTabActivity.this.ALARM_SERVICE);
+		axlAlarmMgr= (AlarmManager)CollectionTabActivity.this.getSystemService(CollectionTabActivity.this.ALARM_SERVICE);
 		setAlarm(axlServiceIntent,axlServicePendingIntent,26194,axlAlarmMgr);
-		
+
 		wifiServiceIntent = new Intent(CollectionTabActivity.this, WiFiService.class);
 		wifiServicePendingIntent = PendingIntent.getService(CollectionTabActivity.this,
 				12345, wifiServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-	    wifiAlarmMgr= (AlarmManager)CollectionTabActivity.this.getSystemService(CollectionTabActivity.this.ALARM_SERVICE);
+		wifiAlarmMgr= (AlarmManager)CollectionTabActivity.this.getSystemService(CollectionTabActivity.this.ALARM_SERVICE);
 		setAlarm(wifiServiceIntent,wifiServicePendingIntent,12345,wifiAlarmMgr);
-		
+
 
 		audioServiceIntent = new Intent(CollectionTabActivity.this, AudioService.class);
 		audioServicePendingIntent = PendingIntent.getService(CollectionTabActivity.this,
 				2512, audioServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-	    audioAlarmMgr= (AlarmManager)CollectionTabActivity.this.getSystemService(CollectionTabActivity.this.ALARM_SERVICE);
+		audioAlarmMgr= (AlarmManager)CollectionTabActivity.this.getSystemService(CollectionTabActivity.this.ALARM_SERVICE);
 		setAlarm(audioServiceIntent,audioServicePendingIntent,2512,audioAlarmMgr);
-		
+
 		lightServiceIntent = new Intent(CollectionTabActivity.this, LightService.class);
 		lightServicePendingIntent = PendingIntent.getService(CollectionTabActivity.this,
 				11894, lightServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-	    lightAlarmMgr= (AlarmManager)CollectionTabActivity.this.getSystemService(CollectionTabActivity.this.ALARM_SERVICE);
+		lightAlarmMgr= (AlarmManager)CollectionTabActivity.this.getSystemService(CollectionTabActivity.this.ALARM_SERVICE);
 		setAlarm(lightServiceIntent,lightServicePendingIntent,11894,lightAlarmMgr);
-		
+
 		magServiceIntent = new Intent(CollectionTabActivity.this, MagService.class);
 		magServicePendingIntent = PendingIntent.getService(CollectionTabActivity.this,
 				20591, magServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-	    magAlarmMgr= (AlarmManager)CollectionTabActivity.this.getSystemService(CollectionTabActivity.this.ALARM_SERVICE);
+		magAlarmMgr= (AlarmManager)CollectionTabActivity.this.getSystemService(CollectionTabActivity.this.ALARM_SERVICE);
 		setAlarm(magServiceIntent,magServicePendingIntent,20591,magAlarmMgr);
-		
+
 		uploaderServiceIntent = new Intent(CollectionTabActivity.this, UploaderService.class);
 		uploaderServicePendingIntent = PendingIntent.getService(CollectionTabActivity.this,
 				4816, uploaderServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-	    uploaderAlarmMgr= (AlarmManager)CollectionTabActivity.this.getSystemService(CollectionTabActivity.this.ALARM_SERVICE);
+		uploaderAlarmMgr= (AlarmManager)CollectionTabActivity.this.getSystemService(CollectionTabActivity.this.ALARM_SERVICE);
 		uploaderAlarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP,
 				System.currentTimeMillis()+Common.UPLOAD_INTERVAL*30*1000, Common.UPLOAD_INTERVAL*30*1000, uploaderServicePendingIntent); 
 		Log.v("ELSERVICES","Uploader alarm Set for service "+4816+" "+Common.INTERVAL);
@@ -258,9 +278,9 @@ public class CollectionTabActivity extends FragmentActivity {
 
 	public void setAlarm(Intent ServiceIntent,PendingIntent ServicePendingIntent,int ReqCode, AlarmManager alarmMgr){
 		Log.v("ELSERVICES","Services started "+ReqCode);
-				
+
 		try{
-		
+
 			alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP,
 					System.currentTimeMillis()+100, Common.INTERVAL*1000, ServicePendingIntent); 
 			Log.v("ELSERVICES","Alarm Set for service "+ReqCode+" "+Common.INTERVAL);
@@ -269,29 +289,29 @@ public class CollectionTabActivity extends FragmentActivity {
 			Log.e("ELSERVICES",e.toString(), e.getCause());
 		}
 	}
-	
-	
-	
+
+
+
 	public void updatePreferences(){
 		SharedPreferences trainingPref = getSharedPreferences(Common.EL_PREFS,0);
 		SharedPreferences.Editor editor = trainingPref.edit();
-	    editor.putInt("TRAINING_COUNT",Common.TRAINING_COUNT);
-	      // Commit the edits!
-	      editor.commit();
+		editor.putInt("TRAINING_COUNT",Common.TRAINING_COUNT);
+		// Commit the edits!
+		editor.commit();
 	}
-		
-	
+
+
 	public void openSettings(){
 		Intent intent = new Intent(this,SettingsActivity.class);
 		startActivity(intent);
 	}
-	
+
 	public void startTraining(View view){
 		getUpdatedPreferences();
 		Intent intent = new Intent(this,TrainActivity.class);
 		startActivity(intent);
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -312,64 +332,64 @@ public class CollectionTabActivity extends FragmentActivity {
 		else if(id == android.R.id.home){
 			if (doubleBackToExitPressedOnce) {
 				Common.changeDoubleBack(true);
-		        finish();
-		        return true;
-		    }
+				finish();
+				return true;
+			}
 
-		    this.doubleBackToExitPressedOnce = true;
-		    Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+			this.doubleBackToExitPressedOnce = true;
+			Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
 
-		    new Handler().postDelayed(new Runnable() {
+			new Handler().postDelayed(new Runnable() {
 
-		        @Override
-		        public void run() {
-		            doubleBackToExitPressedOnce=false;                       
-		        }
-		    }, 2000);
+				@Override
+				public void run() {
+					doubleBackToExitPressedOnce=false;                       
+				}
+			}, 2000);
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
+
 	public void onSaveInstanceState(Bundle savedInstanceState) {
 		// Always call the superclass so it can save the view hierarchy state
 		super.onSaveInstanceState(savedInstanceState);
 
 		// Save the last sync time and last data received
-//		savedInstanceState.putBundle("PEN_SIS", Common.PEN_SIS);
+		//		savedInstanceState.putBundle("PEN_SIS", Common.PEN_SIS);
 		savedInstanceState.putString("Message", "main message restored");
 		Log.v("ELSERVICES", "Main Instance saved");
 
 	}
-	
-	public void sendMessage(){
-		 new AsyncTask<Void,String,String>() {
-	         @Override
-	         protected String doInBackground(Void... params) {
-	             String msg = "";
-	             try {
-	                 Bundle data = new Bundle();
-	                     data.putString("my_message", "Hello World");
-	                     data.putString("my_action",
-	                             "com.google.android.gcm.demo.app.ECHO_NOW");
-	                     SecureRandom random = new SecureRandom();
-	                     String randomId=new BigInteger(130, random).toString(32);
-	                     
-	                     String id = Long.toString(System.currentTimeMillis());
-	                     gcm.send(SENDER_ID + "@gcm.googleapis.com", id, data);
-	                     msg = "Sent message";
-	                     Log.i("ELSERVICES", "message sent");
-	             } catch (IOException ex) {
-	                 msg = "Error :" + ex.getMessage();
-	             }
-	             return msg;
-	         }
 
-	         @Override
-	         protected void onPostExecute(String msg) {
-	            Log.i("ELSERVICES", msg);
-	         }
-	     }.execute(null, null, null);
+	public void sendMessage(){
+		new AsyncTask<Void,String,String>() {
+			@Override
+			protected String doInBackground(Void... params) {
+				String msg = "";
+				try {
+					Bundle data = new Bundle();
+					data.putString("my_message", "Hello World");
+					data.putString("my_action",
+							"com.google.android.gcm.demo.app.ECHO_NOW");
+					SecureRandom random = new SecureRandom();
+					String randomId=new BigInteger(130, random).toString(32);
+
+					String id = Long.toString(System.currentTimeMillis());
+					gcm.send(SENDER_ID + "@gcm.googleapis.com", id, data);
+					msg = "Sent message";
+					Log.i("ELSERVICES", "message sent");
+				} catch (IOException ex) {
+					msg = "Error :" + ex.getMessage();
+				}
+				return msg;
+			}
+
+			@Override
+			protected void onPostExecute(String msg) {
+				Log.i("ELSERVICES", msg);
+			}
+		}.execute(null, null, null);
 	}
 
 	public void onSend(View view){
@@ -392,20 +412,20 @@ public class CollectionTabActivity extends FragmentActivity {
 			// Return a PlaceholderFragment (defined as a static inner class
 			// below).
 			Fragment fragment=null;
-		switch(position){	
-		case 0:
-			fragment=new TrainFragment();
-			break;
-		case 1:
-			fragment=new EnergyWastageFragment();
-			break;
-		case 2:
-			fragment=new PersonalEnergyFragment();
-			break;
-		case 3:
-			fragment=new RealTimePowerFragment();
-			break;
-		}
+			switch(position){	
+			case 0:
+				fragment=new TrainFragment();
+				break;
+			case 1:
+				fragment=new EnergyWastageFragment();
+				break;
+			case 2:
+				fragment=new PersonalEnergyFragment();
+				break;
+			case 3:
+				fragment=new RealTimePowerFragment();
+				break;
+			}
 			return fragment;
 		}
 
