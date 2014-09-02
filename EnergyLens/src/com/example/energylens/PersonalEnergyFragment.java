@@ -49,8 +49,8 @@ import android.widget.TextView;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-public class PersonalEnergyFragment extends Fragment{
-	GraphicalView chartView;
+public class PersonalEnergyFragment extends Fragment {
+	public static GraphicalView chartView;
 	XYMultipleSeriesRenderer appRenderer=new XYMultipleSeriesRenderer(),mRenderer = new XYMultipleSeriesRenderer();
 	XYMultipleSeriesDataset appDataset=new XYMultipleSeriesDataset(),mDataset = new XYMultipleSeriesDataset();
 	String[] appliances={"TV","Microwave","Computer","AC","Fan","Washing Machine"};
@@ -125,7 +125,7 @@ public class PersonalEnergyFragment extends Fragment{
 		mRenderer.setChartTitle("Your Energy Consumption for the Last 12 hours");
 		mRenderer.setChartTitleTextSize(18);
 		mRenderer.setLabelsColor(Color.BLACK);
-		mRenderer.setLabelsTextSize(15);
+		mRenderer.setLabelsTextSize(18);
 		mRenderer.setXTitle("Hours");
 		mRenderer.setYTitle("Energy");
 		mRenderer.setYLabelsAlign(Align.RIGHT);
@@ -220,7 +220,8 @@ public class PersonalEnergyFragment extends Fragment{
 		Date start=new Date(Common.TIME_PERIOD_START);
 		Date end=new Date(Common.TIME_PERIOD_END);
 		Log.v("ELSERVICES", "From: "+start.toString()+" To: "+end.toString());
-		sendMessage();
+//		if(Common.CURRENT_VISIBLE==2)
+			sendMessage();
 	}
 
 	public void onPause(){
@@ -231,19 +232,19 @@ public class PersonalEnergyFragment extends Fragment{
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onViewCreated(view, savedInstanceState);
-		
+
 		SharedPreferences sp=getActivity().getSharedPreferences(PREFS_NAME,0);
-		
+
 		if(sp.contains("LAST_SYNC")){
 			Log.v("ELSERVICES", "Loading PEn from saved data");
 			lastSyncInMillis=sp.getLong("LAST_SYNC",System.currentTimeMillis());
-				parsePref(sp.getString("JSON_RESPONSE", ""));
-				updateChart();
-				updateApps();
-				updateViews(lastSyncInMillis);
+			parsePref(sp.getString("JSON_RESPONSE", ""));
+			updateChart();
+			updateApps();
+			updateViews(lastSyncInMillis);
 		}
 	}
-	
+
 	public void parsePref(String resp){
 		try {
 			JSONObject response=new JSONObject(resp);
@@ -370,17 +371,17 @@ public class PersonalEnergyFragment extends Fragment{
 	private void parseData(Bundle data){
 		Log.v("ELSERVICES", "parsedata");
 		String msg_type, api;
- 
+
 		if(data.getString("api").equals("energy/personal/")){
-			
+
 			LinearLayout appDist = (LinearLayout)getActivity().findViewById(R.id.PEnDist);
 			Log.v("ELSERVICES","before Remove all views: " + appDist.getChildCount());
 			appDist.removeAllViews();
 			Log.v("ELSERVICES","Remove all views: " + appDist.getChildCount());
-			
+
 			activity_names.clear();
 			activity_usage.clear();
-			
+
 			try {
 				latestData=data;
 				Set<String> keys=data.keySet();
@@ -391,13 +392,13 @@ public class PersonalEnergyFragment extends Fragment{
 				for(String key:keys){
 					response.put(key, data.get(key));
 				}
-				
+
 				SharedPreferences bundleData=getActivity().getSharedPreferences(PREFS_NAME,0);
 				Editor editor=bundleData.edit();
 				editor.putString("JSON_RESPONSE", response.toString());
 				editor.putLong("LAST_SYNC", lastSyncInMillis);
 				editor.commit();
-				
+
 				JSONObject options=new JSONObject(response.getString("options"));
 
 				if(options!=null){

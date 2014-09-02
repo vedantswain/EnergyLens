@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.achartengine.GraphicalView;
+import org.achartengine.model.SeriesSelection;
 
 import android.app.AlarmManager;
 import android.app.Fragment;
@@ -44,8 +45,7 @@ public class CollectionTabActivity extends FragmentActivity {
 	Context context;
 	String SENDER_ID = "166229175411";
 	Boolean doubleBackToExitPressedOnce=false;
-	GraphicalView chartView;
-
+	
 	private AlarmManager axlAlarmMgr,wifiAlarmMgr,audioAlarmMgr,lightAlarmMgr,magAlarmMgr,uploaderAlarmMgr;
 	private PendingIntent axlServicePendingIntent,wifiServicePendingIntent,audioServicePendingIntent,lightServicePendingIntent,magServicePendingIntent,uploaderServicePendingIntent;
 	private Intent axlServiceIntent,wifiServiceIntent,audioServiceIntent,lightServiceIntent,magServiceIntent,uploaderServiceIntent;
@@ -122,6 +122,7 @@ public class CollectionTabActivity extends FragmentActivity {
 
 			}
 		});
+		
 	} 
 
 	public void addShortcut(){
@@ -186,7 +187,7 @@ public class CollectionTabActivity extends FragmentActivity {
 
 	public void getUpdatedPreferences(){
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-		Common.changeServerUrl(sharedPref.getString("SERVER_URL", "http://192.168.20.217:9010/"));
+		Common.changeServerUrl(sharedPref.getString("SERVER_URL", Common.SERVER_URL));
 
 		SharedPreferences trainingPref = getSharedPreferences(Common.EL_PREFS,0);
 		Common.changeTrainingStatus(trainingPref.getInt("TRAINING_STATUS", 0));
@@ -272,7 +273,7 @@ public class CollectionTabActivity extends FragmentActivity {
 				4816, uploaderServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 		uploaderAlarmMgr= (AlarmManager)CollectionTabActivity.this.getSystemService(CollectionTabActivity.this.ALARM_SERVICE);
 		uploaderAlarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-				System.currentTimeMillis()+Common.UPLOAD_INTERVAL*30*1000, Common.UPLOAD_INTERVAL*30*1000, uploaderServicePendingIntent); 
+				System.currentTimeMillis()+Common.UPLOAD_INTERVAL*60*1000, Common.UPLOAD_INTERVAL*30*1000, uploaderServicePendingIntent); 
 		Log.v("ELSERVICES","Uploader alarm Set for service "+4816+" "+Common.INTERVAL);
 	}
 

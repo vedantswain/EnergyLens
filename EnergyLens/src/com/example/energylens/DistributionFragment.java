@@ -10,10 +10,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -64,22 +63,24 @@ public class DistributionFragment extends Fragment {
 
 		progressBar.setProgress(percent);
 
-		progressBar.setOnClickListener(new View.OnClickListener(){
+		//		ImageButton appBtn=(ImageButton)inflateView.findViewById(R.id.imageButton1);
+		if(Common.CURRENT_VISIBLE==2){
+			inflateView.setOnClickListener(new View.OnClickListener(){
 
-			@Override
-			public void onClick(View view) {
-				// TODO Auto-generated method stub
-				Bundle extras=new Bundle();
-				Log.v("ELSERVICES", "Distribution "+appliance);
-				Intent intent=new Intent(getActivity(),CorrectionActivity.class);
-				extras.putString("appliance", appliance);
-				extras.putInt("color", color);
-				intent.putExtras(extras);
-				if(!appliance.equals("Unknown") && Common.CURRENT_VISIBLE==2)
-					startActivity(intent);
-			}
-		});			
-
+				@Override
+				public void onClick(View view) {
+					// TODO Auto-generated method stub
+					Bundle extras=new Bundle();
+					Log.v("ELSERVICES", "Distribution "+appliance);
+					Intent intent=new Intent(getActivity(),CorrectionActivity.class);
+					extras.putString("appliance", appliance);
+					extras.putInt("color", color);
+					intent.putExtras(extras);
+					if(!appliance.equals("Unknown"))
+						startActivity(intent);
+				}
+			});			
+		}
 		return inflateView;
 	}
 

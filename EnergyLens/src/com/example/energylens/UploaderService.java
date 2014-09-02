@@ -85,7 +85,7 @@ public class UploaderService extends Service{
 
 	public void getUpdatedPreferences(){
 		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-		Common.changeServerUrl(sharedPref.getString("SERVER_URL", "http://192.168.20.217:9010/"));
+		Common.changeServerUrl(sharedPref.getString("SERVER_URL",Common.SERVER_URL));
 	}
 
 	@Override
@@ -213,7 +213,7 @@ public class UploaderService extends Service{
 		try
 		{
 			Log.i("ELSERVICES", Common.SERVER_URL+Common.API);
-			URL url = new URL("http://198.162.20.217:9010/");
+			URL url = new URL(Common.SERVER_URL+Common.API);
 			connection = (HttpURLConnection) url.openConnection();
 
 			// Allow Inputs &amp; Outputs.

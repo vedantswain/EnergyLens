@@ -55,7 +55,7 @@ public class LogWriter {
 	public static void LogWrite(File logFile,String logstring,String header,boolean isWifi,boolean isAudio){
 		synchronized(logFile){
 					
-//					Log.v("ELSERVICES", "Writing Log");
+//					Log.v("ELSERVICES", "Writing Log to: "+logFile.toString()+" "+Common.LABEL);
 					PathCheck(logFile,header);
 					
 					BufferedWriter buf;

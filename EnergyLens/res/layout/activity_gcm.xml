@@ -24,28 +24,6 @@
         android:hint="What should we call you?"
         android:inputType="textPersonName" />
 
-    <EditText
-        android:id="@+id/gcmEmail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/gcmName"
-        android:ems="10"
-        android:hint="How do we reach you by mail?"
-        android:inputType="textEmailAddress" />
-
-    <EditText
-        android:id="@+id/serverUrl"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/gcmEmail"
-        android:ems="10"
-        android:hint="Which server do we connect to?"
-        android:visibility="invisible" />
-
     <Button
         android:id="@+id/register"
         android:layout_width="wrap_content"
@@ -57,15 +35,6 @@
         android:onClick="onRegister"
         android:text="Register Device" />
 
-    <CheckBox
-        android:id="@+id/firstInstall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/serverUrl"
-        android:layout_marginTop="74dp"
-        android:text="First Install?" />
-
     <EditText
         android:id="@+id/apptNo"
         android:layout_width="wrap_content"
@@ -73,10 +42,52 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/firstInstall"
-        android:layout_marginTop="17dp"
         android:ems="10"
         android:hint="Which appartment do you live in?"
-        android:visibility="invisible" >
+        android:visibility="invisible" />
+
+    <Button
+        android:id="@+id/selectWifi"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/apptNo"
+        android:onClick="launchWifiDialog"
+        android:visibility="invisible"
+        android:text="Select Wifi" />
+
+    <CheckBox
+        android:id="@+id/firstInstall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:text="First Install?" />
+
+    <AutoCompleteTextView
+        android:id="@+id/serverUrl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/gcmEmail"
+        android:layout_marginTop="18dp"
+        android:ems="10"
+        android:hint="Which server do we connect to?" />
+
+    <EditText
+        android:id="@+id/gcmEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/gcmName"
+        android:layout_marginTop="14dp"
+        android:ems="10"
+        android:hint="How do we reach you by mail?"
+        android:inputType="textEmailAddress" >
 
         <requestFocus />
     </EditText>

@@ -31,26 +31,53 @@
                 android:src="@drawable/ic_launcher" />
 
             <Button
-                android:id="@+id/setApp"
+                android:id="@+id/setLoc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
-                android:layout_marginTop="49dp"
-                android:onClick="launchAppDialog"
-                android:text="no appliance selected" />
+                android:onClick="launchLocDialog"
+                android:text="select location" />
 
-            <Button
-                android:id="@+id/setLoc"
+            <TextView
+                android:id="@+id/textView2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/setApp"
-                android:layout_alignRight="@+id/setApp"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/setLoc"
+                android:layout_marginTop="16dp"
+                android:text="Appliances"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <Button
+                android:id="@+id/setApp"
+                 style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignTop="@+id/textView2"
+                android:onClick="launchAppDialog"
+                android:text="Add" />
+
+            <TextView
+                android:id="@+id/appList"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/textView2"
+                android:layout_toLeftOf="@+id/setApp" />
+
+            <Button
+                android:id="@+id/remApp"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
                 android:layout_below="@+id/setApp"
-                android:layout_marginTop="35dp"
-                android:onClick="launchLocDialog"
-                android:text="no location selected" />
+                android:text="Del" 
+                android:onClick="removeLastApp"/>
+
         </RelativeLayout>
 
         <RelativeLayout

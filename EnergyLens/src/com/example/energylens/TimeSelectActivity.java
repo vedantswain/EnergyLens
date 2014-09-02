@@ -160,4 +160,8 @@ DatePickerDialogFragment.DatePickerDialogListener{
 		changeTimeOf=1;
 		launchTimePicker();
 	}
+	
+	public void done(View view){
+		finish();
+	}
 }

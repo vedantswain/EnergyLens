@@ -89,7 +89,7 @@ public class CorrectionActivity extends FragmentActivity implements ApplianceDia
 	Context context;
 	String SENDER_ID = "166229175411";
 
-	Button start,end;
+	TextView start,end;
 	JSONArray activities;
 	JSONArray appliances;
 
@@ -104,8 +104,8 @@ public class CorrectionActivity extends FragmentActivity implements ApplianceDia
 		setContentView(R.layout.activity_correction);
 		y=y1;
 
-		start=(Button)findViewById(R.id.setStart);
-		end=(Button) findViewById(R.id.setEnd);
+		start=(TextView)findViewById(R.id.setStart);
+		end=(TextView) findViewById(R.id.setEnd);
 
 		Intent intent=getIntent();
 		Bundle extras=intent.getExtras();
@@ -394,7 +394,7 @@ public class CorrectionActivity extends FragmentActivity implements ApplianceDia
 	public void setTimeSlice(long xCoord){
 
 		TextView guide=(TextView) findViewById(R.id.textGuide);
-		SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM HH:mm");
 
 		if(lastSet==1){ //select start edge
 			Log.v("ELSERVICES", "Set in start slice");
