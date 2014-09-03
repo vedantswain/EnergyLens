@@ -69,7 +69,6 @@ public class RealTimePowerFragment extends Fragment{
 
 	public void setupChart(){
 		Random rnd=new Random();
-		counter++;
 		Calendar c=Calendar.getInstance();
 		c.setTimeInMillis((long) (timestamp*1000));
 		drawChart(c.getTime(),Math.round(power));
@@ -80,6 +79,7 @@ public class RealTimePowerFragment extends Fragment{
 
 	public void drawChart(Date x, double y){
 		mSeries.add(x, y);
+		counter++;
 		if(counter>60){
 			mSeries.remove(0);
 		}
@@ -110,6 +110,8 @@ public class RealTimePowerFragment extends Fragment{
 		mRenderer.setYLabelsAlign(Align.RIGHT);
 		mRenderer.setChartTitle("Real-Time Power Consumption");
 		mRenderer.setShowGrid(true);
+		int[] margins={5,80,5,0};
+		mRenderer.setMargins(margins);
 
 		final XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
 		dataset.addSeries(mSeries);

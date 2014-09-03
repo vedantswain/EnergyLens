@@ -25,6 +25,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Binder;
 import android.os.Environment;
 import android.os.IBinder;
@@ -40,9 +41,10 @@ public class UploaderService extends Service{
 	DataOutputStream outputStream = null;
 	DataInputStream inputStream = null;
 	String path = Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator;
+	String researchPath= path+"UsageStats"+File.separator;
 	String [] file={"accelerometer_log.csv","audio_log.csv","light_log.csv","mag_log.csv","rawaudio_log.csv","wifi_log.csv",
 			"Training_accelerometer_log.csv","Training_audio_log.csv","Training_light_log.csv","Training_mag_log.csv","Training_rawaudio_log.csv","Training_wifi_log.csv"};
-	//	String [] file={"audio_log.csv"};
+	String [] researchFile={"screen_log.csv"};
 	String urlServer = Common.SERVER_URL+Common.API;
 	String lineEnd = "\r\n";
 	String twoHyphens = "--";
@@ -99,18 +101,41 @@ public class UploaderService extends Service{
 
 	}
 
+	private void upload_research(){
+		for(String filename:researchFile){
+			research_upload_setup(filename);
+		}
+		Log.i("ELSERVICES", "all research files visited "+System.currentTimeMillis());
+		research_upload_pending();
+	}
+
+	public void timeCheck(){
+		SharedPreferences sp=getSharedPreferences(Common.EL_PREFS,0);
+		long timePassed=System.currentTimeMillis()-sp.getLong("LAST_RS_UP", System.currentTimeMillis());
+		Editor editor=sp.edit();
+		if(timePassed==0)
+			editor.putLong("LAST_RS_UP", System.currentTimeMillis());
+		Log.v("ELSERVICES", "TIME CHECK: "+timePassed/(60*1000));
+		if(timePassed>1*10*60*1000){
+			upload_research();
+			editor.putLong("LAST_RS_UP", System.currentTimeMillis());
+		}
+		editor.commit();
+	}
+
 	Runnable mTask = new Runnable() {
 		public void run() {
 
 			synchronized (mBinder) {
 				try {
-
+					
 					for(String filename:file){
 						upload_setup(filename);
 					}
 					Log.i("ELSERVICES", "all files visited "+System.currentTimeMillis());
-					stopSelf();
 					upload_pending();
+					timeCheck();
+					stopSelf();					
 				}
 				catch (Exception e) {
 				}
@@ -125,7 +150,7 @@ public class UploaderService extends Service{
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
+
 		InputStream input = null;
 		OutputStream output = null;
 		try {
@@ -163,6 +188,30 @@ public class UploaderService extends Service{
 		return ft.format(date);
 	}
 
+	public void research_upload_pending(){
+
+		File list[] = (new File(researchPath)).listFiles();
+
+		Arrays.sort(list, new Comparator<File>(){
+			public int compare(File f1, File f2)
+			{
+				return Long.valueOf(f1.lastModified()).compareTo(f2.lastModified());
+			} });
+
+		//
+		for(int i=list.length-1;i>=0;i--){
+			File file=list[i];
+			String filename=file.getAbsolutePath().replace(path, "");
+			Log.i("ELSERVICES", "pending "+filename);
+			Log.i("ELSERVICES", "uploading pending research files");
+			if(file.length()==0)
+				file.delete();
+			else
+				upload(file,Common.SERVER_URL+Common.API);
+
+		}
+	}
+
 	public void upload_pending(){
 
 		File list[] = (new File(path)).listFiles();
@@ -183,9 +232,31 @@ public class UploaderService extends Service{
 				if(file.length()==0)
 					file.delete();
 				else
-					upload(file);
+					upload(file,Common.SERVER_URL+Common.API);
 			}
 		}
+	}
+
+	public void research_upload_setup(String filename){
+		TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+		String devId=telephonyManager.getDeviceId();
+		String pathToFile=researchPath+filename;
+		String uniqueID=getDate();
+		String upPathToFile=researchPath+devId+'_'+uniqueID+".csv"; 
+
+		File oldFile=new File(pathToFile);
+		File upFile=new File(upPathToFile);
+
+		if(oldFile.exists()){
+			fileCopy(oldFile,upFile);
+			if(upFile.length()==0)
+				upFile.delete();
+			else{
+				Log.v("ELSERVICES", "Research upload: "+oldFile.toString()+"->"+upFile.toString());
+				upload(upFile,Common.SERVER_URL+Common.API);
+				
+			}
+				}
 	}
 
 	public void upload_setup(String filename){
@@ -204,16 +275,16 @@ public class UploaderService extends Service{
 			if(upFile.length()==0)
 				upFile.delete();
 			else
-				upload(upFile);
+				upload(upFile,Common.SERVER_URL+Common.API);
 		}
 	}
 
 
-	public void upload(File upFile){
+	public void upload(File upFile,String URL){
 		try
 		{
-			Log.i("ELSERVICES", Common.SERVER_URL+Common.API);
-			URL url = new URL(Common.SERVER_URL+Common.API);
+			Log.i("ELSERVICES", URL);
+			URL url = new URL(URL);
 			connection = (HttpURLConnection) url.openConnection();
 
 			// Allow Inputs &amp; Outputs.

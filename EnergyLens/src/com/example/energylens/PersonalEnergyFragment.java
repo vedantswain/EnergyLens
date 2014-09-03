@@ -133,6 +133,8 @@ public class PersonalEnergyFragment extends Fragment {
 		mRenderer.setClickEnabled(true);
 		mRenderer.setSelectableBuffer(50);
 		mRenderer.setShowGrid(true);
+		int[] margins={5,80,5,0};
+		mRenderer.setMargins(margins);
 
 		mDataset.addSeries(mSeries);
 		chartView = ChartFactory.getBarChartView(getActivity().getApplicationContext(), mDataset, mRenderer, BarChart.Type.DEFAULT);

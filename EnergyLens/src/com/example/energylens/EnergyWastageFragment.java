@@ -72,6 +72,8 @@ public class EnergyWastageFragment extends Fragment{
 	private long maxY=0;
 	private String PREFS_NAME="WASTE_PREFS";
 
+	long timeVisit,timeOfStay;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {	     
@@ -144,6 +146,8 @@ public class EnergyWastageFragment extends Fragment{
 		mRenderer.setClickEnabled(true);
 		mRenderer.setSelectableBuffer(50);
 		mRenderer.setShowGrid(true);
+		int[] margins={5,80,5,0};
+		mRenderer.setMargins(margins);
 
 		mDataset.addSeries(mSeries);
 		chartView = ChartFactory.getBarChartView(getActivity().getApplicationContext(), mDataset, mRenderer, BarChart.Type.DEFAULT);
@@ -215,13 +219,18 @@ public class EnergyWastageFragment extends Fragment{
 		Date start=new Date(Common.TIME_PERIOD_START);
 		Date end=new Date(Common.TIME_PERIOD_END);
 		Log.v("ELSERVICES", "From: "+start.toString()+" To: "+end.toString());
-//		if(Common.CURRENT_VISIBLE==1)
+		if(Common.CURRENT_VISIBLE==1){
+			timeVisit=System.currentTimeMillis();
 			sendMessage();
+		}
 	}
 
 	public void onPause(){
 		super.onResume();
 		getActivity().unregisterReceiver(receiver);
+		timeOfStay=System.currentTimeMillis();
+		LogWriter.screenLogWrite(timeVisit+","+"EnergyWastage"+","+timeOfStay);
+		timeVisit=timeOfStay;
 	}
 
 	public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -302,7 +311,7 @@ public class EnergyWastageFragment extends Fragment{
 
 					gcm.send(SENDER_ID + "@gcm.googleapis.com", randomId, data);
 					msg = "EnergyWastage sent message";
-					Log.i("ELSERVICES", "message sent to personal: "+data.toString());
+					Log.i("ELSERVICES", "message sent to wastage: "+data.toString());
 
 				} catch (IOException ex) {
 					msg = "Error :" + ex.getMessage();

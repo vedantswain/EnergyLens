@@ -45,7 +45,7 @@ public class CollectionTabActivity extends FragmentActivity {
 	Context context;
 	String SENDER_ID = "166229175411";
 	Boolean doubleBackToExitPressedOnce=false;
-	
+
 	private AlarmManager axlAlarmMgr,wifiAlarmMgr,audioAlarmMgr,lightAlarmMgr,magAlarmMgr,uploaderAlarmMgr;
 	private PendingIntent axlServicePendingIntent,wifiServicePendingIntent,audioServicePendingIntent,lightServicePendingIntent,magServicePendingIntent,uploaderServicePendingIntent;
 	private Intent axlServiceIntent,wifiServiceIntent,audioServiceIntent,lightServiceIntent,magServiceIntent,uploaderServiceIntent;
@@ -82,6 +82,22 @@ public class CollectionTabActivity extends FragmentActivity {
 		getUpdatedPreferences();
 		addShortcut();
 
+		Bundle intent_extras = getIntent().getExtras();
+		Log.v("ELSERVICES","notification: "+getIntent().getExtras());
+        if (intent_extras != null)
+        {
+        	Log.v("ELSERVICES","notification"+ intent_extras.get("started_from"));
+			if(intent_extras.get("started_from").equals(26194)){
+				Log.v("ELSERVICES", "notification started intent");
+				SharedPreferences sp=getSharedPreferences(Common.EL_PREFS,0);
+				Editor editor=sp.edit();
+				editor.putBoolean("LAST_NOTIF_CLICKED",true);
+				editor.commit();
+				long timeRcvd=sp.getLong("LAST_NOTIF_ARRIVAL", System.currentTimeMillis());
+				LogWriter.notifLogWrite(Long.toString(timeRcvd)+","+sp.getLong("LAST_NOTIF_ID",0)+","+System.currentTimeMillis());
+			}
+
+		}
 		if(Common.TRAINING_STATUS==1){
 			Intent intent = new Intent(this,TrainActivity.class);
 			startActivity(intent);
@@ -104,10 +120,7 @@ public class CollectionTabActivity extends FragmentActivity {
 			public void onPageSelected(int arg0) {
 				// TODO Auto-generated method stub
 				Common.changeCurrentVisible(arg0);
-				if(arg0==3){
-					Log.v("ELSERVICES", "RTP Visible");
-				}
-
+				Log.v("ELSERVICES", "Current visible: "+arg0);
 			}
 
 			@Override
@@ -122,7 +135,7 @@ public class CollectionTabActivity extends FragmentActivity {
 
 			}
 		});
-		
+
 	} 
 
 	public void addShortcut(){
@@ -144,6 +157,7 @@ public class CollectionTabActivity extends FragmentActivity {
 			sendBroadcast(shortcutintent);
 		}
 	}
+	
 
 	protected void onResume(){
 		super.onResume();

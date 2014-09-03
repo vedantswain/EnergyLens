@@ -52,10 +52,10 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 	private String[] labels={"New Appliance","Fan","AC","Microwave","TV","Computer","Printer","Washing Machine","Fan+AC"};
 	private ArrayList<String> labelsList=new ArrayList<String>();
 	private ArrayList<String> locList=new ArrayList<String>();
-	
+
 	private NotificationManager mNotificationManager;
 	NotificationCompat.Builder builder;
-	
+
 	private ArrayList<String> selectedApps=new ArrayList<String>();
 	int selectedAppsCount=0;
 
@@ -68,7 +68,7 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 		viewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
 
 		getUpdatedPreferences();
-		
+
 		Log.v("ELSERVICES", "Created during Status: "+Common.TRAINING_STATUS);
 
 		if(Common.TRAINING_STATUS==1){
@@ -201,7 +201,7 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 		Common.changePrefix("");
 		Common.changeTrainingCount(Common.TRAINING_COUNT+1);
 		updatePreferences(Common.TRAINING_STATUS);
-		
+
 		clearNotification();
 		try {
 			stop();
@@ -229,16 +229,18 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 		// Commit the edits!
 		editor.commit();
 	}
-	
+
 	private void sendNotification(){
 		String message=Common.LABEL+" at "+Common.LOCATION+" running";
-		
+
 		mNotificationManager = (NotificationManager)
 				this.getSystemService(Context.NOTIFICATION_SERVICE);
 
+		Intent intent=new Intent(this, CollectionTabActivity.class);
+		intent.putExtra("start_from", 26194);
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-				new Intent(this, CollectionTabActivity.class), 0);
-		
+				intent, 0);		
+
 		NotificationCompat.Builder mBuilder =
 				new NotificationCompat.Builder(this)
 		.setSmallIcon(R.drawable.ic_launcher)
@@ -246,24 +248,36 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 		.setStyle(new NotificationCompat.BigTextStyle()
 		.bigText(message))
 		.setContentText(message);
-		
+
 		mBuilder.setContentIntent(contentIntent);
-		
+
 		Notification trainingNote=mBuilder.build();
 		trainingNote.flags |= Notification.FLAG_ONGOING_EVENT;
 		
+		SharedPreferences sp=getSharedPreferences(Common.EL_PREFS,0);
+		long timeRcvd=sp.getLong("LAST_NOTIF_ARRIVAL", 0);
+		boolean lastNotifClicked=sp.getBoolean("LAST_NOTIF_CLICKED", false);
+		if(timeRcvd!=0 && !lastNotifClicked)
+			LogWriter.notifLogWrite(timeRcvd+","+sp.getLong("LAST_NOTIF_ID",0)+","+"never");
+		
+		//store notification data
+		Editor editor=sp.edit();
+		editor.putLong("LAST_NOTIF_ARRIVAL",System.currentTimeMillis());
+		editor.putLong("LAST_NOTIF_ID", 26194);
+		editor.commit();
+
 		mNotificationManager.notify(26194, trainingNote);
 	}
-	
+
 	public void clearNotification() {
-	    NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-	    notificationManager.cancel(26194);
+		NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+		notificationManager.cancel(26194);
 	}
 
 	public void startService(View view){
-		if(Common.LABEL!="none" && Common.LOCATION!="none"){
+		if(!(Common.LABEL.equals("none")) && !(Common.LOCATION.equals("none"))){
 			Common.changePrefix("Training_");
-			//			Log.v("ELSERVICES", Common.LABEL+" "+Common.LOCATION+" "+Common.FILE_PREFIX);
+			Log.v("ELSERVICES", Common.LABEL+" "+Common.LOCATION+" "+Common.FILE_PREFIX);
 			viewFlipper.showNext();
 			Common.changeTrainingStatus(1);
 			updatePreferences(Common.TRAINING_STATUS);
@@ -418,16 +432,21 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 			textView.setText(Common.LABEL);
 		}
 	}
-	
+
 	public void removeLastApp(View view){
-		selectedAppsCount--;
-		selectedApps.remove(selectedApps.get(selectedApps.size()-1));
-		StringBuilder sb=new StringBuilder();
-		for(String apps:selectedApps)
-			sb.append(apps);
-		Common.changeLabel(sb.toString());
-		TextView textView=(TextView) findViewById(R.id.appList);
-		textView.setText(Common.LABEL);
+		if(selectedAppsCount>0){
+			selectedAppsCount--;
+			selectedApps.remove(selectedApps.get(selectedApps.size()-1));
+			StringBuilder sb=new StringBuilder();
+			for(String apps:selectedApps)
+				sb.append(apps);
+			if(selectedAppsCount>0)
+				Common.changeLabel(sb.toString());
+			else
+				Common.changeLabel("none");
+			TextView textView=(TextView) findViewById(R.id.appList);
+			textView.setText(Common.LABEL);
+		}
 	}
 
 	@Override
@@ -509,7 +528,7 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 			Common.changeActivityApps(updatedLabels.split(","));
 			labels=updatedLabels.split(",");
 			for(String label:labels){
-				
+
 			}
 		}
 		String updatedLocs=sp.getString("LOC_LIST", "");

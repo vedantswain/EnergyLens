@@ -5,11 +5,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import android.content.Context;
 import android.os.Environment;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 public class LogWriter {
-	public static File axlLog, errorLog, wifiLog,audioLog,rawaudioLog,lightLog,magLog; 
+	public static File axlLog, errorLog, wifiLog,audioLog,rawaudioLog,lightLog,magLog,screenLog,notifLog; 
 	public static String WIFIHEADER="time"+","+"mac"+","+"ssid"+","+"rssi"+","+"label";
 	public static String ACCLHEADER="time"+","+"x"+","+"y"+","+"z"+","+"label"+","+"location";
 	public static String RAWSOUNDHEADER="time"+","+"values"+","+"label"+","+"location";
@@ -17,9 +19,11 @@ public class LogWriter {
 	public static String LIGHTHEADER = "time" + "," + "value" + "," + "label" +","+"location";
 	public static String MAGHEADER = "time" + "," + "x" + "," + "y" + "," + "z" + ","+"label"+","+"location"; 
 	public static String ERRHEADER = "error log";
+	public static String SCREENHEADER="time_of_day"+","+"screen_name"+","+"time_of_stay";
+	public static String NOTIFHEADER="received_at"+","+"notification_id"+","+"seen_at";
 	
 	public static File EnergyLensDir=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+");
-	
+	public static File UsageStatsDir=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"UsageStats");
 		
 	public static void PathCheck(File logFile,String header){
 //		Log.v("ELSERVICES", "checking path");
@@ -27,6 +31,16 @@ public class LogWriter {
 			try{
 			EnergyLensDir.mkdir();
 			Log.v("LOG WRITER","directory made at: "+EnergyLensDir.getPath());
+			}
+			catch(Exception e){
+				Log.v("LOG WRITER",e.toString());
+			}
+		}
+		
+		if(!UsageStatsDir.exists()){
+			try{
+			UsageStatsDir.mkdir();
+			Log.v("LOG WRITER","directory made at: "+UsageStatsDir.getPath());
 			}
 			catch(Exception e){
 				Log.v("LOG WRITER",e.toString());
@@ -121,5 +135,42 @@ public class LogWriter {
 		errorLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"error_log"+".csv");
 		LogWrite(errorLog,logstring,ERRHEADER,false,false);
 	}
+	
+	public static void screenLogWrite(String logstring){
+		String filename="screen_log";
+		screenLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"UsageStats"+File.separator+filename+".csv");
+		researchLogWrite(screenLog,logstring,SCREENHEADER);
+	}
+	
+	public static void notifLogWrite(String logstring){
+		String filename="notif_log";
+		notifLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"UsageStats"+File.separator+filename+".csv");
+		researchLogWrite(notifLog,logstring,NOTIFHEADER);
+	}
+	
+	public static void researchLogWrite(File logFile,String logstring,String header){
+		synchronized(logFile){
+					
+//					Log.v("ELSERVICES", "Writing Log to: "+logFile.toString()+" "+Common.LABEL);
+					PathCheck(logFile,header);
+					
+					BufferedWriter buf;
+					try {
+						buf = new BufferedWriter(new FileWriter(logFile, true));
+//						Log.v("ELSERVICES", "Before label");
+						buf.append(logstring);
+						buf.newLine();
+						buf.close();
+						Log.v("ELSERVICES", logstring+" written  into"+logFile.toString() );
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						Log.v("LOG WRITER",e.toString());
+						if(logFile!=errorLog)
+							errorLogWrite(e.toString());
+					} 
+				
+			}
+	}		
 	
 }

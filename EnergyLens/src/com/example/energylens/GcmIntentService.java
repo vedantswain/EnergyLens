@@ -1,13 +1,12 @@
 package com.example.energylens;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
@@ -58,7 +57,8 @@ public class GcmIntentService extends IntentService {
 
 				Log.i(TAG, "Completed work @ " + SystemClock.elapsedRealtime());
 				// Post notification of received message.
-				sendNotification(extras);
+				if(extras.getString("api","none").equals("energy/wastage/notification/"))
+					sendNotification(extras);
 				Log.i(TAG, "Received: " + extras.toString());
 				publishData(extras); 
 			}
@@ -88,8 +88,10 @@ public class GcmIntentService extends IntentService {
 		mNotificationManager = (NotificationManager)
 				this.getSystemService(Context.NOTIFICATION_SERVICE);
 
+		Intent intent=new Intent(this, CollectionTabActivity.class);
+		intent.putExtra("start_from", 26194);
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-				new Intent(this, GCMActivity.class), 0);
+				intent, 0);		
 
 		String msg_type=data.getString("msg_type");
 		String api=data.getString("api");
@@ -103,6 +105,18 @@ public class GcmIntentService extends IntentService {
 		.setStyle(new NotificationCompat.BigTextStyle()
 		.bigText(message))
 		.setContentText(message);
+		
+		SharedPreferences sp=getSharedPreferences(Common.EL_PREFS,0);
+		long timeRcvd=sp.getLong("LAST_NOTIF_ARRIVAL", 0);
+		boolean lastNotifClicked=sp.getBoolean("LAST_NOTIF_CLICKED", false);
+		if(timeRcvd!=0 && !lastNotifClicked)
+			LogWriter.notifLogWrite(timeRcvd+","+sp.getLong("LAST_NOTIF_ID",0)+","+"never");
+		
+		//store notification data
+		Editor editor=sp.edit();
+		editor.putLong("LAST_NOTIF_ARRIVAL",System.currentTimeMillis());
+		editor.putLong("LAST_NOTIF_ID", NOTIFICATION_ID);
+		editor.commit();
 
 		mBuilder.setContentIntent(contentIntent);
 		mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
