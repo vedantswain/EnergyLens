@@ -14,7 +14,7 @@ public class Common{
 	public static String[] ACTIVITY_LOCS;
 	public static String[] ACTIVITY_APPS;
 	public static Boolean DOUBLE_BACK=false;
-	public static int CURRENT_VISIBLE=1;
+	public static int CURRENT_VISIBLE=0;
 	public static String SENDER_ID = "166229175411";
 	public static long INTERVAL = 30; //seconds between each scheduling of service
 	public static int SAMPLE_TIME=10; //seconds for which sensors will take data

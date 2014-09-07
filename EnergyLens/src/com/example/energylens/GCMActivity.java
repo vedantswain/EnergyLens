@@ -135,8 +135,6 @@ public class GCMActivity extends FragmentActivity implements TryAgainDialogListe
 			regid = getRegistrationId(context);
 
 			if (!regid.isEmpty()) {
-				if(wifiRcvr!=null)
-					unregisterReceiver(wifiRcvr);
 				Intent intent = new Intent(this,CollectionTabActivity.class);
 				startActivity(intent);
 			}
@@ -294,8 +292,6 @@ public class GCMActivity extends FragmentActivity implements TryAgainDialogListe
 	}
 
 	public void toMain(){
-		if(wifiRcvr!=null)
-			unregisterReceiver(wifiRcvr);
 		Intent intent = new Intent(this,CollectionTabActivity.class);
 		startActivity(intent);
 	}

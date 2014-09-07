@@ -14,18 +14,28 @@
         android:paddingTop="@dimen/activity_vertical_margin" 
         android:clickable="true">
 
-        <Button
-            android:id="@+id/timeSelectBtn"
-            style="?android:attr/buttonStyleSmall"
+         <TextView
+            android:id="@+id/sorryText2"
             android:layout_width="wrap_content"
-            android:layout_height="32dp"
+            android:layout_height="wrap_content"
+            android:text="Sorry we have no information to display"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+        
+        <ImageView
+             android:id="@+id/timeSelectBtn2"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:visibility="invisible"
             android:onClick="toTimeSelect"
-            android:text="Change Time Period " />
+            android:src="@drawable/ic_history" />
 
         <TextView
             android:id="@+id/lastSyncText"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:visibility="invisible" 
+            android:textSize="12sp" />
 
         <LinearLayout
             android:id="@+id/chartPEn"
@@ -45,26 +55,29 @@
                 android:paddingBottom="10dp"
                 android:paddingTop="10dp"
                 android:text="Total Consumption"
+                android:visibility="invisible"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/totalVal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="40dp"
+                android:textSize="16sp"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
         </LinearLayout>
 
         <TextView
-            android:id="@+id/distName"
+            android:id="@+id/distName2"
             android:layout_width="304dp"
             android:layout_height="wrap_content"
             android:paddingBottom="10dp"
             android:paddingTop="10dp"
-            android:text="Appliance-wise Distribution:"
+            android:text="Appliance-wise Consumption:"
+            android:visibility="invisible"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textSize="14sp" />
+            android:textSize="16sp" />
 
         <LinearLayout
             android:id="@+id/PEnDist"

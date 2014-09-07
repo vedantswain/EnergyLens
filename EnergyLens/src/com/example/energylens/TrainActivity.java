@@ -31,6 +31,7 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
@@ -237,9 +238,9 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 				this.getSystemService(Context.NOTIFICATION_SERVICE);
 
 		Intent intent=new Intent(this, CollectionTabActivity.class);
-		intent.putExtra("start_from", 26194);
+
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-				intent, 0);		
+				intent, PendingIntent.FLAG_UPDATE_CURRENT);		
 
 		NotificationCompat.Builder mBuilder =
 				new NotificationCompat.Builder(this)
@@ -253,20 +254,37 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 
 		Notification trainingNote=mBuilder.build();
 		trainingNote.flags |= Notification.FLAG_ONGOING_EVENT;
-		
-		SharedPreferences sp=getSharedPreferences(Common.EL_PREFS,0);
-		long timeRcvd=sp.getLong("LAST_NOTIF_ARRIVAL", 0);
-		boolean lastNotifClicked=sp.getBoolean("LAST_NOTIF_CLICKED", false);
-		if(timeRcvd!=0 && !lastNotifClicked)
-			LogWriter.notifLogWrite(timeRcvd+","+sp.getLong("LAST_NOTIF_ID",0)+","+"never");
-		
-		//store notification data
-		Editor editor=sp.edit();
-		editor.putLong("LAST_NOTIF_ARRIVAL",System.currentTimeMillis());
-		editor.putLong("LAST_NOTIF_ID", 26194);
-		editor.commit();
 
 		mNotificationManager.notify(26194, trainingNote);
+	}
+
+	private void customNotification(){
+		// Using RemoteViews to bind custom layouts into Notification
+		RemoteViews remoteViews = new RemoteViews(getPackageName(),
+				R.layout.customnotification);
+
+		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
+		// Set Icon
+		.setSmallIcon(R.drawable.ic_launcher)
+		// Set Ticker Message
+		.setTicker("appliance is running")
+		.setContentTitle("EnergyLens+")
+		// Dismiss Notification
+		.setAutoCancel(true)
+		// Set RemoteViews into Notification
+		.setContent(remoteViews);
+		
+		Notification trainingNote=mBuilder.build();
+		trainingNote.flags |= Notification.FLAG_ONGOING_EVENT;
+		
+		// Locate and set the Text into customnotificationtext.xml TextViews
+		remoteViews.setTextViewText(R.id.notifMessage,"appliance left running at location");
+
+		// Create Notification Manager
+		NotificationManager notificationmanager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+		// Build Notification with Notification Manager
+		notificationmanager.notify(0, mBuilder.build());
+		
 	}
 
 	public void clearNotification() {
@@ -283,6 +301,7 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 			updatePreferences(Common.TRAINING_STATUS);
 			Toast.makeText(TrainActivity.this, "Training data collection started", LENGTH_SHORT).show();
 			sendNotification();
+//			customNotification();
 			start();
 		}
 		else
@@ -527,9 +546,7 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 		if(updatedLabels!=""){
 			Common.changeActivityApps(updatedLabels.split(","));
 			labels=updatedLabels.split(",");
-			for(String label:labels){
 
-			}
 		}
 		String updatedLocs=sp.getString("LOC_LIST", "");
 		if(updatedLocs!=""){

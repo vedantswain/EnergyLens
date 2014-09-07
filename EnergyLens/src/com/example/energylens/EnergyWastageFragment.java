@@ -22,8 +22,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -39,14 +37,19 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.text.format.DateFormat;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 
 public class EnergyWastageFragment extends Fragment{
@@ -55,8 +58,8 @@ public class EnergyWastageFragment extends Fragment{
 	XYMultipleSeriesDataset appDataset=new XYMultipleSeriesDataset(),mDataset = new XYMultipleSeriesDataset();
 	String[] appliances={"TV","Microwave","Computer","AC","Fan","Washing Machine"};
 	int[] distribution={30,10,40,40,5,2,2};
-	GoogleCloudMessaging gcm;
-	String SENDER_ID = "166229175411";
+	static GoogleCloudMessaging gcm;
+	static String SENDER_ID = "166229175411";
 
 	long totalWastage;
 	long[] hourlyWastage;
@@ -74,11 +77,14 @@ public class EnergyWastageFragment extends Fragment{
 
 	long timeVisit,timeOfStay;
 
+	View inflateView;
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {	     
 		View rootView = inflater.inflate(R.layout.fragment_energywastage, container, false);
 		gcm = GoogleCloudMessaging.getInstance(getActivity());
+		inflateView=rootView;
 		return rootView;
 
 	}
@@ -110,7 +116,7 @@ public class EnergyWastageFragment extends Fragment{
 		Log.v("ELSERVICES", "chart drawn");
 
 		// Creating an  XYSeries for Income
-		XYSeries mSeries = new XYSeries("Power");
+		XYSeries mSeries = new XYSeries("Energy Wasted");
 
 		for(int i=0;i<y.length;i++){
 			mSeries.add(i+1, y[i]);
@@ -119,10 +125,17 @@ public class EnergyWastageFragment extends Fragment{
 
 		XYSeriesRenderer bar_renderer = new XYSeriesRenderer();
 		bar_renderer.setLineWidth(1);
-		bar_renderer.setColor(Color.DKGRAY);
+		bar_renderer.setColor(Color.rgb(102, 0, 0));
 		bar_renderer.setDisplayBoundingPoints(true);
 		bar_renderer.setDisplayChartValues(true);
+		
+		DisplayMetrics metrics = getActivity().getResources().getDisplayMetrics();
+		float val = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, metrics);
 
+		DateFormat df=new DateFormat();
+		String from_time=df.format("dd MMM yy HH:mm", Common.TIME_PERIOD_START).toString();
+		String to_time=df.format("dd MMM yy HH:mm", Common.TIME_PERIOD_END).toString();
+		
 		mRenderer.addSeriesRenderer(bar_renderer);
 		//  	  mRenderer.addSeriesRenderer(line_renderer);
 
@@ -135,18 +148,22 @@ public class EnergyWastageFragment extends Fragment{
 		mRenderer.setXAxisMin(0);
 		mRenderer.setYAxisMax(maxY*1.5);
 		mRenderer.setXAxisMax(y.length+1);
-		mRenderer.setChartTitle("Your Energy Wastage for the Last 12 hours");
-		mRenderer.setChartTitleTextSize(18);
-		mRenderer.setLabelsColor(Color.BLACK);
-		mRenderer.setLabelsTextSize(18);
-		mRenderer.setXTitle("Hours");
+		mRenderer.setChartTitle("Your Energy Wastage from "+from_time+" to "+to_time);
+		mRenderer.setChartTitleTextSize(val);
+		mRenderer.setLabelsColor(Color.DKGRAY);
+		mRenderer.setYLabelsColor(0, Color.DKGRAY);
+		mRenderer.setXLabelsColor(Color.DKGRAY);
+		mRenderer.setLabelsTextSize(val);
+		mRenderer.setXTitle("Time");
 		mRenderer.setYTitle("Energy");
+		mRenderer.setAxisTitleTextSize(val);
+		mRenderer.setLegendTextSize(val);
 		mRenderer.setYLabelsAlign(Align.RIGHT);
 		mRenderer.setBarSpacing(1);
 		mRenderer.setClickEnabled(true);
 		mRenderer.setSelectableBuffer(50);
 		mRenderer.setShowGrid(true);
-		int[] margins={5,80,5,0};
+		int[] margins={20,80,10,0};
 		mRenderer.setMargins(margins);
 
 		mDataset.addSeries(mSeries);
@@ -166,7 +183,7 @@ public class EnergyWastageFragment extends Fragment{
 
 		chartView.setOnTouchListener(new View.OnTouchListener() {
 			ViewPager mViewPager=CollectionTabActivity.mViewPager;
-			ViewParent mParent= (ViewParent)getActivity().findViewById(R.id.WasteGroup);
+			ViewParent mParent= (ViewParent)inflateView.findViewById(R.id.WasteGroup);
 
 			float mFirstTouchX,mFirstTouchY;
 
@@ -213,13 +230,13 @@ public class EnergyWastageFragment extends Fragment{
 	@Override
 	public void onResume() {
 		super.onResume();
-		LinearLayout layout = (LinearLayout) getActivity().findViewById(R.id.chartComp);
+		LinearLayout layout = (LinearLayout) inflateView.findViewById(R.id.chartComp);
 		chartView = ChartFactory.getLineChartView(getActivity(), mDataset, mRenderer);
 		getActivity().registerReceiver(receiver, new IntentFilter(GcmIntentService.RECEIVER));
 		Date start=new Date(Common.TIME_PERIOD_START);
 		Date end=new Date(Common.TIME_PERIOD_END);
 		Log.v("ELSERVICES", "From: "+start.toString()+" To: "+end.toString());
-		if(Common.CURRENT_VISIBLE==1){
+		if(Common.CURRENT_VISIBLE==0){
 			timeVisit=System.currentTimeMillis();
 			sendMessage();
 		}
@@ -229,7 +246,6 @@ public class EnergyWastageFragment extends Fragment{
 		super.onResume();
 		getActivity().unregisterReceiver(receiver);
 		timeOfStay=System.currentTimeMillis();
-		LogWriter.screenLogWrite(timeVisit+","+"EnergyWastage"+","+timeOfStay);
 		timeVisit=timeOfStay;
 	}
 
@@ -243,6 +259,7 @@ public class EnergyWastageFragment extends Fragment{
 			Log.v("ELSERVICES", "Loading PEn from saved data");
 			lastSyncInMillis=sp.getLong("LAST_SYNC",System.currentTimeMillis());
 			parsePref(sp.getString("JSON_RESPONSE", ""));
+			setViews();
 			updateChart();
 			updateApps();
 			updateViews(lastSyncInMillis);
@@ -278,7 +295,7 @@ public class EnergyWastageFragment extends Fragment{
 	}
 
 
-	public void sendMessage(){
+	public static void sendMessage(){
 		new AsyncTask<Void,String,String>() {
 			@Override
 			protected String doInBackground(Void... params) {
@@ -367,7 +384,7 @@ public class EnergyWastageFragment extends Fragment{
 
 		if(data.getString("api").equals("energy/wastage/report/")){
 
-			LinearLayout appDist = (LinearLayout)getActivity().findViewById(R.id.WasteDist);
+			LinearLayout appDist = (LinearLayout)inflateView.findViewById(R.id.WasteDist);
 			Log.v("ELSERVICES","before Remove all views: " + appDist.getChildCount());
 			appDist.removeAllViews();
 			Log.v("ELSERVICES","Remove all views: " + appDist.getChildCount());
@@ -461,15 +478,29 @@ public class EnergyWastageFragment extends Fragment{
 	}
 
 	private void updateViews(long syncTime){
-		TextView totalVal=(TextView)getActivity().findViewById(R.id.totalValWaste);
-		totalVal.setText(Long.toString(totalWastage)+"Wh");
+		TextView totalVal=(TextView)inflateView.findViewById(R.id.totalValWaste);
+		totalVal.setText(Long.toString(totalWastage)+" Wh");
 
 		DateFormat df=new DateFormat();
-		lastSyncTime=df.format("dd/MM/yy HH:mm", syncTime).toString();
-		TextView textView=(TextView)getActivity().findViewById(R.id.lastSyncWastage);
+		lastSyncTime=df.format("dd MMM yy HH:mm", syncTime).toString();
+		TextView textView=(TextView)inflateView.findViewById(R.id.lastSyncWastage);
 		textView.setText("Last synced on: "+lastSyncTime);
 
 		lastSyncInMillis=System.currentTimeMillis();
+	}
+	
+	private void setViews(){
+		TextView tv=(TextView)inflateView.findViewById(R.id.segText3);
+		tv.setVisibility(View.VISIBLE);
+		tv=(TextView)inflateView.findViewById(R.id.lastSyncWastage);
+		tv.setVisibility(View.VISIBLE);
+		tv=(TextView)inflateView.findViewById(R.id.distName);
+		tv.setVisibility(View.VISIBLE);
+		
+		tv=(TextView)inflateView.findViewById(R.id.sorryText);
+		tv.setVisibility(View.GONE);
+		ImageView history=(ImageView)inflateView.findViewById(R.id.timeSelectBtn);
+		history.setVisibility(View.VISIBLE);
 	}
 
 	private BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -481,6 +512,7 @@ public class EnergyWastageFragment extends Fragment{
 				Bundle data = bundle.getBundle("Data");
 				parseData(data);
 				if(data.getString("api").equals("energy/wastage/report/")){
+					setViews();
 					updateChart();
 					updateApps();
 					updateViews(System.currentTimeMillis());

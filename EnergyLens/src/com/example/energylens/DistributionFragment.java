@@ -64,7 +64,7 @@ public class DistributionFragment extends Fragment {
 		progressBar.setProgress(percent);
 
 		//		ImageButton appBtn=(ImageButton)inflateView.findViewById(R.id.imageButton1);
-		if(Common.CURRENT_VISIBLE==2){
+
 			inflateView.setOnClickListener(new View.OnClickListener(){
 
 				@Override
@@ -72,15 +72,17 @@ public class DistributionFragment extends Fragment {
 					// TODO Auto-generated method stub
 					Bundle extras=new Bundle();
 					Log.v("ELSERVICES", "Distribution "+appliance);
-					Intent intent=new Intent(getActivity(),CorrectionActivity.class);
+					Intent intent=new Intent(getActivity(),DisaggregationActivity.class);
 					extras.putString("appliance", appliance);
 					extras.putInt("color", color);
 					intent.putExtras(extras);
-					if(!appliance.equals("Unknown"))
-						startActivity(intent);
+					if(!appliance.equals("Unknown") && Common.CURRENT_VISIBLE==1){
+						Log.v("ELSERVICES", "Clicked from tab: "+Common.CURRENT_VISIBLE);
+							startActivity(intent);
+					}
 				}
 			});			
-		}
+
 		return inflateView;
 	}
 

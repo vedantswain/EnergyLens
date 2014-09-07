@@ -30,12 +30,15 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
+import android.graphics.Paint.Align;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.text.format.DateFormat;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -45,7 +48,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-public class CorrectionActivity extends FragmentActivity implements ApplianceDialogFragment.ApplianceDialogListener,AppLocDialogFragment.LocationDialogListener,TimePickerDialogFragment.TimePickerDialogListener{
+public class DisaggregationActivity extends FragmentActivity implements ApplianceDialogFragment.ApplianceDialogListener,AppLocDialogFragment.LocationDialogListener,TimePickerDialogFragment.TimePickerDialogListener{
 
 	GraphicalView chartView;
 	boolean firstPointSet=false;
@@ -98,6 +101,9 @@ public class CorrectionActivity extends FragmentActivity implements ApplianceDia
 	private String toLocation,toApp;
 	private long lastSyncInMillis;
 
+	long timeOfVisit,timeOfStay;
+	String screenName="Disaggregated Activity";
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -115,18 +121,24 @@ public class CorrectionActivity extends FragmentActivity implements ApplianceDia
 		app=extras.getString("appliance");
 		color=extras.getInt("color");
 
+		timeOfVisit=System.currentTimeMillis();
+
 		if(savedInstanceState!=null){
 			Log.v("ELSERVICES", "Loading from savedInstance");
 		}
 
 		SharedPreferences sp=getSharedPreferences(app+"CORRECTION_PREFS",0);
 
+		Log.v("ELSERVICES", "Shared prefs exist: "+sp.contains("LAST_SYNC"));
+
 		if(sp.contains("LAST_SYNC")){
-			Log.v("ELSERVICES", "Loading PEn from saved data");
+			Log.v("ELSERVICES", "Loading Dissag from saved data");
 			lastSyncInMillis=sp.getLong("LAST_SYNC",System.currentTimeMillis());
 			parsePref(sp.getString("JSON_RESPONSE", ""));
 			updateViews(lastSyncInMillis);
 		}
+
+		Toast.makeText(getApplicationContext(), "Refresh if you can't see the graph", 1000);
 
 		gcm = GoogleCloudMessaging.getInstance(this);
 		setupMessage();
@@ -143,6 +155,12 @@ public class CorrectionActivity extends FragmentActivity implements ApplianceDia
 			setupChart(false);
 	}
 
+	protected void onStop(){
+		super.onStop();
+		timeOfStay=System.currentTimeMillis()-timeOfVisit;
+		LogWriter.screenLogWrite(timeOfVisit+","+screenName+","+timeOfStay);
+	}
+
 	@Override
 	public void onPause() {
 		super.onPause();
@@ -155,7 +173,7 @@ public class CorrectionActivity extends FragmentActivity implements ApplianceDia
 
 
 		// Creating an  XYSeries for Income
-		TimeSeries mSeries = new TimeSeries("Reassign");
+		TimeSeries mSeries = new TimeSeries("Consumption");
 		Date date=new Date();
 
 		XYSeriesRenderer renderer = new XYSeriesRenderer();
@@ -185,28 +203,31 @@ public class CorrectionActivity extends FragmentActivity implements ApplianceDia
 		//		Date date=new Date();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
 
-		if(isSlice){
-			Log.v("ELSERVICES", "isSlice");
-			c.setTimeInMillis(xOfStart);
+		//		if(isSlice){
+		//			Log.v("ELSERVICES", "isSlice");
+		//			c.setTimeInMillis(xOfStart);
+		//
+		//			TimeSeries sliceSeries=new TimeSeries("Time SLice");
+		//			sliceSeries.add(c.getTime(), maxY*1.5);
+		//			Log.v("ELSERVICES", "time-slice start: "+c.getTime());
+		//			c.setTimeInMillis(xOfEnd);
+		//			sliceSeries.add(c.getTime(), maxY*1.5);
+		//			Log.v("ELSERVICES", "time-slice end: "+c.getTime());
+		//
+		//			XYSeriesRenderer sliceRenderer = new XYSeriesRenderer();
+		//			sliceRenderer.setLineWidth(2);
+		//			sliceRenderer.setColor(Color.argb(95, 0, 0, 0));
+		//			// Include low and max value
+		//			sliceRenderer.setDisplayBoundingPoints(true);
+		//			FillOutsideLine fill = new FillOutsideLine(FillOutsideLine.Type.BOUNDS_ALL);
+		//			fill.setColor(Color.argb(127, 0, 0, 0));
+		//			sliceRenderer.addFillOutsideLine(fill);
+		//			mRenderer.addSeriesRenderer(sliceRenderer);
+		//			dataset.addSeries(sliceSeries);			
+		//		}
 
-			TimeSeries sliceSeries=new TimeSeries("Time SLice");
-			sliceSeries.add(c.getTime(), maxY*1.5);
-			Log.v("ELSERVICES", "time-slice start: "+c.getTime());
-			c.setTimeInMillis(xOfEnd);
-			sliceSeries.add(c.getTime(), maxY*1.5);
-			Log.v("ELSERVICES", "time-slice end: "+c.getTime());
-
-			XYSeriesRenderer sliceRenderer = new XYSeriesRenderer();
-			sliceRenderer.setLineWidth(2);
-			sliceRenderer.setColor(Color.argb(95, 0, 0, 0));
-			// Include low and max value
-			sliceRenderer.setDisplayBoundingPoints(true);
-			FillOutsideLine fill = new FillOutsideLine(FillOutsideLine.Type.BOUNDS_ALL);
-			fill.setColor(Color.argb(127, 0, 0, 0));
-			sliceRenderer.addFillOutsideLine(fill);
-			mRenderer.addSeriesRenderer(sliceRenderer);
-			dataset.addSeries(sliceSeries);			
-		}
+		DisplayMetrics metrics = this.getResources().getDisplayMetrics();
+		float val = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, metrics);
 
 
 		// We want to avoid black border
@@ -215,11 +236,27 @@ public class CorrectionActivity extends FragmentActivity implements ApplianceDia
 		mRenderer.setSelectableBuffer(20);
 		mRenderer.setYAxisMax(maxY*1.5);
 		mRenderer.setYAxisMin(0);
+//		if(time.size()>0){
+//			mRenderer.setXAxisMin((time.get(0).longValue()*1000)-1000);
+//			mRenderer.setXAxisMin((time.get(time.size()-1).longValue()*1000)+1000);
+//		}
+		mRenderer.setChartTitleTextSize(val);
+		mRenderer.setLabelsColor(Color.DKGRAY);
+		mRenderer.setYLabelsColor(0, Color.DKGRAY);
+		mRenderer.setXLabelsColor(Color.DKGRAY);
+		mRenderer.setLabelsTextSize(val);
+		mRenderer.setLegendTextSize(val);
+		mRenderer.setYLabelsAlign(Align.RIGHT);
+		mRenderer.setXTitle("Hours");
+		mRenderer.setYTitle("Energy");
+		mRenderer.setAxisTitleTextSize(val);
 		//		mRenderer.setXAxisMax(Calendar.getInstance().getTimeInMillis());
 		//		mRenderer.setXAxisMin(Calendar.getInstance().getTimeInMillis()-(24*60*60*1000));
 		mRenderer.setPanEnabled(false);
 		mRenderer.setZoomEnabled(false);
 		mRenderer.setShowGrid(true); // we show the grid
+		int[] margins={20,80,10,10};
+		mRenderer.setMargins(margins);
 
 
 		chartView = ChartFactory.getTimeChartView(this, dataset, mRenderer, "Reassign");
@@ -227,20 +264,20 @@ public class CorrectionActivity extends FragmentActivity implements ApplianceDia
 		LinearLayout chart_container=(LinearLayout)findViewById(R.id.chartComparison);
 		chart_container.addView(chartView,0);
 
-		chartView.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				Log.v("ELSERVICES", "Graph clicked");
-				// handle the click event on the chart
-				SeriesSelection seriesSelection = chartView.getCurrentSeriesAndPoint();
-				if (seriesSelection == null) {
-					//	            Toast.makeText(getActivity(), "No chart element", Toast.LENGTH_SHORT).show();
-				} else {
-					// display information of the clicked point
-					setTimeSlice((long) seriesSelection.getXValue());
-				}
-			}
-		});
-		Log.v("ELSERVICES", "Start slice: "+xOfStart+" Stop slice: "+xOfEnd);
+		//		chartView.setOnClickListener(new View.OnClickListener() {
+		//			public void onClick(View v) {
+		//				Log.v("ELSERVICES", "Graph clicked");
+		//				// handle the click event on the chart
+		//				SeriesSelection seriesSelection = chartView.getCurrentSeriesAndPoint();
+		//				if (seriesSelection == null) {
+		//					//	            Toast.makeText(getActivity(), "No chart element", Toast.LENGTH_SHORT).show();
+		//				} else {
+		//					// display information of the clicked point
+		//					setTimeSlice((long) seriesSelection.getXValue());
+		//				}
+		//			}
+		//		});
+		//		Log.v("ELSERVICES", "Start slice: "+xOfStart+" Stop slice: "+xOfEnd);
 	}
 
 	public void setupMessage(){
@@ -280,7 +317,7 @@ public class CorrectionActivity extends FragmentActivity implements ApplianceDia
 					String randomId=new BigInteger(130, random).toString(32);
 
 					gcm.send(SENDER_ID + "@gcm.googleapis.com", randomId, data);
-					msg = "PersonalEnergy sent message";
+					msg = "Correction sent message";
 					Log.i("ELSERVICES", "message sent to disaggregated: "+data.toString());
 
 				} catch (IOException ex) {
@@ -514,7 +551,8 @@ public class CorrectionActivity extends FragmentActivity implements ApplianceDia
 		}
 		else{
 			reset();
-			parseActivities(loc);
+			if(activities!=null)
+				parseActivities(loc);
 			setupChart(false);
 		}
 	}
@@ -674,7 +712,8 @@ public class CorrectionActivity extends FragmentActivity implements ApplianceDia
 						TextView textView=(TextView) findViewById(R.id.appLocation);
 						textView.setText(app+" at "+activities.getJSONObject(0).getString("location"));
 						initLoc=activities.getJSONObject(0).getString("location");
-						parseActivities(initLoc);
+						if(activities!=null) 
+							parseActivities(initLoc);
 					}
 
 					appliances=options.getJSONArray("appliances");
@@ -726,7 +765,8 @@ public class CorrectionActivity extends FragmentActivity implements ApplianceDia
 					TextView textView=(TextView) findViewById(R.id.appLocation);
 					textView.setText(app+" at "+activities.getJSONObject(0).getString("location"));
 					initLoc=activities.getJSONObject(0).getString("location");
-					parseActivities(initLoc);
+					if(activities!=null) 
+						parseActivities(initLoc);
 				}
 
 				appliances=options.getJSONArray("appliances");
@@ -744,7 +784,7 @@ public class CorrectionActivity extends FragmentActivity implements ApplianceDia
 
 	private void updateViews(long time){
 		DateFormat df=new DateFormat();
-		String lastSyncTime=df.format("dd/MM/yy HH:mm", time).toString();
+		String lastSyncTime=df.format("dd MMM yy HH:mm", time).toString();
 		TextView textView=(TextView) findViewById(R.id.lastSyncCorrect);
 		textView.setText("Last synced on: "+lastSyncTime);
 		lastSyncInMillis=time;

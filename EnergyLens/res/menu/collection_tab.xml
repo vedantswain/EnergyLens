@@ -3,6 +3,16 @@
     tools:context="com.example.energylens.CollectionTabActivity" >
 
     <item
+        android:id="@+id/groundReport"
+        android:icon="@drawable/ic_action_ground_report_holo_dark"
+        android:showAsAction="ifRoom"
+        android:title="@string/action_report"/>
+    <item
+        android:id="@+id/training"
+         android:showAsAction="ifRoom"
+        android:icon="@drawable/ic_action_training_holo_dark"
+        android:title="@string/action_train"/>
+    <item
         android:id="@+id/appGroup"
         android:orderInCategory="100"
         android:showAsAction="never"

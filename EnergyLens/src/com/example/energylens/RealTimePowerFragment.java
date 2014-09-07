@@ -40,7 +40,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.telephony.TelephonyManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,6 +95,9 @@ public class RealTimePowerFragment extends Fragment{
 		//		renderer.setPointStrokeWidth(3);
 		renderer.setDisplayChartValues(true);
 
+		DisplayMetrics metrics = getActivity().getResources().getDisplayMetrics();
+		float val = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, metrics);
+		
 		final XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
 		mRenderer.addSeriesRenderer(renderer);
 
@@ -101,16 +106,19 @@ public class RealTimePowerFragment extends Fragment{
 		mRenderer.setZoomEnabled(false);
 		mRenderer.setPanEnabled(false);
 		mRenderer.setYAxisMin(0);
-		mRenderer.setYAxisMax(power*1.5);
-		mRenderer.setChartTitleTextSize(14);
-		mRenderer.setLabelsColor(Color.BLACK);
-		mRenderer.setLabelsTextSize(18);
+		mRenderer.setYAxisMax(12000);
+		mRenderer.setChartTitleTextSize(val);
+		mRenderer.setLabelsColor(Color.DKGRAY);
+		mRenderer.setYLabelsColor(0, Color.DKGRAY);
+		mRenderer.setXLabelsColor(Color.DKGRAY);
+		mRenderer.setLabelsTextSize(val);
+		mRenderer.setLegendTextSize(val);
 		mRenderer.setYTitle("Power");
 		mRenderer.setXTitle("Time");
 		mRenderer.setYLabelsAlign(Align.RIGHT);
 		mRenderer.setChartTitle("Real-Time Power Consumption");
 		mRenderer.setShowGrid(true);
-		int[] margins={5,80,5,0};
+		int[] margins={20,80,10,0};
 		mRenderer.setMargins(margins);
 
 		final XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
@@ -125,7 +133,7 @@ public class RealTimePowerFragment extends Fragment{
 		chart_container.addView(chartView,0);
 
 		TextView textView=(TextView) getView().findViewById(R.id.RealTimeText);
-		textView.setText("Current power consumption: "+y+"W");
+		textView.setText("Current power consumption: "+y+" W");
 	}	
 
 	private void UpdateGUI() {
@@ -139,7 +147,7 @@ public class RealTimePowerFragment extends Fragment{
 		myTimer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				if(Common.CURRENT_VISIBLE==3)
+				if(Common.CURRENT_VISIBLE==2)
 					UpdateGUI();
 			}
 		}, 0, 1000);
@@ -154,7 +162,7 @@ public class RealTimePowerFragment extends Fragment{
 		myTimer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				if(Common.CURRENT_VISIBLE==3)
+				if(Common.CURRENT_VISIBLE==2)
 					UpdateGUI();
 			}
 		}, 0, 1000);

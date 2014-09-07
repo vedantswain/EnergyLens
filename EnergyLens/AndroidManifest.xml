@@ -52,9 +52,6 @@
             android:name=".CollectionTabActivity"
             android:label="@string/title_activity_collection_tab"
             android:screenOrientation="portrait" >
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".AxlServ"
@@ -149,8 +146,16 @@
                 android:value="com.example.energylens.CollectionTabActivity" />
         </activity>
         <activity
-            android:name=".CorrectionActivity"
+            android:name=".DisaggregationActivity"
             android:label="@string/title_activity_correction"
+            android:parentActivityName=".CollectionTabActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.energylens.CollectionTabActivity" />
+        </activity>
+        <activity
+            android:name=".GroundReportActivity"
+            android:label="@string/title_activity_ground_report"
             android:parentActivityName=".CollectionTabActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

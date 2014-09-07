@@ -1,5 +1,12 @@
 package com.example.energylens;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Set;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -11,6 +18,7 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -21,6 +29,9 @@ public class GcmIntentService extends IntentService {
 	NotificationCompat.Builder builder;
 	private String TAG="GCMDemo";
 	public static String RECEIVER="com.example.energylens";
+	
+	ArrayList<String> groundReportResponses=new ArrayList<String>();
+	ArrayList<String> groundReportDates=new ArrayList<String>();
 
 
 	public GcmIntentService() {
@@ -57,7 +68,7 @@ public class GcmIntentService extends IntentService {
 
 				Log.i(TAG, "Completed work @ " + SystemClock.elapsedRealtime());
 				// Post notification of received message.
-				if(extras.getString("api","none").equals("energy/wastage/notification/"))
+				if(extras.getString("api","none").contains("energy/"))
 					sendNotification(extras);
 				Log.i(TAG, "Received: " + extras.toString());
 				publishData(extras); 
@@ -89,9 +100,12 @@ public class GcmIntentService extends IntentService {
 				this.getSystemService(Context.NOTIFICATION_SERVICE);
 
 		Intent intent=new Intent(this, CollectionTabActivity.class);
-		intent.putExtra("start_from", 26194);
+		Bundle extras=new Bundle();
+		extras.putString("started_from", "notification");
+		extras.putString("notif_id", Integer.toString(26194));
+		intent.putExtras(extras);
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-				intent, 0);		
+				intent, PendingIntent.FLAG_UPDATE_CURRENT);			
 
 		String msg_type=data.getString("msg_type");
 		String api=data.getString("api");
@@ -105,21 +119,100 @@ public class GcmIntentService extends IntentService {
 		.setStyle(new NotificationCompat.BigTextStyle()
 		.bigText(message))
 		.setContentText(message);
-		
+
+		if(api.equals("energy/report/notification/")){
+			getGroundReportPreferences();
+			parseGroundReportData(data);
+		}
+
 		SharedPreferences sp=getSharedPreferences(Common.EL_PREFS,0);
 		long timeRcvd=sp.getLong("LAST_NOTIF_ARRIVAL", 0);
-		boolean lastNotifClicked=sp.getBoolean("LAST_NOTIF_CLICKED", false);
+		boolean lastNotifClicked=sp.getBoolean("LAST_NOTIF_CLICKED", true);
 		if(timeRcvd!=0 && !lastNotifClicked)
 			LogWriter.notifLogWrite(timeRcvd+","+sp.getLong("LAST_NOTIF_ID",0)+","+"never");
-		
+
 		//store notification data
 		Editor editor=sp.edit();
 		editor.putLong("LAST_NOTIF_ARRIVAL",System.currentTimeMillis());
 		editor.putLong("LAST_NOTIF_ID", NOTIFICATION_ID);
+		editor.putBoolean("LAST_NOTIF_CLICKED", false);
 		editor.commit();
 
 		mBuilder.setContentIntent(contentIntent);
 		mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
 
 	}
+
+	private void getGroundReportPreferences(){
+		SharedPreferences sp=getSharedPreferences("GROUNDREPORT_PREFS",0);
+
+		if(sp.contains("JSON_RESPONSES")){
+			Log.v("ELSERVICES", "Loading GroundReport from saved data");
+			String string=sp.getString("JSON_RESPONSES", "");
+			String date=sp.getString("RESPONSE_DATES", "");
+			//			parsePref(sp.getString("JSON_RESPONSE", ""));
+			if(!string.equals("") && !date.equals(""))
+				parseResponses(string,date);
+		}
+
+	}	
+
+	private void parseGroundReportData(Bundle data){
+		Log.v("ELSERVICES", "parsedata");
+
+		if(data.getString("api").equals("energy/report/notification/")){
+			try {
+				Set<String> keys=data.keySet();
+				JSONObject response=new JSONObject();
+				if(response!=null)
+					Log.v("ELSERVICES", "GroundReport not null");
+
+				for(String key:keys){
+					response.put(key, data.get(key));
+				}
+
+				JSONObject options=new JSONObject(response.getString("options"));
+
+				storePreferences(response.toString());
+
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void parseResponses(String string, String date){
+		String[] respArray=string.split("|");
+		for(String str:respArray){
+			groundReportResponses.add(str);
+		}
+
+		String[] dateArray=date.split("|");
+		for(String str:dateArray){
+			groundReportDates.add(str);
+		}
+
+	}
+
+	private void storePreferences(String response){
+		SharedPreferences bundleData=getSharedPreferences("GROUNDREPORT_PREFS",0);
+
+		groundReportResponses.add("|"+response);
+		StringBuilder strings=new StringBuilder();
+		for(String str:groundReportResponses)
+			strings.append(str);
+
+		Editor editor=bundleData.edit();
+		editor.putString("JSON_RESPONSES", strings.toString());
+
+		groundReportDates.add("|"+Long.toString(System.currentTimeMillis()));
+		for(String str:groundReportDates)
+			strings.append(str);
+
+		editor.putString("RESPONSE_DATES", strings.toString());
+		editor.commit();
+
+	}
+
 }

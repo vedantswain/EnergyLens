@@ -6,9 +6,6 @@ import java.security.SecureRandom;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.achartengine.GraphicalView;
-import org.achartengine.model.SeriesSelection;
-
 import android.app.AlarmManager;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -17,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -26,6 +24,9 @@ import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -64,6 +65,9 @@ public class CollectionTabActivity extends FragmentActivity {
 	 */
 	static ViewPager mViewPager;
 
+	int prevTabNo=-1;
+	long timeOfVisit,timeOfStay;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -76,18 +80,18 @@ public class CollectionTabActivity extends FragmentActivity {
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
-
+		
 		gcm = GoogleCloudMessaging.getInstance(this);
 
 		getUpdatedPreferences();
 		addShortcut();
 
 		Bundle intent_extras = getIntent().getExtras();
-		Log.v("ELSERVICES","notification: "+getIntent().getExtras());
-        if (intent_extras != null)
-        {
-        	Log.v("ELSERVICES","notification"+ intent_extras.get("started_from"));
-			if(intent_extras.get("started_from").equals(26194)){
+		Log.v("ELSERVICES","started: "+getIntent().toString()+"notification: "+getIntent().getExtras());
+		if (intent_extras != null)
+		{
+			Log.v("ELSERVICES","notification"+ intent_extras.get("started_from"));
+			if(intent_extras.get("started_from").equals("notification")){
 				Log.v("ELSERVICES", "notification started intent");
 				SharedPreferences sp=getSharedPreferences(Common.EL_PREFS,0);
 				Editor editor=sp.edit();
@@ -103,7 +107,7 @@ public class CollectionTabActivity extends FragmentActivity {
 			startActivity(intent);
 		}
 		else if(Common.TRAINING_COUNT>0){
-			mViewPager.setCurrentItem(1);
+			mViewPager.setCurrentItem(0);
 			Log.v("ELSERVICES", "Switched");
 			start();
 		}
@@ -117,10 +121,31 @@ public class CollectionTabActivity extends FragmentActivity {
 		mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
 			@Override
-			public void onPageSelected(int arg0) {
+			public void onPageSelected(int tabNo) {
 				// TODO Auto-generated method stub
-				Common.changeCurrentVisible(arg0);
-				Log.v("ELSERVICES", "Current visible: "+arg0);
+				String screenName="";
+				switch(prevTabNo){
+				case 0:screenName="EnergyWastage";
+				break;
+				case 1:screenName="PersonalEnergy";
+				break;
+				case 2:screenName="RealTimePower";
+				break;
+				}
+				if(prevTabNo!=-1){
+					timeOfStay=System.currentTimeMillis()-timeOfVisit;
+					LogWriter.screenLogWrite(timeOfVisit+","+screenName+","+timeOfStay);
+				}
+				prevTabNo=tabNo;
+				Common.changeCurrentVisible(tabNo);
+				Log.v("ELSERVICES", "Current visible: "+tabNo);
+				switch(tabNo){
+				case 0:EnergyWastageFragment.sendMessage();
+				break;
+				case 1:PersonalEnergyFragment.sendMessage();
+				break;
+				}
+				timeOfVisit=System.currentTimeMillis();
 			}
 
 			@Override
@@ -157,7 +182,7 @@ public class CollectionTabActivity extends FragmentActivity {
 			sendBroadcast(shortcutintent);
 		}
 	}
-	
+
 
 	protected void onResume(){
 		super.onResume();
@@ -344,6 +369,17 @@ public class CollectionTabActivity extends FragmentActivity {
 			openSettings();
 			return true;
 		}
+		else if(id == R.id.groundReport){
+			Intent intent = new Intent(this,GroundReportActivity.class);
+			startActivity(intent);
+			return true;
+		}
+		else if(id == R.id.training){
+			getUpdatedPreferences();
+			Intent intent = new Intent(this,TrainActivity.class);
+			startActivity(intent);
+			return true;
+		}
 		else if(id == android.R.id.home){
 			if (doubleBackToExitPressedOnce) {
 				Common.changeDoubleBack(true);
@@ -429,15 +465,12 @@ public class CollectionTabActivity extends FragmentActivity {
 			Fragment fragment=null;
 			switch(position){	
 			case 0:
-				fragment=new TrainFragment();
-				break;
-			case 1:
 				fragment=new EnergyWastageFragment();
 				break;
-			case 2:
+			case 1:
 				fragment=new PersonalEnergyFragment();
 				break;
-			case 3:
+			case 2:
 				fragment=new RealTimePowerFragment();
 				break;
 			}
@@ -446,24 +479,41 @@ public class CollectionTabActivity extends FragmentActivity {
 
 		@Override
 		public int getCount() {
-			// Show 4 total pages.
-			return 4;
+			// Show 3 total pages.
+			return 3;
 		}
 
 		@Override
 		public CharSequence getPageTitle(int position) {
 			Locale l = Locale.getDefault();
+			String title="";
+			
+
+			Drawable mDrawable=getResources().getDrawable(R.drawable.ic_energy);
+			
 			switch (position) {
 			case 0:
-				return getString(R.string.title_section1).toUpperCase(l);
+				title= getString(R.string.title_section2).toUpperCase(l);
+				mDrawable=getResources().getDrawable(R.drawable.ic_wastage);
+				break;
 			case 1:
-				return getString(R.string.title_section2).toUpperCase(l);
+				title= getString(R.string.title_section3).toUpperCase(l);
+				mDrawable=getResources().getDrawable(R.drawable.ic_energy);
+				break;
 			case 2:
-				return getString(R.string.title_section3).toUpperCase(l);
-			case 3:
-				return getString(R.string.title_section4).toUpperCase(l);
+				title= getString(R.string.title_section4).toUpperCase(l);
+				mDrawable=getResources().getDrawable(R.drawable.ic_realtime);
+				break;
 			}
-			return null;
+			mDrawable.setBounds(0, 0, mDrawable.getIntrinsicWidth(), mDrawable.getIntrinsicHeight()); 
+			
+			SpannableStringBuilder sb = new SpannableStringBuilder(" "+title);
+			 ImageSpan span = new ImageSpan(mDrawable, ImageSpan.ALIGN_BOTTOM); 
+			 sb.setSpan(span, 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+			 
+			 return sb;
+			 
+//			return null;
 		}
 	}
 }

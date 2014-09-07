@@ -13,18 +13,28 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin" >
 
-        <Button
-            android:id="@+id/timeSelectBtn"
-            style="?android:attr/buttonStyleSmall"
+        <TextView
+            android:id="@+id/sorryText"
             android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:text="Change Time Period " 
-            android:onClick="toTimeSelect"/>
+            android:layout_height="wrap_content"
+            android:text="Sorry we have no information to display"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <ImageView
+             android:id="@+id/timeSelectBtn"
+             android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:visibility="invisible"
+            android:onClick="toTimeSelect"
+            android:src="@drawable/ic_history" />
 
         <TextView
             android:id="@+id/lastSyncWastage"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:textSize="12sp" />
 
         <LinearLayout
             android:id="@+id/chartWaste"
@@ -44,14 +54,16 @@
                 android:paddingBottom="10dp"
                 android:paddingTop="10dp"
                 android:text="Total Wastage"
+                android:visibility="invisible"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/totalValWaste"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="40dp"
+                android:textSize="16sp"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
         </LinearLayout>
@@ -62,9 +74,10 @@
             android:layout_height="wrap_content"
             android:paddingBottom="10dp"
             android:paddingTop="10dp"
-            android:text="Appliance-wise Distribution:"
+            android:text="Appliance-wise Wastage:"
+            android:visibility="invisible"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textSize="14sp" />
+            android:textSize="16sp" />
 
         <LinearLayout
             android:id="@+id/WasteDist"

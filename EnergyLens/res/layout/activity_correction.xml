@@ -13,7 +13,8 @@
             android:layout_below="@+id/chartComparison"
             android:layout_centerHorizontal="true"
             android:padding="20dp"
-            android:text="touch a point to select a start time" />
+            android:text="touch a point to select a start time"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/correctToText"
@@ -22,13 +23,15 @@
             android:layout_below="@+id/setStart"
             android:layout_centerHorizontal="true"
             android:padding="10dp"
-            android:text="Corrected Activity?" />
+            android:text="Corrected Activity?"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/lastSyncCorrect"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/appLocation" />
+            android:layout_below="@+id/appLocation" 
+            android:textSize="12sp"/>
 
         <LinearLayout
             android:id="@+id/chartComparison"
@@ -37,9 +40,18 @@
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/lastSyncCorrect"
             android:orientation="vertical" >
-
         </LinearLayout>
+
         
+         <ImageView
+             android:id="@+id/resetSliceBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="resetSlice"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/chartComparison"
+            android:src="@drawable/ic_action_reset" />
+
         <LinearLayout
             android:id="@+id/chartSlice"
             android:layout_width="match_parent"
@@ -62,26 +74,16 @@
             android:text="Location: " />
 
         <Button
-            android:id="@+id/resetSliceBtn"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/setEnd"
-            android:layout_alignBottom="@+id/setEnd"
-            android:layout_centerHorizontal="true"
-            android:onClick="resetSlice"
-            android:text="Reset" />
-
-        <Button
             android:id="@+id/correctLoc"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/correctToText"
-            android:layout_toLeftOf="@+id/resetSliceBtn"
+            android:layout_centerHorizontal="true"
             android:onClick="correctLoc"
-            android:text="Location" />
+            android:text="Location"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/correctApp"
@@ -91,9 +93,10 @@
             android:layout_alignBaseline="@+id/correctLoc"
             android:layout_alignBottom="@+id/correctLoc"
             android:layout_alignParentRight="true"
-            android:layout_toRightOf="@+id/resetSliceBtn"
+            android:layout_centerHorizontal="true"
             android:onClick="correctApp"
-            android:text="Appliance" />
+            android:text="Appliance"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/correct"
@@ -105,7 +108,8 @@
             android:layout_alignParentRight="true"
             android:layout_below="@+id/correctApp"
             android:onClick="toCorrect"
-            android:text="Correct" />
+            android:text="Correct"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/setEnd"
@@ -114,17 +118,21 @@
             android:layout_below="@+id/textGuide"
             android:layout_toRightOf="@+id/correctToText"
             android:padding="10dp"
-            android:text="--:--" />
+            android:text="--:--"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/setStart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/resetSliceBtn"
-            android:layout_alignBottom="@+id/resetSliceBtn"
+            android:layout_alignBaseline="@+id/setEnd"
+            android:layout_alignBottom="@+id/setEnd"
             android:layout_alignLeft="@+id/textGuide"
             android:padding="10dp"
-            android:text="--:--" />
+            android:text="--:--"
+            android:visibility="gone" />
+
+       
 
     </RelativeLayout>
 

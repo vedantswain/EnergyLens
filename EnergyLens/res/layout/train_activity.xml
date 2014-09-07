@@ -20,7 +20,7 @@
             android:gravity="center"
             android:orientation="vertical" >
 
-            <ImageButton
+            <ImageView
                 android:id="@+id/startButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -28,7 +28,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginBottom="131dp"
                 android:onClick="startService"
-                android:src="@drawable/ic_launcher" />
+                android:src="@drawable/ic_action_start" />
 
             <Button
                 android:id="@+id/setLoc"
@@ -48,17 +48,7 @@
                 android:layout_below="@+id/setLoc"
                 android:layout_marginTop="16dp"
                 android:text="Appliances"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-            <Button
-                android:id="@+id/setApp"
-                 style="?android:attr/buttonStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignTop="@+id/textView2"
-                android:onClick="launchAppDialog"
-                android:text="Add" />
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
                 android:id="@+id/appList"
@@ -66,17 +56,27 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_below="@+id/textView2"
+                android:textSize="16sp"
                 android:layout_toLeftOf="@+id/setApp" />
 
-            <Button
-                android:id="@+id/remApp"
-                style="?android:attr/buttonStyleSmall"
+
+            <ImageView
+                android:id="@+id/setApp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
+                android:layout_alignTop="@+id/textView2"
+                android:onClick="launchAppDialog"
+                android:src="@drawable/ic_action_addition" />
+
+            <ImageView
+                 android:id="@+id/remApp"
+                  android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
                 android:layout_below="@+id/setApp"
-                android:text="Del" 
-                android:onClick="removeLastApp"/>
+                android:onClick="removeLastApp"
+                android:src="@drawable/ic_action_remove" />
 
         </RelativeLayout>
 
@@ -86,7 +86,7 @@
             android:gravity="center"
             android:orientation="vertical" >
 
-            <ImageButton
+            <ImageView
                 android:id="@+id/stopButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -94,7 +94,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginBottom="158dp"
                 android:onClick="launchTrainMoreDialog"
-                android:src="@android:drawable/ic_delete" />
+                android:src="@drawable/ic_action_stop" />
 
             <ProgressBar
                 android:id="@+id/trainingResume"
