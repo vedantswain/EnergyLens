@@ -33,23 +33,23 @@
         android:text="Train More?" />
 
     <Button
-        android:id="@+id/noBtn"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/yesBtn"
-        android:layout_alignBottom="@+id/yesBtn"
-        android:layout_alignLeft="@+id/trainApp"
-        android:text="No" />
-
-    <Button
         android:id="@+id/yesBtn"
-        style="?android:attr/buttonStyleSmall"
+        android:textColor="#ffffff"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignRight="@+id/trainApp"
         android:layout_below="@+id/textView1"
         android:layout_marginTop="28dp"
         android:text="Yes" />
+
+    <Button
+        android:id="@+id/noBtn"
+        android:textColor="#ffffff"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView1"
+        android:layout_marginTop="28dp"
+        android:layout_alignLeft="@+id/trainApp"
+        android:text="No" />
 
 </RelativeLayout>

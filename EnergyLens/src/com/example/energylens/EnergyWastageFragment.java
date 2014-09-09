@@ -33,6 +33,8 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
 import android.graphics.Paint.Align;
+import android.graphics.PorterDuff.Mode;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -168,7 +170,7 @@ public class EnergyWastageFragment extends Fragment{
 
 		mDataset.addSeries(mSeries);
 		chartView = ChartFactory.getBarChartView(getActivity().getApplicationContext(), mDataset, mRenderer, BarChart.Type.DEFAULT);
-		LinearLayout chart_container=(LinearLayout)getView().findViewById(R.id.chartWaste);
+		LinearLayout chart_container=(LinearLayout)inflateView.findViewById(R.id.chartWaste);
 		chart_container.addView(chartView,0);
 
 
@@ -177,7 +179,7 @@ public class EnergyWastageFragment extends Fragment{
 				Log.v("ELSERVICES", "Graph clicked");
 				// handle the click event on the chart
 				SeriesSelection seriesSelection = chartView.getCurrentSeriesAndPoint();
-				//				Log.v("ELSERVICES", "Selected: "+seriesSelection.getSeriesIndex());
+//				Log.v("ELSERVICES", "Selected: "+seriesSelection.getSeriesIndex());
 			}
 		});
 
@@ -499,6 +501,7 @@ public class EnergyWastageFragment extends Fragment{
 		
 		tv=(TextView)inflateView.findViewById(R.id.sorryText);
 		tv.setVisibility(View.GONE);
+		
 		ImageView history=(ImageView)inflateView.findViewById(R.id.timeSelectBtn);
 		history.setVisibility(View.VISIBLE);
 	}

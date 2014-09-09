@@ -41,6 +41,7 @@ public class UploaderService extends Service{
 	DataOutputStream outputStream = null;
 	DataInputStream inputStream = null;
 	String path = Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator;
+	String dataPath=path+"SensorData"+File.separator;
 	String researchPath= path+"UsageStats"+File.separator;
 	String [] file={"accelerometer_log.csv","audio_log.csv","light_log.csv","mag_log.csv","rawaudio_log.csv","wifi_log.csv",
 			"Training_accelerometer_log.csv","Training_audio_log.csv","Training_light_log.csv","Training_mag_log.csv","Training_rawaudio_log.csv","Training_wifi_log.csv"};
@@ -158,7 +159,7 @@ public class UploaderService extends Service{
 			output = new FileOutputStream(dst);
 			byte[] buf = new byte[1024];
 			int bytesRead;
-			if(src.getAbsolutePath().equals(path+"wifi_log.csv")){
+			if(src.getAbsolutePath().equals(dataPath+"wifi_log.csv")){
 				BufferedReader br = new BufferedReader(new FileReader(src.getAbsolutePath()));     
 				if (!br.readLine().equals("time"+","+"mac"+","+"ssid"+","+"rssi"+","+"label")) {
 					BufferedWriter bw = new BufferedWriter(new FileWriter(src, true));
@@ -182,7 +183,7 @@ public class UploaderService extends Service{
 
 	public String getDate() {
 		Date date = new Date();
-		SimpleDateFormat ft = new SimpleDateFormat ("dd-MM-yyyy_hh-mm-ss");
+		SimpleDateFormat ft = new SimpleDateFormat ("dd-MM-yyyy_HH-mm-ss");
 		//		   	 String unique= date.toString().replace(" ", "");
 		//		   	 Log.i("ELSERVICES","path new: "+unique.replace(":",""));
 		return ft.format(date);
@@ -201,7 +202,7 @@ public class UploaderService extends Service{
 		//
 		for(int i=list.length-1;i>=0;i--){
 			File file=list[i];
-			String filename=file.getAbsolutePath().replace(path, "");
+			String filename=file.getAbsolutePath().replace(researchPath, "");
 			Log.i("ELSERVICES", "pending "+filename);
 			Log.i("ELSERVICES", "uploading pending research files");
 			if(file.length()==0)
@@ -214,7 +215,7 @@ public class UploaderService extends Service{
 
 	public void upload_pending(){
 
-		File list[] = (new File(path)).listFiles();
+		File list[] = (new File(dataPath)).listFiles();
 
 		Arrays.sort(list, new Comparator<File>(){
 			public int compare(File f1, File f2)
@@ -225,7 +226,7 @@ public class UploaderService extends Service{
 		//
 		for(int i=list.length-1;i>=0;i--){
 			File file=list[i];
-			String filename=file.getAbsolutePath().replace(path, "");
+			String filename=file.getAbsolutePath().replace(dataPath, "");
 			Log.i("ELSERVICES", "pending "+filename);
 			if(filename.contains("upload_")){
 				Log.i("ELSERVICES", "uploading pending files");
@@ -262,10 +263,10 @@ public class UploaderService extends Service{
 	public void upload_setup(String filename){
 		TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
 		String devId=telephonyManager.getDeviceId();
-		String pathToFile=path+filename;
+		String pathToFile=dataPath+filename;
 		String[] split=filename.split("\\.");
 		String uniqueID=getDate();
-		String upPathToFile=path+devId+'_'+"upload_"+split[0]+"_"+uniqueID+".csv"; 
+		String upPathToFile=dataPath+devId+'_'+"upload_"+split[0]+"_"+uniqueID+".csv"; 
 
 		File oldFile=new File(pathToFile);
 		File upFile=new File(upPathToFile);

@@ -377,7 +377,7 @@ public class GCMActivity extends FragmentActivity implements TryAgainDialogListe
 			for(String ssid:SSIDs){
 				JSONObject jsonOtherAp=new JSONObject();
 				jsonOtherAp.put("ssid", ssid);
-				jsonOtherAp.put("bssid", BSSIDs.get(index));
+				jsonOtherAp.put("macid", BSSIDs.get(index));
 				index++;
 				jsonOtherAps.put(jsonOtherAp);
 			}

@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -28,8 +28,11 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 	private ArrayList<String> locList=new ArrayList<String>();
 	private Spinner appSpinner;
 	private Spinner locSpinner;	
+	private ImageView appIcon,locIcon;
 	private String toApp="none",toLoc="none";
 
+	int wasClicked=-1;
+	
 	long id;
 	String[] pair={"",""};
 	int corrected_count=0;
@@ -50,7 +53,7 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 		dateFormat.format(from);
 		TextView activityText=(TextView)inflateView.findViewById(R.id.activityText);
 		final String activityLine="Using "+appliance+" from "+dateFormat.format(from).toString()+" to "+dateFormat.format(to).toString()
-				+" at "+loc+" consumes: "+Long.toString(usage)+" kWh";
+				+" in "+loc+" consumed: "+Long.toString(usage)+" kWh";
 		activityText.setText(activityLine);
 
 		getUpdatedPreferences();
@@ -67,12 +70,14 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 		    
 		    // Check which radio button was clicked
 		            if (checked){
-		            	Log.v("ELSERVICES", "corrected");
 					appSpinner.setVisibility(View.INVISIBLE);
 					appSpinner.setSelection(0);
+					appIcon.setVisibility(View.INVISIBLE);
 					locSpinner.setVisibility(View.INVISIBLE);
 					locSpinner.setSelection(0);
+					locIcon.setVisibility(View.INVISIBLE);
 					GroundReportActivity.changeCorrectionIds(id,pair, 0);
+					wasClicked=0;
 		            }
 		    }
 		});
@@ -86,10 +91,17 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 		    
 		    // Check which radio button was clicked
 		    		if (checked){
-		            	Log.v("ELSERVICES", "incorrect");
 					appSpinner.setVisibility(View.VISIBLE);
 					locSpinner.setVisibility(View.VISIBLE);
-					GroundReportActivity.changeCorrectionIds(id,pair, 1); 
+					appIcon.setVisibility(View.VISIBLE);
+					locIcon.setVisibility(View.VISIBLE);
+					
+					if(wasClicked==0)
+						GroundReportActivity.changeCorrectionIds(id,pair, 2);
+					else
+						GroundReportActivity.changeCorrectionIds(id,pair, 1);
+					
+					wasClicked=1;
 		    		}
 			}
 		});
@@ -126,6 +138,8 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 		appSpinner.setAdapter(dataAdapter);
 		appSpinner.setOnItemSelectedListener(this);
 		appSpinner.setVisibility(View.INVISIBLE);
+		appIcon = (ImageView) inflateView.findViewById(R.id.appIcon);
+		appIcon.setVisibility(View.INVISIBLE);
 	}
 
 	private void setLocSpinner(){
@@ -140,6 +154,8 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 		locSpinner.setAdapter(dataAdapter);
 		locSpinner.setOnItemSelectedListener(this);
 		locSpinner.setVisibility(View.INVISIBLE);
+		locIcon = (ImageView) inflateView.findViewById(R.id.locIcon);
+		locIcon.setVisibility(View.INVISIBLE);
 	}
 
 	public static UsageReportFragment newInstance(long id,String appliance,long use,String loc,long from, long to) {

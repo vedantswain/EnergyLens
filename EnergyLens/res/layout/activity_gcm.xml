@@ -23,6 +23,7 @@
         android:ems="10"
         android:hint="What should we call you?"
         android:inputType="textPersonName" />
+    <requestFocus />
 
     <Button
         android:id="@+id/register"
@@ -33,7 +34,8 @@
         android:layout_alignParentRight="true"
         android:layout_marginBottom="44dp"
         android:onClick="onRegister"
-        android:text="Register Device" />
+        android:text="Register Device"
+        android:textColor="#ffffff" />
 
     <EditText
         android:id="@+id/apptNo"
@@ -48,15 +50,15 @@
 
     <Button
         android:id="@+id/selectWifi"
-        style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/apptNo"
         android:onClick="launchWifiDialog"
-        android:visibility="invisible"
-        android:text="Select Wifi" />
+        android:text="Select Wifi"
+        android:textColor="#ffffff"
+        android:visibility="invisible" />
 
     <CheckBox
         android:id="@+id/firstInstall"
@@ -89,7 +91,7 @@
         android:hint="How do we reach you by mail?"
         android:inputType="textEmailAddress" >
 
-        <requestFocus />
+        
     </EditText>
 
 </RelativeLayout>

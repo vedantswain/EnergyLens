@@ -133,7 +133,7 @@ public class RealTimePowerFragment extends Fragment{
 		chart_container.addView(chartView,0);
 
 		TextView textView=(TextView) getView().findViewById(R.id.RealTimeText);
-		textView.setText("Current power consumption: "+y+" W");
+		textView.setText("Current power consumption: "+y+" Watts");
 	}	
 
 	private void UpdateGUI() {

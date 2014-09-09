@@ -31,6 +31,7 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
     <uses-permission android:name="com.android.launcher.permission.UNINSTALL_SHORTCUT" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <permission
         android:name="com.example.gcm.permission.C2D_MESSAGE"
@@ -156,6 +157,14 @@
         <activity
             android:name=".GroundReportActivity"
             android:label="@string/title_activity_ground_report"
+            android:parentActivityName=".GroundReportListActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.energylens.GroundReportListActivity" />
+        </activity>
+        <activity
+            android:name=".GroundReportListActivity"
+            android:label="@string/title_activity_ground_report_list"
             android:parentActivityName=".CollectionTabActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

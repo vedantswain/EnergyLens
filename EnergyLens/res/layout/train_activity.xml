@@ -38,7 +38,8 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
                 android:onClick="launchLocDialog"
-                android:text="select location" />
+                android:text="Select Location"
+                android:textColor="#ffffff" />
 
             <TextView
                 android:id="@+id/textView2"
@@ -56,9 +57,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_below="@+id/textView2"
-                android:textSize="16sp"
-                android:layout_toLeftOf="@+id/setApp" />
-
+                android:layout_toLeftOf="@+id/setApp"
+                android:textSize="16sp" />
 
             <ImageView
                 android:id="@+id/setApp"
@@ -70,14 +70,13 @@
                 android:src="@drawable/ic_action_addition" />
 
             <ImageView
-                 android:id="@+id/remApp"
-                  android:layout_width="wrap_content"
+                android:id="@+id/remApp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_below="@+id/setApp"
                 android:onClick="removeLastApp"
                 android:src="@drawable/ic_action_remove" />
-
         </RelativeLayout>
 
         <RelativeLayout
@@ -143,26 +142,25 @@
 
             <Button
                 android:id="@+id/yesBtn"
-                style="?android:attr/buttonStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignRight="@+id/trainApp"
                 android:layout_below="@+id/textView1"
-                android:layout_marginRight="20dp"
-                android:layout_marginTop="21dp"
+                android:layout_marginTop="28dp"
                 android:onClick="onTrainMore"
-                android:text="Yes" />
+                android:text="Yes"
+                android:textColor="#ffffff" />
 
             <Button
                 android:id="@+id/noBtn"
-                style="?android:attr/buttonStyleSmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignLeft="@+id/trainApp"
-                android:layout_alignTop="@+id/yesBtn"
-                android:layout_marginLeft="30dp"
+                android:layout_below="@+id/textView1"
+                android:layout_marginTop="28dp"
                 android:onClick="onCancel"
-                android:text="No" />
+                android:text="No"
+                android:textColor="#ffffff" />
         </RelativeLayout>
     </ViewFlipper>
 

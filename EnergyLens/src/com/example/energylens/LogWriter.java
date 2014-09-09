@@ -23,6 +23,7 @@ public class LogWriter {
 	public static String NOTIFHEADER="received_at"+","+"notification_id"+","+"seen_at";
 	
 	public static File EnergyLensDir=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+");
+	public static File SensorDataDir=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"SensorData");
 	public static File UsageStatsDir=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"UsageStats");
 		
 	public static void PathCheck(File logFile,String header){
@@ -31,6 +32,16 @@ public class LogWriter {
 			try{
 			EnergyLensDir.mkdir();
 			Log.v("LOG WRITER","directory made at: "+EnergyLensDir.getPath());
+			}
+			catch(Exception e){
+				Log.v("LOG WRITER",e.toString());
+			}
+		}
+		
+		if(!SensorDataDir.exists()){
+			try{
+			SensorDataDir.mkdir();
+			Log.v("LOG WRITER","directory made at: "+SensorDataDir.getPath());
 			}
 			catch(Exception e){
 				Log.v("LOG WRITER",e.toString());
@@ -102,49 +113,49 @@ public class LogWriter {
 
 	
 	public static void axlLogWrite(String logstring){
-		axlLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+Common.FILE_PREFIX+"accelerometer_log"+".csv");
+		axlLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"SensorData"+File.separator+Common.FILE_PREFIX+"accelerometer_log"+".csv");
 		LogWrite(axlLog,logstring,ACCLHEADER,false,false);
 	}
 	
 	public static void audioLogWrite(String logstring){
-		audioLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+Common.FILE_PREFIX+"audio_log"+".csv");
+		audioLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"SensorData"+File.separator+Common.FILE_PREFIX+"audio_log"+".csv");
 		LogWrite(audioLog,logstring,SOUNDHEADER,false,true);
 	}
 	
 	public static void rawaudioLogWrite(String logstring){
-		rawaudioLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+Common.FILE_PREFIX+"rawaudio_log"+".csv");
+		rawaudioLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"SensorData"+File.separator+Common.FILE_PREFIX+"rawaudio_log"+".csv");
 		LogWrite(rawaudioLog,logstring,RAWSOUNDHEADER,false,true);
 	}
 	
 	public static void lightLogWrite(String logstring){
-		lightLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+Common.FILE_PREFIX+"light_log"+".csv");
+		lightLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"SensorData"+File.separator+Common.FILE_PREFIX+"light_log"+".csv");
 		LogWrite(lightLog,logstring,LIGHTHEADER,false,false);
 	}
 	
 	public static void magLogWrite(String logstring){
-		magLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+Common.FILE_PREFIX+"mag_log"+".csv");
+		magLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"SensorData"+File.separator+Common.FILE_PREFIX+"mag_log"+".csv");
 		LogWrite(magLog,logstring,MAGHEADER,false,false);
 	}
 	
 	public static void wifiLogWrite(String logstring){
-		wifiLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+Common.FILE_PREFIX+"wifi_log"+".csv");
+		wifiLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"SensorData"+File.separator+Common.FILE_PREFIX+"wifi_log"+".csv");
 		LogWrite(wifiLog,logstring,WIFIHEADER,true,false);
 	}
 	
 	public static void errorLogWrite(String logstring){
-		errorLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"error_log"+".csv");
+		errorLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"SensorData"+File.separator+"error_log"+".csv");
 		LogWrite(errorLog,logstring,ERRHEADER,false,false);
 	}
 	
 	public static void screenLogWrite(String logstring){
 		String filename="screen_log";
-		screenLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"UsageStats"+File.separator+filename+".csv");
+		screenLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"SensorData"+File.separator+"UsageStats"+File.separator+filename+".csv");
 		researchLogWrite(screenLog,logstring,SCREENHEADER);
 	}
 	
 	public static void notifLogWrite(String logstring){
 		String filename="notif_log";
-		notifLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"UsageStats"+File.separator+filename+".csv");
+		notifLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"SensorData"+File.separator+"UsageStats"+File.separator+filename+".csv");
 		researchLogWrite(notifLog,logstring,NOTIFHEADER);
 	}
 	

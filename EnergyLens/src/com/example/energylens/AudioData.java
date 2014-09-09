@@ -201,7 +201,7 @@ public class AudioData {
 						
 						String raw_data=String.valueOf(now);
 						
-						raw_data+=",\"";
+						raw_data+=",`";
 	
 						for(int i=0;i<data16bit.length;i++){
 	
@@ -218,7 +218,7 @@ public class AudioData {
 						}
 	
 	
-						raw_data+="\","+Common.LABEL+","+Common.LOCATION+"\n";
+						raw_data+="`,"+Common.LABEL+","+Common.LOCATION+"\n";
 	
 						 
 						// Convert shorts to 8-bit bytes for raw audio output

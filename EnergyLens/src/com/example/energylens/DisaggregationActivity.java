@@ -538,7 +538,7 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 	public void onLocSelected(String loc,int index) {
 		// TODO Auto-generated method stub
 		TextView textView=(TextView) findViewById(R.id.appLocation);
-		textView.setText(app+" at "+loc);
+		textView.setText(app+" in "+loc);
 		Log.v("ELSERVICES", "New Loc: "+loc);
 		if(forCorrection){
 			parseApp(loc,index);

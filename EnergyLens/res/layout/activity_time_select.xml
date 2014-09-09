@@ -25,26 +25,25 @@
 
         <Button
             android:id="@+id/fromDateBtn"
-            style="?android:attr/buttonStyleSmall"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/trainApp"
-            android:text="Button" 
-            android:onClick="changeFromDate"/>
+            android:onClick="changeFromDate"
+            android:text="Button"
+            android:textColor="#ffffff" />
 
         <Button
             android:id="@+id/fromTimeBtn"
-            style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@+id/fromDateBtn"
             android:layout_alignBottom="@+id/fromDateBtn"
             android:layout_alignParentRight="true"
             android:layout_toRightOf="@+id/fromDateBtn"
-            android:text="Button" 
-            android:onClick="changeFromTime"/>
-
+            android:onClick="changeFromTime"
+            android:text="Button"
+            android:textColor="#ffffff" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -62,36 +61,35 @@
 
         <Button
             android:id="@+id/toDateBtn"
-            style="?android:attr/buttonStyleSmall"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/TextView01"
-            android:text="Button" 
-            android:onClick="changeToDate"/>
+            android:onClick="changeToDate"
+            android:text="Button"
+            android:textColor="#ffffff" />
 
         <Button
             android:id="@+id/toTimeBtn"
-            style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@+id/toDateBtn"
             android:layout_alignBottom="@+id/toDateBtn"
             android:layout_alignParentRight="true"
             android:layout_toRightOf="@+id/toDateBtn"
-            android:text="Button" 
-            android:onClick="changeToTime"/>
+            android:onClick="changeToTime"
+            android:text="Button"
+            android:textColor="#ffffff" />
 
         <Button
             android:id="@+id/button1"
-            style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:text="Done" 
-            android:onClick="done"/>
-
+            android:onClick="done"
+            android:text="Done"
+            android:textColor="#ffffff" />
     </RelativeLayout>
 
 </LinearLayout>

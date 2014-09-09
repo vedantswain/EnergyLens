@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content" >
 
     <LinearLayout
         android:id="@+id/WasteGroup"
@@ -21,20 +21,22 @@
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <ImageView
-             android:id="@+id/timeSelectBtn"
-             android:layout_width="fill_parent"
+            android:id="@+id/timeSelectBtn"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:gravity="right"
-            android:visibility="invisible"
             android:onClick="toTimeSelect"
-            android:src="@drawable/ic_history" />
+            android:src="@drawable/ic_history"
+            android:visibility="invisible" />
 
         <TextView
             android:id="@+id/lastSyncWastage"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:visibility="invisible"
-            android:textSize="12sp" />
+            android:gravity="right"
+            android:textSize="12sp"
+            android:visibility="invisible" />
+
 
         <LinearLayout
             android:id="@+id/chartWaste"
@@ -54,18 +56,17 @@
                 android:paddingBottom="10dp"
                 android:paddingTop="10dp"
                 android:text="Total Wastage"
-                android:visibility="invisible"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:visibility="invisible" />
 
             <TextView
                 android:id="@+id/totalValWaste"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="40dp"
-                android:textSize="16sp"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="16sp" />
         </LinearLayout>
 
         <TextView
@@ -75,18 +76,16 @@
             android:paddingBottom="10dp"
             android:paddingTop="10dp"
             android:text="Appliance-wise Wastage:"
-            android:visibility="invisible"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:visibility="invisible" />
 
         <LinearLayout
             android:id="@+id/WasteDist"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
-
         </LinearLayout>
-
     </LinearLayout>
 
 </ScrollView>

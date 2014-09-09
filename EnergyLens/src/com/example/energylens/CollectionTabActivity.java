@@ -14,6 +14,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Color;
+import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -22,6 +24,7 @@ import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v13.app.FragmentStatePagerAdapter;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.text.SpannableStringBuilder;
@@ -39,13 +42,14 @@ import android.widget.ToggleButton;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-public class CollectionTabActivity extends FragmentActivity {
+public class CollectionTabActivity extends FragmentActivity implements TrainMoreDialogFragment.TrainMoreDialogListener{
 
 	GoogleCloudMessaging gcm;
 	AtomicInteger msgId = new AtomicInteger();
 	Context context;
 	String SENDER_ID = "166229175411";
 	Boolean doubleBackToExitPressedOnce=false;
+	String groundReportDates;
 
 	private AlarmManager axlAlarmMgr,wifiAlarmMgr,audioAlarmMgr,lightAlarmMgr,magAlarmMgr,uploaderAlarmMgr;
 	private PendingIntent axlServicePendingIntent,wifiServicePendingIntent,audioServicePendingIntent,lightServicePendingIntent,magServicePendingIntent,uploaderServicePendingIntent;
@@ -67,7 +71,7 @@ public class CollectionTabActivity extends FragmentActivity {
 
 	int prevTabNo=-1;
 	long timeOfVisit,timeOfStay;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -80,7 +84,7 @@ public class CollectionTabActivity extends FragmentActivity {
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
-		
+
 		gcm = GoogleCloudMessaging.getInstance(this);
 
 		getUpdatedPreferences();
@@ -102,6 +106,11 @@ public class CollectionTabActivity extends FragmentActivity {
 			}
 
 		}
+
+//		if(Common.TRAINING_COUNT==0){
+//			DialogFragment newFragment = new TrainMoreDialogFragment();
+//			newFragment.show(getSupportFragmentManager(), "Training");
+//		}
 		if(Common.TRAINING_STATUS==1){
 			Intent intent = new Intent(this,TrainActivity.class);
 			startActivity(intent);
@@ -237,6 +246,12 @@ public class CollectionTabActivity extends FragmentActivity {
 
 		Log.v("ELSERVICES", "Training onresume "+Common.TRAINING_STATUS+"\n Label "+Common.LABEL+"\n Location "+Common.LOCATION);
 
+		SharedPreferences sp=getSharedPreferences("GROUNDREPORT_PREFS",0);
+
+		if(sp.contains("JSON_RESPONSES")){
+			Log.v("ELSERVICES", "Loading GroundReport from saved data");
+			groundReportDates=sp.getString("RESPONSE_DATES", "");
+		}
 	}
 
 	public void toTimeSelect(View view){
@@ -370,8 +385,16 @@ public class CollectionTabActivity extends FragmentActivity {
 			return true;
 		}
 		else if(id == R.id.groundReport){
-			Intent intent = new Intent(this,GroundReportActivity.class);
-			startActivity(intent);
+			getUpdatedPreferences();
+			Intent intent = new Intent(this,GroundReportListActivity.class);
+			if(groundReportDates!=null){
+				if(groundReportDates.length()>2)
+					startActivity(intent);
+				else
+					Toast.makeText(getApplicationContext(), "No new reports", 2000).show();
+			}
+			else
+				Toast.makeText(getApplicationContext(), "No new reports", 2000).show();
 			return true;
 		}
 		else if(id == R.id.training){
@@ -487,10 +510,10 @@ public class CollectionTabActivity extends FragmentActivity {
 		public CharSequence getPageTitle(int position) {
 			Locale l = Locale.getDefault();
 			String title="";
-			
+
 
 			Drawable mDrawable=getResources().getDrawable(R.drawable.ic_energy);
-			
+
 			switch (position) {
 			case 0:
 				title= getString(R.string.title_section2).toUpperCase(l);
@@ -506,14 +529,29 @@ public class CollectionTabActivity extends FragmentActivity {
 				break;
 			}
 			mDrawable.setBounds(0, 0, mDrawable.getIntrinsicWidth(), mDrawable.getIntrinsicHeight()); 
-			
+
 			SpannableStringBuilder sb = new SpannableStringBuilder(" "+title);
-			 ImageSpan span = new ImageSpan(mDrawable, ImageSpan.ALIGN_BOTTOM); 
-			 sb.setSpan(span, 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-			 
-			 return sb;
-			 
-//			return null;
+			ImageSpan span = new ImageSpan(mDrawable, ImageSpan.ALIGN_BOTTOM); 
+			sb.setSpan(span, 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+			return sb;
+
+			//			return null;
 		}
+	}
+
+	@Override
+	public void onTrainMore() {
+		// TODO Auto-generated method stub
+		Common.changeTrainingCount(Common.TRAINING_COUNT+1);
+		updatePreferences();
+		start();
+	}
+
+	@Override
+	public void onCancel() {
+		// TODO Auto-generated method stub
+		Intent intent=new Intent(this,TrainActivity.class);
+		startActivity(intent);
 	}
 }

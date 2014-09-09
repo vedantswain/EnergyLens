@@ -194,7 +194,7 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 		if(Common.TRAINING_STATUS==1){
 			Toast.makeText(TrainActivity.this, "Training data collection stopped", LENGTH_SHORT).show();
 		}
-		Common.changeTrainingStatus(0);
+		Common.changeTrainingStatus(2);
 		//		DialogFragment newFragment = new TrainMoreDialogFragment();
 		//		newFragment.show(getSupportFragmentManager(), "TrainMore");
 		Common.changeLabel("none");
@@ -258,34 +258,34 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 		mNotificationManager.notify(26194, trainingNote);
 	}
 
-	private void customNotification(){
-		// Using RemoteViews to bind custom layouts into Notification
-		RemoteViews remoteViews = new RemoteViews(getPackageName(),
-				R.layout.customnotification);
-
-		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
-		// Set Icon
-		.setSmallIcon(R.drawable.ic_launcher)
-		// Set Ticker Message
-		.setTicker("appliance is running")
-		.setContentTitle("EnergyLens+")
-		// Dismiss Notification
-		.setAutoCancel(true)
-		// Set RemoteViews into Notification
-		.setContent(remoteViews);
-		
-		Notification trainingNote=mBuilder.build();
-		trainingNote.flags |= Notification.FLAG_ONGOING_EVENT;
-		
-		// Locate and set the Text into customnotificationtext.xml TextViews
-		remoteViews.setTextViewText(R.id.notifMessage,"appliance left running at location");
-
-		// Create Notification Manager
-		NotificationManager notificationmanager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-		// Build Notification with Notification Manager
-		notificationmanager.notify(0, mBuilder.build());
-		
-	}
+//	private void customNotification(){
+//		// Using RemoteViews to bind custom layouts into Notification
+//		RemoteViews remoteViews = new RemoteViews(getPackageName(),
+//				R.layout.customnotification);
+//
+//		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
+//		// Set Icon
+//		.setSmallIcon(R.drawable.ic_launcher)
+//		// Set Ticker Message
+//		.setTicker("appliance is running")
+//		.setContentTitle("EnergyLens+")
+//		// Dismiss Notification
+//		.setAutoCancel(true)
+//		// Set RemoteViews into Notification
+//		.setContent(remoteViews);
+//		
+//		Notification trainingNote=mBuilder.build();
+//		trainingNote.flags |= Notification.FLAG_ONGOING_EVENT;
+//		
+//		// Locate and set the Text into customnotificationtext.xml TextViews
+//		remoteViews.setTextViewText(R.id.notifMessage,"appliance left running at location");
+//
+//		// Create Notification Manager
+//		NotificationManager notificationmanager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+//		// Build Notification with Notification Manager
+//		notificationmanager.notify(0, mBuilder.build());
+//		
+//	}
 
 	public void clearNotification() {
 		NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -349,7 +349,7 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 				4816, uploaderServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 		uploaderAlarmMgr= (AlarmManager)TrainActivity.this.getSystemService(TrainActivity.this.ALARM_SERVICE);
 		uploaderAlarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-				System.currentTimeMillis()+Common.UPLOAD_INTERVAL*60*1000, Common.UPLOAD_INTERVAL*30*1000, uploaderServicePendingIntent); 
+				System.currentTimeMillis()+Common.UPLOAD_INTERVAL*10*1000, Common.UPLOAD_INTERVAL*30*1000, uploaderServicePendingIntent); 
 		Log.v("ELSERVICES","Uploader alarm Set for service "+4816+" "+Common.INTERVAL);
 	}
 
@@ -401,7 +401,7 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 				if(power!=null)
 					trainingPower.setText(power.toString());
 				TextView trainingText=(TextView) findViewById(R.id.trainApp);
-				trainingText.setText(lastLabel+" at "+lastLocation+"\n consumed: ");
+				trainingText.setText(lastLabel+" in "+lastLocation+"\n consumed: ");
 
 				Log.i("ELSERVICES", msg);
 			}

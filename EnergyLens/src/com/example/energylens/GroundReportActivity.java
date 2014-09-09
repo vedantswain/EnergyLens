@@ -61,6 +61,7 @@ public class GroundReportActivity extends Activity {
 	ArrayList<String> responses=new ArrayList<String>();
 	ArrayList<String> dates=new ArrayList<String>();
 	String current_response;
+	int report_index;
 	long current_date;
 	static int corrected_count=0;
 
@@ -70,57 +71,85 @@ public class GroundReportActivity extends Activity {
 		setContentView(R.layout.activity_ground_report);
 
 		SharedPreferences sp=getSharedPreferences("GROUNDREPORT_PREFS",0);
+		
+		Intent intent=getIntent();
+		Bundle extras=intent.getExtras();
+		
+		report_index=extras.getInt("index");
+		Log.v("ELSERVICES", "Report no: "+report_index);
 
 		if(sp.contains("JSON_RESPONSES")){
-			Log.v("ELSERVICES", "Loading GroundReport from saved data");
+			Log.v("ELSERVICES", "Loading All responses from saved data "+sp.getString("JSON_RESPONSES", "")
+					+"\t"+sp.getString("RESPONSE_DATES", ""));
 			String string=sp.getString("JSON_RESPONSES", "");
 			String date=sp.getString("RESPONSE_DATES", "");
-//			parsePref(sp.getString("JSON_RESPONSE", ""));
-			if(!string.equals("") && !date.equals(""))
+			//			parsePref(sp.getString("JSON_RESPONSE", ""));
+			if(!string.equals("") && !date.equals("")){
+//				Toast.makeText(GroundReportActivity.this, "Loaded last uncorrected report", 1000).show();
 				parseResponses(string,date);
-			if(ids!=null){
-				setApps(ids,apps,usage,locs,period);
 			}
-			else
-				Toast.makeText(getApplicationContext(), "no activity in this location", 1000).show();
+			else{
+				Toast.makeText(GroundReportActivity.this, "No new reports", 2000).show();
+				finish();
+			}
 		}
 
 		gcm = GoogleCloudMessaging.getInstance(this);
-		setupMessage();
+		//		setupMessage();
 	}
 
 	public void parseResponses(String string, String date){
-		String[] respArray=string.split("|");
+		responses=new ArrayList<String>();
+		dates=new ArrayList<String>();
+
+		String[] respArray=string.split("\\|");
 		for(String str:respArray){
 			responses.add(str);
+			Log.v("ELSERVICES","Responses: " +str);
 		}
 
-		String[] dateArray=date.split("|");
+		String[] dateArray=date.split("\\|");
 		for(String str:dateArray){
+			Log.v("ELSERVICES", "GroundReport Date: "+str);
 			dates.add(str);
 		}
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yy HH:mm");
-		current_date=Long.parseLong(dateArray[dateArray.length-1]);
+
+		if(!dates.get(report_index).equals(""))
+			current_date=Long.parseLong(dates.get(report_index));
 		TextView reportDate=(TextView) findViewById(R.id.reportDate);
 		reportDate.setText(dateFormat.format(current_date).toString());
-		current_response=respArray[respArray.length-1];
-		parsePref(current_response);		
+		current_response=responses.get(report_index);
+		Log.v("ELSERVICES","Current response: " +current_response);
+
+		if(!current_response.equals("")){
+			parsePref(current_response);	
+		}
+		else{
+			Toast.makeText(GroundReportActivity.this, "No new reports", 2000).show();
+			finish();
+		}
 	}
 
 	static void changeCorrectionIds(long id,String[] pairData,int flag){
-		if(flag==1){
+		if(flag>0){
 			correctionIds.add(id);
-			if(corrected_count>0)
+			changeCorrectionPairData(id,pairData,1);
+			if(flag>1)
 				corrected_count--;
+			Log.v("ELSERVICES","Count "+corrected_count);
 		}
-		else if(flag==0 && correctionIds.contains(id)){
-			int index=correctionIds.indexOf(id);
-			correctionIds.remove(index);
+		else if(flag==0){
+			int index=3676;
+			if(correctionIds.contains(id)){
+				index=correctionIds.indexOf(id);
+				correctionIds.remove(index);
+			}
 			corrected_count++;
-			if(correctionPairData.contains(pairData)){
-				int pdIndex=correctionPairData.indexOf(pairData);
-				correctionPairData.remove(pdIndex);
+			Log.v("ELSERVICES","Count "+corrected_count);
+			if(correctionPairData.size()>index){
+				correctionPairData.remove(index);
 				Log.v("ELSERVICES", "removed");
 			}
 		}
@@ -129,21 +158,17 @@ public class GroundReportActivity extends Activity {
 	static void changeCorrectionPairData(long id,String[] pairData,int flag){
 		int index=correctionIds.indexOf(id);
 		if(flag==1){
-			if(correctionPairData.contains(pairData)){
-				int pdIndex=correctionPairData.indexOf(pairData);
-				correctionPairData.remove(pdIndex);
-				correctionPairData.add(pdIndex,pairData);
-			}
+			if(correctionPairData.size()>index)
+				correctionPairData.remove(index);
+			correctionPairData.add(index,pairData);
 			
 
 		}else if(flag==0){
-			if(correctionPairData.contains(pairData)){
-				int pdIndex=correctionPairData.indexOf(pairData);
-				correctionPairData.remove(pdIndex);
+			if(correctionPairData.size()>index)
+				correctionPairData.remove(index);
 			}
 		}
-	}
-
+	
 	protected void onStart(){
 		super.onStart();
 		this.registerReceiver(receiver, new IntentFilter(GcmIntentService.RECEIVER));
@@ -152,7 +177,12 @@ public class GroundReportActivity extends Activity {
 	@Override
 	public void onPause() {
 		super.onPause();
-		this.unregisterReceiver(receiver);
+		try{
+			this.unregisterReceiver(receiver);
+		}
+		catch(Exception e){
+			Log.e("ELSERVICES", e.getMessage());
+		}
 	}
 
 
@@ -180,6 +210,11 @@ public class GroundReportActivity extends Activity {
 		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 		UsageReportFragment fragment = new UsageReportFragment();
 
+		LinearLayout ll = (LinearLayout)findViewById(R.id.groundReport);
+		Log.v("ELSERVICES","before Remove all views, groundReport: " + ll.getChildCount());
+		ll.removeAllViews();
+		Log.v("ELSERVICES","Remove all views groundRport: " + ll.getChildCount());
+
 		int index=0;
 		for(String activity:apps){
 			fragment=UsageReportFragment.newInstance(ids.get(index),activity, use.get(index),locs.get(index),period.get(index)[0],period.get(index)[1]);
@@ -187,23 +222,21 @@ public class GroundReportActivity extends Activity {
 			fragmentList.add(fragment);
 			index++;
 		}
+		Log.v("ELSERVICES","GroundRport activity fragment count: " + index);
 		fragmentTransaction.commit();
 		fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 	}
 
 	public void onDoneBtn(View view){
 		Log.v("ELSERVICES", "Done");
+		Log.v("ELSERVICES", ids.size()+" == "+corrected_count+"+"+correctionIds.size()+" ?");
 		if(correctionIds.size()+corrected_count==ids.size() && ids.size()>0){
 			//					Log.v("ELSERVICES", correctionIds.get(0)+" "+correctionIds.get(1)+" "+correctionIds.get(2)+" ");
-			Log.v("ELSERVICES", correctionPairData.get(0)[0]+" "+correctionPairData.get(0)[1]);
-			responses.remove(responses.size()-1);
-			dates.remove(responses.size()-1);
-			if(responses.size()>0 && dates.size()>0)
-				storeRemaining();
+			//			Log.v("ELSERVICES", "Correction pairs"+correctionPairData.get(0)[0]+" "+correctionPairData.get(0)[1]);
 			toCorrect();
 		}
 		else{
-			Toast.makeText(this, "You've not corrected all the activities", 1000);
+			Toast.makeText(GroundReportActivity.this, "You've not corrected all the activities", 1000).show();
 		}
 	}
 
@@ -228,8 +261,14 @@ public class GroundReportActivity extends Activity {
 				if(correctionIds.contains(id)){
 					int index=correctionIds.indexOf(id);
 					activity.put("id",id);
-					activity.put("to_appliance", correctionPairData.get(index)[0]);
-					activity.put("to_location", correctionPairData.get(index)[1]);
+					if(correctionPairData.size()<index){
+						activity.put("to_appliance", correctionPairData.get(index)[0]);
+						activity.put("to_location", correctionPairData.get(index)[1]);
+					}
+					else{
+						activity.put("to_appliance","");
+						activity.put("to_location","");	
+					}
 					activity.put("incorrect", "true");
 				}
 				else{
@@ -262,7 +301,7 @@ public class GroundReportActivity extends Activity {
 
 			if(options!=null){
 				activities=options.getJSONArray("activities");
-
+				Log.v("ELSERVICES","GroundReport Activitiy count: " + activities.length());
 				if(activities!=null){
 					parseActivities();
 				}
@@ -274,77 +313,89 @@ public class GroundReportActivity extends Activity {
 		}
 	}
 
-	private void storePreferences(String response){
-		SharedPreferences bundleData=getSharedPreferences("GROUNDREPORT_PREFS",0);
-
-		responses.add("|"+response);
-		StringBuilder strings=new StringBuilder();
-		for(String str:responses)
-			strings.append(str);
-
-		Editor editor=bundleData.edit();
-		editor.putString("JSON_RESPONSES", strings.toString());
-
-		dates.add("|"+Long.toString(System.currentTimeMillis()));
-		for(String str:dates)
-			strings.append(str);
-
-		editor.putString("RESPONSE_DATES", strings.toString());
-		editor.commit();
-
-	}
+	//	private void storePreferences(String response){
+	//		SharedPreferences bundleData=getSharedPreferences("GROUNDREPORT_PREFS",0);
+	//
+	//		responses.add("|"+response);
+	//		StringBuilder strings=new StringBuilder("");
+	//		for(String str:responses)
+	//			strings.append(str);
+	//
+	//		Editor editor=bundleData.edit();
+	//		editor.putString("JSON_RESPONSES", strings.toString());
+	//
+	//		strings=new StringBuilder("");
+	//		dates.add("|"+Long.toString(System.currentTimeMillis()));
+	//		for(String str:dates)
+	//			strings.append(str);
+	//
+	//		editor.putString("RESPONSE_DATES", strings.toString());
+	//		editor.commit();
+	//
+	//	}
 
 	private void storeRemaining(){
+		corrected_count=0;
+		correctionIds=new ArrayList<Long>();
+		correctionPairData=new ArrayList<String[]>();
+
 		SharedPreferences bundleData=getSharedPreferences("GROUNDREPORT_PREFS",0);
 
-		StringBuilder strings=new StringBuilder();
+		StringBuilder strings=new StringBuilder("");
 		for(String str:responses)
-			strings.append(str);
+			strings.append("|"+str);
 
 		Editor editor=bundleData.edit();
 		editor.putString("JSON_RESPONSES", strings.toString());
 
+		strings=new StringBuilder("");
 		for(String str:dates)
-			strings.append(str);
+			strings.append("|"+str);
 
 		editor.putString("RESPONSE_DATES", strings.toString());
 		editor.commit();
-		
-		if(responses.size()>0 && dates.size()>0)
-			parseResponses(responses.get(responses.size()-1),dates.get(dates.size()-1));
+
+//		if(responses.size()>0 && dates.size()>0){
+//			parseResponses(responses.get(responses.size()-1),dates.get(dates.size()-1));
+//		}
+//		else{
+//			Toast.makeText(GroundReportActivity.this, "No new reports", 1000).show();
+			finish();
+//		}
 	}
 
 	private void parseData(Bundle data){
 		Log.v("ELSERVICES", "parsedata");
 
-		if(data.getString("api").equals("energy/report/notification/")){
-			try {
-				Set<String> keys=data.keySet();
-				JSONObject response=new JSONObject();
-				if(response!=null)
-					Log.v("ELSERVICES", "GroundReport not null");
-
-				for(String key:keys){
-					response.put(key, data.get(key));
-				}
-
-				JSONObject options=new JSONObject(response.getString("options"));
-
-				storePreferences(response.toString());
-
-				if(options!=null){
-					activities=options.getJSONArray("activities");
-
-					if(activities!=null){
-						parseActivities();
-					}
-				}
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		else if(data.getString("api").equals("inference/reassign/")){
+		//		if(data.getString("api").equals("energy/report/notification/")){
+		//			try {
+		//				Set<String> keys=data.keySet();
+		//				JSONObject response=new JSONObject();
+		//				if(response!=null)
+		//					Log.v("ELSERVICES", "GroundReport not null");
+		//
+		//				for(String key:keys){
+		//					response.put(key, data.get(key));
+		//				}
+		//
+		//				JSONObject options=new JSONObject(response.getString("options"));
+		//
+		//				storePreferences(response.toString());
+		//
+		//				if(options!=null){
+		//					activities=options.getJSONArray("activities");
+		//
+		//					if(activities!=null){
+		//						parseActivities();
+		//					}
+		//				}
+		//			} catch (JSONException e) {
+		//				// TODO Auto-generated catch block
+		//				e.printStackTrace();
+		//			}
+		//		}
+		//		else 
+		if(data.getString("api").equals("inference/reassign/")){
 			try {
 				Set<String> keys=data.keySet();
 				JSONObject response=new JSONObject();
@@ -359,7 +410,17 @@ public class GroundReportActivity extends Activity {
 
 				if(options!=null){
 
-					Log.v("ELSERVICES", options.getString("status"));
+					Log.v("ELSERVICES","inference response: "+options.getString("status"));
+					if(options.getString("status").equals("true")){
+						if(responses.size()>0 && dates.size()>0){
+							responses.remove(report_index);
+							dates.remove(report_index);
+							storeRemaining();
+						}
+					}
+					else{
+						Toast.makeText(GroundReportActivity.this, "There was an error. Try again", 1000).show();
+					}
 
 				}
 			} catch (JSONException e) {
@@ -377,9 +438,6 @@ public class GroundReportActivity extends Activity {
 		usage=new ArrayList<Long>();
 		apps=new ArrayList<String>();
 		locs=new ArrayList<String>();
-
-		LinearLayout ll = (LinearLayout) findViewById(R.id.groundReport);
-		ll.removeAllViews();
 
 		int k=0;
 		for(int i=0;i<activities.length();i++){
@@ -404,7 +462,7 @@ public class GroundReportActivity extends Activity {
 			setApps(ids,apps,usage,locs,period);
 		}
 		else
-			Toast.makeText(getApplicationContext(), "no activities", 1000).show();
+			Toast.makeText(GroundReportActivity.this, "no activities", 1000).show();
 	}
 
 

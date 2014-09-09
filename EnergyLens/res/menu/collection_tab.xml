@@ -4,13 +4,13 @@
 
     <item
         android:id="@+id/groundReport"
-        android:icon="@drawable/ic_action_ground_report_holo_dark"
+        android:icon="@drawable/ic_action_ground_report"
         android:showAsAction="ifRoom"
         android:title="@string/action_report"/>
     <item
         android:id="@+id/training"
          android:showAsAction="ifRoom"
-        android:icon="@drawable/ic_action_training_holo_dark"
+        android:icon="@drawable/ic_action_training"
         android:title="@string/action_train"/>
     <item
         android:id="@+id/appGroup"

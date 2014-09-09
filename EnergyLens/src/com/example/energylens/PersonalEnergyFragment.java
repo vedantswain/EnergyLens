@@ -33,6 +33,8 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
 import android.graphics.Paint.Align;
+import android.graphics.PorterDuff.Mode;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -164,7 +166,7 @@ public class PersonalEnergyFragment extends Fragment {
 				Log.v("ELSERVICES", "Graph clicked");
 				// handle the click event on the chart
 				SeriesSelection seriesSelection = chartView.getCurrentSeriesAndPoint();
-				//				Log.v("ELSERVICES", "Selected: "+seriesSelection.getSeriesIndex());
+//				Log.v("ELSERVICES", "Selected: "+seriesSelection.getSeriesIndex());
 			}
 		});
 

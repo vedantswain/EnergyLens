@@ -30,8 +30,8 @@
             android:id="@+id/lastSyncCorrect"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/appLocation" 
-            android:textSize="12sp"/>
+            android:layout_below="@+id/appLocation"
+            android:textSize="12sp" />
 
         <LinearLayout
             android:id="@+id/chartComparison"
@@ -42,14 +42,13 @@
             android:orientation="vertical" >
         </LinearLayout>
 
-        
-         <ImageView
-             android:id="@+id/resetSliceBtn"
+        <ImageView
+            android:id="@+id/resetSliceBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="resetSlice"
-            android:layout_centerHorizontal="true"
             android:layout_below="@+id/chartComparison"
+            android:layout_centerHorizontal="true"
+            android:onClick="resetSlice"
             android:src="@drawable/ic_action_reset" />
 
         <LinearLayout
@@ -59,19 +58,18 @@
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/lastSyncCorrect"
             android:orientation="vertical" >
-
         </LinearLayout>
 
         <Button
             android:id="@+id/appLocation"
-            style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/lastSyncReassign"
             android:onClick="launchLocDialog"
-            android:text="Location: " />
+            android:text="Location: "
+            android:textColor="#ffffff" />
 
         <Button
             android:id="@+id/correctLoc"
@@ -131,9 +129,6 @@
             android:padding="10dp"
             android:text="--:--"
             android:visibility="gone" />
-
-       
-
     </RelativeLayout>
 
 </ScrollView>

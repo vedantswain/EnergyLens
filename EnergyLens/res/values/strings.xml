@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <string name="app_name">EnergyLens+</string>
@@ -14,9 +15,9 @@
     <string name="cancel">Cancel</string>
     <string name="dialog_appliances">Select appliances</string>
     <string name="dialog_locations">Select location</string>
-    <string name="dialog_train_more">Train another device?</string>
+    <string name="dialog_train_more">Already done training?</string>
     <string name="yes">Yes</string>
-    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_settings">EnergyLens+</string>
     <string name="no">No</string>
     <string name="title_section4">Real-Time Power</string>
     <string name="title_activity_reassign">ReassignActivity</string>
@@ -28,10 +29,11 @@
     <string name="title_activity_register">RegisterActivity</string>
     <string name="title_activity_gcm">GCMActivity</string>
     <string name="dialog_try_again">Registration failed. Give it another try?</string>
-    <string name="title_activity_time_select">TimeSelectActivity</string>
-    <string name="title_activity_correction">CorrectionActivity</string>
+    <string name="title_activity_time_select">EnergyLens+</string>
+    <string name="title_activity_correction">EnergyLens+</string>
     <string name="action_report">Report</string>
     <string name="title_activity_ground_report">EnergyLens+</string>
     <string name="action_train">Training</string>
+    <string name="title_activity_ground_report_list">EnergyLens+</string>
 
 </resources>

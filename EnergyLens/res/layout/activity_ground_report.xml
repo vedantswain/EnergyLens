@@ -26,20 +26,18 @@
             android:layout_below="@+id/reportDate"
             android:layout_marginTop="20dp"
             android:orientation="vertical" >
-
         </LinearLayout>
 
         <Button
             android:id="@+id/button1"
-            style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/groundReport"
             android:layout_marginTop="16dp"
+            android:onClick="onDoneBtn"
             android:text="Done"
-            android:onClick="onDoneBtn" />
-
+            android:textColor="#ffffff" />
     </RelativeLayout>
 
 </ScrollView>
