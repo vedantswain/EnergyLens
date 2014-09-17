@@ -120,9 +120,19 @@ public class PersonalEnergyFragment extends Fragment {
 		DisplayMetrics metrics = getActivity().getResources().getDisplayMetrics();
 		float val = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, metrics);
 
-		DateFormat df=new DateFormat();
-		String from_time=df.format("dd MMM yy HH:mm", Common.TIME_PERIOD_START).toString();
-		String to_time=df.format("dd MMM yy HH:mm", Common.TIME_PERIOD_END).toString();
+//		DateFormat df=new DateFormat();
+//		String from_time=df.format("dd MMM yy HH:mm", Common.TIME_PERIOD_START).toString();
+//		String to_time=df.format("dd MMM yy HH:mm", Common.TIME_PERIOD_END).toString();
+		
+		for(int i=0;i<y.length;i++){
+			long currTime=lastSyncInMillis;
+			long graphTime=currTime-((y.length-i)*60*60*1000);
+			String text=DateFormat.format("dd/MM HH:mm",graphTime).toString();
+			mRenderer.addXTextLabel(i+1, text);
+		}
+
+		mRenderer.setXLabelsAlign(Align.RIGHT);
+		mRenderer.setXLabelsAngle(-45);
 		
 		mRenderer.addSeriesRenderer(bar_renderer);
 		//  	  mRenderer.addSeriesRenderer(line_renderer);
@@ -136,14 +146,14 @@ public class PersonalEnergyFragment extends Fragment {
 		mRenderer.setXAxisMin(0);
 		mRenderer.setYAxisMax(maxY*1.5);
 		mRenderer.setXAxisMax(y.length+1);
-		mRenderer.setChartTitle("Your Energy Consumption from "+from_time+" to "+to_time);
+		mRenderer.setChartTitle("Your energy consumption for the last 12 hours");
 		mRenderer.setChartTitleTextSize(val);
 		mRenderer.setLabelsColor(Color.DKGRAY);
 		mRenderer.setYLabelsColor(0, Color.DKGRAY);
 		mRenderer.setXLabelsColor(Color.DKGRAY);
 		mRenderer.setLabelsTextSize(val);
-		mRenderer.setXTitle("Time");
-		mRenderer.setYTitle("Energy");
+		mRenderer.setXTitle("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n Time");
+		mRenderer.setYTitle("Energy (Wh)");
 		mRenderer.setAxisTitleTextSize(val);
 		mRenderer.setLegendTextSize(val);
 		mRenderer.setYLabelsAlign(Align.RIGHT);
@@ -151,7 +161,7 @@ public class PersonalEnergyFragment extends Fragment {
 		mRenderer.setClickEnabled(true);
 		mRenderer.setSelectableBuffer(50);
 		mRenderer.setShowGrid(true);
-		int[] margins={20,80,10,0};
+		int[] margins={20,80,120,0};
 		mRenderer.setMargins(margins);
 
 
@@ -243,7 +253,10 @@ public class PersonalEnergyFragment extends Fragment {
 		Log.v("ELSERVICES", "From: "+start.toString()+" To: "+end.toString());
 		if(Common.CURRENT_VISIBLE==1){
 			Log.v("ELSERVICES", "personal");
-			sendMessage();
+			if(System.currentTimeMillis()-Common.PERSONAL_LAST_SENT>Common.SEND_REQUEST_INTERVAL*60*1000){
+				Common.changeLastSent(1,System.currentTimeMillis());
+				sendMessage();
+			}
 		}
 	}
 
@@ -468,8 +481,8 @@ public class PersonalEnergyFragment extends Fragment {
 		
 		tv=(TextView)inflateView.findViewById(R.id.sorryText2);
 		tv.setVisibility(View.GONE);
-		ImageView history=(ImageView)inflateView.findViewById(R.id.timeSelectBtn2);
-		history.setVisibility(View.VISIBLE);
+//		ImageView history=(ImageView)inflateView.findViewById(R.id.timeSelectBtn2);
+//		history.setVisibility(View.VISIBLE);
 	}
 
 

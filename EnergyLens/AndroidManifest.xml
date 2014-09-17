@@ -105,6 +105,11 @@
             android:label="@string/title_activity_reassign" >
         </activity>
 
+        <receiver android:name=".ToggleServiceReceiver" >
+            <intent-filter>
+                <action android:name="EnergyLensPlus.toggleService" />
+            </intent-filter>
+        </receiver>
         <receiver android:name=".BootupReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -131,7 +136,8 @@
 
         <activity
             android:name=".GCMActivity"
-            android:label="@string/title_activity_collection_tab" >
+            android:label="@string/title_activity_collection_tab"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -165,6 +171,22 @@
         <activity
             android:name=".GroundReportListActivity"
             android:label="@string/title_activity_ground_report_list"
+            android:parentActivityName=".CollectionTabActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.energylens.CollectionTabActivity" />
+        </activity>
+        <activity
+            android:name=".SocketActivity"
+            android:label="@string/title_activity_socket"
+            android:parentActivityName="com.example.hw_3.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.hw_3.MainActivity" />
+        </activity>
+        <activity
+            android:name=".AboutActivity"
+            android:label="@string/title_activity_about"
             android:parentActivityName=".CollectionTabActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

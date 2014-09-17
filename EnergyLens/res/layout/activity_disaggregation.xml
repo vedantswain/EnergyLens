@@ -57,7 +57,8 @@
             android:layout_height="382dp"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/lastSyncCorrect"
-            android:orientation="vertical" >
+            android:orientation="vertical"
+            android:padding="10dp" >
         </LinearLayout>
 
         <Button

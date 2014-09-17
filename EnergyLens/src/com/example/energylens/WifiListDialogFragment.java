@@ -33,8 +33,8 @@ public class WifiListDialogFragment extends DialogFragment {
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
-		if(GCMActivity.SSIDs!=null)
-			wifiList=GCMActivity.SSIDs.toArray(wifiList);
+		if(GCMActivity.apList!=null)
+			wifiList=GCMActivity.apList.toArray(wifiList);
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle(R.string.dialog_locations)
 		.setItems(wifiList, new DialogInterface.OnClickListener() {

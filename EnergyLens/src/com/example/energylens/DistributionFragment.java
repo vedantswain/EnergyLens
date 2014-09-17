@@ -76,10 +76,11 @@ public class DistributionFragment extends Fragment {
 					extras.putString("appliance", appliance);
 					extras.putInt("color", color);
 					intent.putExtras(extras);
-					if(!appliance.equals("Unknown") && Common.CURRENT_VISIBLE==1){
+					if(!appliance.equals("Unknown") &&(Common.CURRENT_VISIBLE==1 ||Common.CURRENT_VISIBLE==0)){
 						Log.v("ELSERVICES", "Clicked from tab: "+Common.CURRENT_VISIBLE);
-							startActivity(intent);
+						startActivity(intent);
 					}
+					
 				}
 			});			
 

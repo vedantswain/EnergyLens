@@ -10,12 +10,12 @@ import android.app.AlarmManager;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.graphics.Color;
-import android.graphics.PorterDuff.Mode;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -26,6 +26,7 @@ import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -46,14 +47,14 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 
 	GoogleCloudMessaging gcm;
 	AtomicInteger msgId = new AtomicInteger();
-	Context context;
+	static Context context;
 	String SENDER_ID = "166229175411";
 	Boolean doubleBackToExitPressedOnce=false;
 	String groundReportDates;
 
-	private AlarmManager axlAlarmMgr,wifiAlarmMgr,audioAlarmMgr,lightAlarmMgr,magAlarmMgr,uploaderAlarmMgr;
-	private PendingIntent axlServicePendingIntent,wifiServicePendingIntent,audioServicePendingIntent,lightServicePendingIntent,magServicePendingIntent,uploaderServicePendingIntent;
-	private Intent axlServiceIntent,wifiServiceIntent,audioServiceIntent,lightServiceIntent,magServiceIntent,uploaderServiceIntent;
+	static public AlarmManager axlAlarmMgr,wifiAlarmMgr,audioAlarmMgr,lightAlarmMgr,magAlarmMgr,uploaderAlarmMgr;
+	static public PendingIntent axlServicePendingIntent,wifiServicePendingIntent,audioServicePendingIntent,lightServicePendingIntent,magServicePendingIntent,uploaderServicePendingIntent;
+	static public Intent axlServiceIntent,wifiServiceIntent,audioServiceIntent,lightServiceIntent,magServiceIntent,uploaderServiceIntent;
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -69,7 +70,9 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 	 */
 	static ViewPager mViewPager;
 
-	int prevTabNo=-1;
+	int prevTabNo=0;
+	String screenName="EnergyWastage";
+
 	long timeOfVisit,timeOfStay;
 
 	@Override
@@ -85,32 +88,17 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 
+		context=this;
 		gcm = GoogleCloudMessaging.getInstance(this);
 
 		getUpdatedPreferences();
-		addShortcut();
+//		addShortcut();
 
-		Bundle intent_extras = getIntent().getExtras();
-		Log.v("ELSERVICES","started: "+getIntent().toString()+"notification: "+getIntent().getExtras());
-		if (intent_extras != null)
-		{
-			Log.v("ELSERVICES","notification"+ intent_extras.get("started_from"));
-			if(intent_extras.get("started_from").equals("notification")){
-				Log.v("ELSERVICES", "notification started intent");
-				SharedPreferences sp=getSharedPreferences(Common.EL_PREFS,0);
-				Editor editor=sp.edit();
-				editor.putBoolean("LAST_NOTIF_CLICKED",true);
-				editor.commit();
-				long timeRcvd=sp.getLong("LAST_NOTIF_ARRIVAL", System.currentTimeMillis());
-				LogWriter.notifLogWrite(Long.toString(timeRcvd)+","+sp.getLong("LAST_NOTIF_ID",0)+","+System.currentTimeMillis());
-			}
-
+		if(Common.TRAINING_COUNT==0){
+			DialogFragment newFragment = new TrainMoreDialogFragment();
+			newFragment.show(getSupportFragmentManager(), "Training");
 		}
 
-//		if(Common.TRAINING_COUNT==0){
-//			DialogFragment newFragment = new TrainMoreDialogFragment();
-//			newFragment.show(getSupportFragmentManager(), "Training");
-//		}
 		if(Common.TRAINING_STATUS==1){
 			Intent intent = new Intent(this,TrainActivity.class);
 			startActivity(intent);
@@ -118,7 +106,8 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 		else if(Common.TRAINING_COUNT>0){
 			mViewPager.setCurrentItem(0);
 			Log.v("ELSERVICES", "Switched");
-			start();
+			Common.changeCurrentVisible(0);
+			toggleServiceMessage("startServices from Main");
 		}
 
 		if(savedInstanceState!=null){
@@ -127,12 +116,14 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 			Log.v("ELSERVICES", savedInstanceState.getString("Message"));
 		}
 
+		Common.changeLastSent(0,System.currentTimeMillis()-(Common.SEND_REQUEST_INTERVAL+1)*60*1000);
+		Common.changeLastSent(1,System.currentTimeMillis()-(Common.SEND_REQUEST_INTERVAL+1)*60*1000);
+
 		mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
 			@Override
 			public void onPageSelected(int tabNo) {
 				// TODO Auto-generated method stub
-				String screenName="";
 				switch(prevTabNo){
 				case 0:screenName="EnergyWastage";
 				break;
@@ -142,17 +133,29 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 				break;
 				}
 				if(prevTabNo!=-1){
+					Log.v("ELSERVICES", "Writing into screen log");
 					timeOfStay=System.currentTimeMillis()-timeOfVisit;
 					LogWriter.screenLogWrite(timeOfVisit+","+screenName+","+timeOfStay);
 				}
 				prevTabNo=tabNo;
 				Common.changeCurrentVisible(tabNo);
-				Log.v("ELSERVICES", "Current visible: "+tabNo);
+				Log.v("ELSERVICES", "Current visible: "+tabNo+" time since: "
+						+Long.toString((System.currentTimeMillis()-Common.WASTAGE_LAST_SENT)/1000)
+						+" interval: "+Common.SEND_REQUEST_INTERVAL);
 				switch(tabNo){
-				case 0:EnergyWastageFragment.sendMessage();
-				break;
-				case 1:PersonalEnergyFragment.sendMessage();
-				break;
+				case 0:
+					if(System.currentTimeMillis()-Common.WASTAGE_LAST_SENT>Common.SEND_REQUEST_INTERVAL*60*1000){
+						Common.changeLastSent(0,System.currentTimeMillis());
+						EnergyWastageFragment.sendMessage();
+					}
+					break;
+				case 1:
+					if(System.currentTimeMillis()-Common.PERSONAL_LAST_SENT>Common.SEND_REQUEST_INTERVAL*60*1000){
+						Common.changeLastSent(1,System.currentTimeMillis());
+						PersonalEnergyFragment.sendMessage();
+					}
+					break;
+
 				}
 				timeOfVisit=System.currentTimeMillis();
 			}
@@ -171,6 +174,16 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 		});
 
 	} 
+	
+	private void toggleServiceMessage(String message){
+		Intent intent = new Intent();
+		intent.setAction("EnergyLensPlus.toggleService");
+		  // add data
+		  intent.putExtra("message", message);
+
+		  Log.v("ELSERVICES", "Broadcast from Train to Main receiver");
+		  sendBroadcast(intent);
+	}
 
 	public void addShortcut(){
 
@@ -196,6 +209,9 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 	protected void onResume(){
 		super.onResume();
 		getUpdatedPreferences();
+		
+//		LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+//			      new IntentFilter("toggleService"));
 	}
 
 	@Override
@@ -284,67 +300,9 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 		btn=(Button) findViewById(R.id.notYet);
 		btn.setVisibility(View.GONE);
 		updatePreferences();
-		start();
+		toggleServiceMessage("startServices from Main");
 		Log.i("ELSERVICES", "Training count: "+Common.TRAINING_COUNT);
 	}
-
-	public void start(){
-		Log.v("ELSERVICES","Service started");
-
-		axlServiceIntent = new Intent(CollectionTabActivity.this, AxlService.class);
-		axlServicePendingIntent = PendingIntent.getService(CollectionTabActivity.this,
-				26194, axlServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-		axlAlarmMgr= (AlarmManager)CollectionTabActivity.this.getSystemService(CollectionTabActivity.this.ALARM_SERVICE);
-		setAlarm(axlServiceIntent,axlServicePendingIntent,26194,axlAlarmMgr);
-
-		wifiServiceIntent = new Intent(CollectionTabActivity.this, WiFiService.class);
-		wifiServicePendingIntent = PendingIntent.getService(CollectionTabActivity.this,
-				12345, wifiServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-		wifiAlarmMgr= (AlarmManager)CollectionTabActivity.this.getSystemService(CollectionTabActivity.this.ALARM_SERVICE);
-		setAlarm(wifiServiceIntent,wifiServicePendingIntent,12345,wifiAlarmMgr);
-
-
-		audioServiceIntent = new Intent(CollectionTabActivity.this, AudioService.class);
-		audioServicePendingIntent = PendingIntent.getService(CollectionTabActivity.this,
-				2512, audioServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-		audioAlarmMgr= (AlarmManager)CollectionTabActivity.this.getSystemService(CollectionTabActivity.this.ALARM_SERVICE);
-		setAlarm(audioServiceIntent,audioServicePendingIntent,2512,audioAlarmMgr);
-
-		lightServiceIntent = new Intent(CollectionTabActivity.this, LightService.class);
-		lightServicePendingIntent = PendingIntent.getService(CollectionTabActivity.this,
-				11894, lightServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-		lightAlarmMgr= (AlarmManager)CollectionTabActivity.this.getSystemService(CollectionTabActivity.this.ALARM_SERVICE);
-		setAlarm(lightServiceIntent,lightServicePendingIntent,11894,lightAlarmMgr);
-
-		magServiceIntent = new Intent(CollectionTabActivity.this, MagService.class);
-		magServicePendingIntent = PendingIntent.getService(CollectionTabActivity.this,
-				20591, magServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-		magAlarmMgr= (AlarmManager)CollectionTabActivity.this.getSystemService(CollectionTabActivity.this.ALARM_SERVICE);
-		setAlarm(magServiceIntent,magServicePendingIntent,20591,magAlarmMgr);
-
-		uploaderServiceIntent = new Intent(CollectionTabActivity.this, UploaderService.class);
-		uploaderServicePendingIntent = PendingIntent.getService(CollectionTabActivity.this,
-				4816, uploaderServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-		uploaderAlarmMgr= (AlarmManager)CollectionTabActivity.this.getSystemService(CollectionTabActivity.this.ALARM_SERVICE);
-		uploaderAlarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-				System.currentTimeMillis()+Common.UPLOAD_INTERVAL*60*1000, Common.UPLOAD_INTERVAL*30*1000, uploaderServicePendingIntent); 
-		Log.v("ELSERVICES","Uploader alarm Set for service "+4816+" "+Common.INTERVAL);
-	}
-
-	public void setAlarm(Intent ServiceIntent,PendingIntent ServicePendingIntent,int ReqCode, AlarmManager alarmMgr){
-		Log.v("ELSERVICES","Services started "+ReqCode);
-
-		try{
-
-			alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-					System.currentTimeMillis()+100, Common.INTERVAL*1000, ServicePendingIntent); 
-			Log.v("ELSERVICES","Alarm Set for service "+ReqCode+" "+Common.INTERVAL);
-		}
-		catch(Exception e){
-			Log.e("ELSERVICES",e.toString(), e.getCause());
-		}
-	}
-
 
 
 	public void updatePreferences(){
@@ -358,6 +316,11 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 
 	public void openSettings(){
 		Intent intent = new Intent(this,SettingsActivity.class);
+		startActivity(intent);
+	}
+	
+	public void openAbout(){
+		Intent intent = new Intent(this,AboutActivity.class);
 		startActivity(intent);
 	}
 
@@ -382,6 +345,10 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 		int id = item.getItemId();
 		if (id == R.id.appGroup) {
 			openSettings();
+			return true;
+		}
+		else if(id==R.id.appAbout){
+			openAbout();
 			return true;
 		}
 		else if(id == R.id.groundReport){
@@ -469,6 +436,27 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 	public void onSend(View view){
 		sendMessage();
 	}
+	
+	//BroadcastManager for getting calls from running services
+	// handler for received Intents for the "my-event" event 
+//	private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+//	  @Override
+//	  public void onReceive(Context context, Intent intent) {
+//	    // Extract data included in the Intent
+//	    String message = intent.getStringExtra("message");
+//	    Log.v("ELSERVICES", "Main receiver got message: " + message);
+//	    if(message.contains("startServices"))
+//	    	toggleServiceMessage("startServices from Main");
+//	    else if(message.equals("stopServices"))
+//			try {
+//				stop();
+//			} catch (Throwable e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//	  }
+//	};
+	
 
 	/**
 	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -545,7 +533,7 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 		// TODO Auto-generated method stub
 		Common.changeTrainingCount(Common.TRAINING_COUNT+1);
 		updatePreferences();
-		start();
+		toggleServiceMessage("startServices from Main");
 	}
 
 	@Override

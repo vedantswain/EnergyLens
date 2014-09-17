@@ -37,37 +37,6 @@
         android:text="Register Device"
         android:textColor="#ffffff" />
 
-    <EditText
-        android:id="@+id/apptNo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/firstInstall"
-        android:ems="10"
-        android:hint="Which appartment do you live in?"
-        android:visibility="invisible" />
-
-    <Button
-        android:id="@+id/selectWifi"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/apptNo"
-        android:onClick="launchWifiDialog"
-        android:text="Select Wifi"
-        android:textColor="#ffffff"
-        android:visibility="invisible" />
-
-    <CheckBox
-        android:id="@+id/firstInstall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
-        android:text="First Install?" />
-
     <AutoCompleteTextView
         android:id="@+id/serverUrl"
         android:layout_width="wrap_content"
@@ -77,7 +46,7 @@
         android:layout_below="@+id/gcmEmail"
         android:layout_marginTop="18dp"
         android:ems="10"
-        android:hint="Which server do we connect to?" />
+        android:hint="Which server do we connect to? (optional)" />
 
     <EditText
         android:id="@+id/gcmEmail"
@@ -88,10 +57,32 @@
         android:layout_below="@+id/gcmName"
         android:layout_marginTop="14dp"
         android:ems="10"
-        android:hint="How do we reach you by mail?"
+        android:hint="How do we reach you by mail (optional)?"
         android:inputType="textEmailAddress" >
 
         
     </EditText>
+
+    <EditText
+        android:id="@+id/apptNo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/serverUrl"
+        android:layout_marginTop="23dp"
+        android:ems="10"
+        android:hint="Which apartment do you live in?" />
+
+    <Button
+        android:id="@+id/selectWifi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/apptNo"
+        android:onClick="launchWifiDialog"
+        android:text="Select Home AP"
+        android:textColor="#ffffff" />
 
 </RelativeLayout>

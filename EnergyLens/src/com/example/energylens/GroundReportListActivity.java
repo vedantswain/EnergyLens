@@ -97,7 +97,7 @@ public class GroundReportListActivity extends Activity {
 
 				Intent intent = new Intent(GroundReportListActivity.this,GroundReportActivity.class);
 				Bundle extrasBundle=new Bundle();
-				extrasBundle.putInt("index", responses.size()-position-1);
+				extrasBundle.putInt("index", responses.size()-position-2);
 				intent.putExtras(extrasBundle);
 				startActivity(intent);
 

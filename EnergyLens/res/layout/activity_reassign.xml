@@ -95,6 +95,7 @@
             android:layout_height="382dp"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/appLocation"
+            android:padding="10dp"
             android:orientation="vertical" >
         </LinearLayout>
 

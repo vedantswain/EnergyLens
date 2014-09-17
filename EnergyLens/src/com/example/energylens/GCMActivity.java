@@ -16,11 +16,13 @@ import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.wifi.ScanResult;
@@ -47,7 +49,9 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-public class GCMActivity extends FragmentActivity implements TryAgainDialogListener,WifiListDialogFragment.WifiListDialogListener{
+public class GCMActivity extends FragmentActivity 
+implements TryAgainDialogListener,WifiListDialogFragment.WifiListDialogListener,
+TryAgainConnectionRefusedDialogFragment.TryAgainDialogListener{
 
 	public static final String EXTRA_MESSAGE = "message";
 	public static final String PROPERTY_REG_ID = "EnergyLens";
@@ -59,6 +63,10 @@ public class GCMActivity extends FragmentActivity implements TryAgainDialogListe
 	public static List<ScanResult> wifiList;
 	public static ArrayList<String> SSIDs=new ArrayList<String>();
 	public static ArrayList<String> BSSIDs=new ArrayList<String>();
+	public static ArrayList<String> apList=new ArrayList<String>();
+
+	private String  backendMessage="";
+	private ProgressDialog progress;
 
 	/**
 	 * Substitute you own sender ID here. This is the project number you got
@@ -105,26 +113,26 @@ public class GCMActivity extends FragmentActivity implements TryAgainDialogListe
 		AutoCompleteTextView textView = (AutoCompleteTextView)findViewById(R.id.serverUrl);
 		textView.setAdapter(adapter);
 
-		final CheckBox checkBox = (CheckBox) findViewById(R.id.firstInstall);
-		checkBox.setOnClickListener(new OnClickListener(){
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				if(checkBox.isChecked()){
-					Log.v("ELSERVICES", "Checked");
-					EditText apptNo=(EditText) findViewById(R.id.apptNo);
-					apptNo.setVisibility(View.VISIBLE);
-					Button selectWifi=(Button) findViewById(R.id.selectWifi);
-					selectWifi.setVisibility(View.VISIBLE);
-				}else{
-					Log.v("ELSERVICES", "unChecked");
-					EditText apptNo=(EditText) findViewById(R.id.apptNo);
-					apptNo.setVisibility(View.INVISIBLE);
-					Button selectWifi=(Button) findViewById(R.id.selectWifi);
-					selectWifi.setVisibility(View.INVISIBLE);
-				}
-			}
-		});
+		//		final CheckBox checkBox = (CheckBox) findViewById(R.id.firstInstall);
+		//		checkBox.setOnClickListener(new OnClickListener(){
+		//			@Override
+		//			public void onClick(View v) {
+		//				// TODO Auto-generated method stub
+		//				if(checkBox.isChecked()){
+		//					Log.v("ELSERVICES", "Checked");
+		//					EditText apptNo=(EditText) findViewById(R.id.apptNo);
+		//					apptNo.setVisibility(View.VISIBLE);
+		//					Button selectWifi=(Button) findViewById(R.id.selectWifi);
+		//					selectWifi.setVisibility(View.VISIBLE);
+		//				}else{
+		//					Log.v("ELSERVICES", "unChecked");
+		//					EditText apptNo=(EditText) findViewById(R.id.apptNo);
+		//					apptNo.setVisibility(View.INVISIBLE);
+		//					Button selectWifi=(Button) findViewById(R.id.selectWifi);
+		//					selectWifi.setVisibility(View.INVISIBLE);
+		//				}
+		//			}
+		//		});
 
 		getUpdatedPreferences();
 
@@ -274,15 +282,22 @@ public class GCMActivity extends FragmentActivity implements TryAgainDialogListe
 					// Require the user to click a button again, or perform
 					// exponential back-off.
 					reg_success=0;
+					progress.dismiss();
 					tryAgain();
 				}
 				return msg;
 			}
 
+
 			@Override
 			protected void onPostExecute(String msg) {
 				Log.i(TAG, msg);
-
+				if(progress.isShowing())
+					progress.dismiss();
+				if(!backendMessage.equals("")){
+					//					Toast.makeText(context, "Couldn't establish connection with server", 1000).show();
+					refusedTryAgain();
+				}
 				if(reg_success==1)
 					toMain();
 
@@ -301,20 +316,20 @@ public class GCMActivity extends FragmentActivity implements TryAgainDialogListe
 		EditText email=(EditText)findViewById(R.id.gcmEmail);
 		EditText server_URL=(EditText)findViewById(R.id.serverUrl);
 		EditText apptNo=(EditText)findViewById(R.id.apptNo);
-		CheckBox checkBox=(CheckBox) findViewById(R.id.firstInstall);
+		//		CheckBox checkBox=(CheckBox) findViewById(R.id.firstInstall);
 
 		if(name.getText().toString().matches("")){
 			Toast.makeText(context, "we need to call you something", 1000).show();
 		}
-		else if(checkBox.isChecked() && apptNo.getText().toString().matches("")){
+		else if(apptNo.getText().toString().matches("")){
 			Toast.makeText(context, "you forgot to give your appartment number", 1000).show();
 		}
 		else{
 			regName=name.getText().toString();
 			regEmail=email.getText().toString();
-			if(checkBox.isChecked()){
-				regAppt=apptNo.getText().toString();
-			}
+			//			if(checkBox.isChecked()){
+			regAppt=apptNo.getText().toString();
+			//			}
 
 			if(server_URL.getText().toString().matches(""))
 				serverUrl=Common.SERVER_URL;
@@ -328,6 +343,8 @@ public class GCMActivity extends FragmentActivity implements TryAgainDialogListe
 
 			Log.i("ELSERVICES", "Name: "+regName+'\n'+"Server: "+serverUrl);
 
+			progress = ProgressDialog.show(this, "Registering",
+					"Registration in progress. Please wait...", true);
 			registerInBackground();
 
 		}
@@ -336,7 +353,12 @@ public class GCMActivity extends FragmentActivity implements TryAgainDialogListe
 
 	public void tryAgain(){
 		DialogFragment newFragment = new TryAgainDialogFragment();
-		newFragment.show(getSupportFragmentManager(), "Appliances");
+		newFragment.show(getSupportFragmentManager(), "TryAgain");
+	}
+
+	public void refusedTryAgain(){
+		DialogFragment newFragment = new TryAgainConnectionRefusedDialogFragment();
+		newFragment.show(getSupportFragmentManager(), "Connection Refused");
 	}
 
 	/**
@@ -350,6 +372,7 @@ public class GCMActivity extends FragmentActivity implements TryAgainDialogListe
 		String result = "";
 		Log.i(TAG,"Server URL: "+ Common.SERVER_URL);
 		try {
+			backendMessage="";
 			TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
 			devid=Long.parseLong(telephonyManager.getDeviceId());
 
@@ -364,14 +387,14 @@ public class GCMActivity extends FragmentActivity implements TryAgainDialogListe
 			jsonObject.put("user_name", regName);
 			jsonObject.put("email_id", regEmail);
 			jsonObject.put("apt_no", regAppt);
-			
+
 			JSONObject jsonHomeAp=new JSONObject();
 			jsonHomeAp.put("ssid", wifiSSID);
 			SSIDs.remove(wifiSSID);
 			jsonHomeAp.put("macid", wifiBSSID);
 			BSSIDs.remove(wifiBSSID);
 			jsonObject.put("home_ap", jsonHomeAp);
-			
+
 			int index=0;
 			JSONArray jsonOtherAps=new JSONArray();
 			for(String ssid:SSIDs){
@@ -447,6 +470,7 @@ public class GCMActivity extends FragmentActivity implements TryAgainDialogListe
 
 		} catch (Exception e) {
 			Log.d("InputStream", e.getLocalizedMessage());
+			backendMessage=e.getLocalizedMessage();
 		}
 
 		Log.i(TAG, result);
@@ -468,12 +492,20 @@ public class GCMActivity extends FragmentActivity implements TryAgainDialogListe
 		editor.putString(PROPERTY_REG_ID, regId);
 		editor.putInt(PROPERTY_APP_VERSION, appVersion);
 		editor.commit();
+
+		SharedPreferences sp=getSharedPreferences(Common.EL_PREFS,0);
+		Editor mEditor=sp.edit();
+		mEditor.putString("USERNAME", regName);
+		mEditor.putString("APARTMENT_NO",regAppt);
+		mEditor.commit();
 	}
 
 
 	@Override
 	public void onTryAgain() {
 		// TODO Auto-generated method stub
+		progress = ProgressDialog.show(this, "Registering",
+				"Registration in progress. Please wait...", true);
 		registerInBackground();	
 	}
 
@@ -511,6 +543,7 @@ public class GCMActivity extends FragmentActivity implements TryAgainDialogListe
 					if(!SSIDs.contains(result.SSID)){
 						SSIDs.add(result.SSID);
 						BSSIDs.add(result.BSSID);
+						apList.add(result.SSID+" ["+result.BSSID+"]");
 						Log.v("ELSERVICES", "Wifi SSID: "+result.SSID);
 					}
 				}
@@ -534,14 +567,33 @@ public class GCMActivity extends FragmentActivity implements TryAgainDialogListe
 		// TODO Auto-generated method stub
 		Button selectWifi=(Button) findViewById(R.id.selectWifi);
 		if(ssid!="No Wifi available"){
-			wifiSSID=ssid;
+			wifiSSID=SSIDs.get(index);
 			wifiBSSID=BSSIDs.get(index);
 			selectWifi.setText(ssid);
+			SharedPreferences sp=getSharedPreferences(Common.EL_PREFS,0);
+			Editor editor=sp.edit();
+			editor.putString("HOME_SSID", SSIDs.get(index));
+			editor.putString("HOME_BSSID", BSSIDs.get(index));
+			editor.commit();
 		}
 		else{
 			wifiSSID="";
 			wifiBSSID="";
 		}
+	}
+
+	@Override
+	public void onOk() {
+		// TODO Auto-generated method stub
+		progress = ProgressDialog.show(this, "Registering",
+				"Registration in progress. Please wait...", true);
+		registerInBackground();	
+	}
+
+	@Override
+	public void onCancelNow() {
+		// TODO Auto-generated method stub
+		finish();
 	}
 
 }

@@ -149,30 +149,30 @@ public class LogWriter {
 	
 	public static void screenLogWrite(String logstring){
 		String filename="screen_log";
-		screenLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"SensorData"+File.separator+"UsageStats"+File.separator+filename+".csv");
+		screenLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"UsageStats"+File.separator+filename+".csv");
 		researchLogWrite(screenLog,logstring,SCREENHEADER);
 	}
 	
-	public static void notifLogWrite(String logstring){
-		String filename="notif_log";
-		notifLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"SensorData"+File.separator+"UsageStats"+File.separator+filename+".csv");
-		researchLogWrite(notifLog,logstring,NOTIFHEADER);
-	}
+//	public static void notifLogWrite(String logstring){
+//		String filename="notif_log";
+//		notifLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"SensorData"+File.separator+"UsageStats"+File.separator+filename+".csv");
+//		researchLogWrite(notifLog,logstring,NOTIFHEADER);
+//	}
 	
 	public static void researchLogWrite(File logFile,String logstring,String header){
 		synchronized(logFile){
 					
-//					Log.v("ELSERVICES", "Writing Log to: "+logFile.toString()+" "+Common.LABEL);
+					Log.v("ELSERVICES", "Writing research Log to: "+logFile.toString()+" "+Common.LABEL);
 					PathCheck(logFile,header);
 					
 					BufferedWriter buf;
 					try {
 						buf = new BufferedWriter(new FileWriter(logFile, true));
-//						Log.v("ELSERVICES", "Before label");
+						Log.v("ELSERVICES", "Before label");
 						buf.append(logstring);
 						buf.newLine();
 						buf.close();
-						Log.v("ELSERVICES", logstring+" written  into"+logFile.toString() );
+						Log.v("ELSERVICES", logstring+"research written  into"+logFile.toString() );
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

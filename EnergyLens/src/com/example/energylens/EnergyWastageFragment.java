@@ -55,6 +55,8 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 
 public class EnergyWastageFragment extends Fragment{
+	long timeSinceSend;
+
 	GraphicalView chartView;
 	XYMultipleSeriesRenderer appRenderer=new XYMultipleSeriesRenderer(),mRenderer = new XYMultipleSeriesRenderer();
 	XYMultipleSeriesDataset appDataset=new XYMultipleSeriesDataset(),mDataset = new XYMultipleSeriesDataset();
@@ -80,10 +82,11 @@ public class EnergyWastageFragment extends Fragment{
 	long timeVisit,timeOfStay;
 
 	View inflateView;
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {	     
+			Bundle savedInstanceState) {	   
+		timeSinceSend=System.currentTimeMillis();
 		View rootView = inflater.inflate(R.layout.fragment_energywastage, container, false);
 		gcm = GoogleCloudMessaging.getInstance(getActivity());
 		inflateView=rootView;
@@ -130,19 +133,28 @@ public class EnergyWastageFragment extends Fragment{
 		bar_renderer.setColor(Color.rgb(102, 0, 0));
 		bar_renderer.setDisplayBoundingPoints(true);
 		bar_renderer.setDisplayChartValues(true);
-		
+
 		DisplayMetrics metrics = getActivity().getResources().getDisplayMetrics();
 		float val = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, metrics);
 
 		DateFormat df=new DateFormat();
-		String from_time=df.format("dd MMM yy HH:mm", Common.TIME_PERIOD_START).toString();
-		String to_time=df.format("dd MMM yy HH:mm", Common.TIME_PERIOD_END).toString();
-		
+//		String from_time=df.format("dd MMM yy HH:mm", Common.TIME_PERIOD_START).toString();
+//		String to_time=df.format("dd MMM yy HH:mm", Common.TIME_PERIOD_END).toString();
+
 		mRenderer.addSeriesRenderer(bar_renderer);
 		//  	  mRenderer.addSeriesRenderer(line_renderer);
 
 		mRenderer.setMarginsColor(Color.argb(0xff, 0xf0, 0xf0, 0xf0)); 
 
+		for(int i=0;i<y.length;i++){
+			long currTime=lastSyncInMillis;
+			long graphTime=currTime-((y.length-i)*60*60*1000);
+			String text=DateFormat.format("dd/MM HH:mm",graphTime).toString();
+			mRenderer.addXTextLabel(i+1, text);
+		}
+		
+		mRenderer.setXLabelsAlign(Align.RIGHT);
+		mRenderer.setXLabelsAngle(-45);
 		mRenderer.setPanEnabled(true);
 		mRenderer.setPanLimits(new double[] {0,y.length+1,0,maxY*1.5});
 		mRenderer.setZoomButtonsVisible(true);
@@ -150,14 +162,14 @@ public class EnergyWastageFragment extends Fragment{
 		mRenderer.setXAxisMin(0);
 		mRenderer.setYAxisMax(maxY*1.5);
 		mRenderer.setXAxisMax(y.length+1);
-		mRenderer.setChartTitle("Your Energy Wastage from "+from_time+" to "+to_time);
+		mRenderer.setChartTitle("Your energy wastage for the last 12 hours");
 		mRenderer.setChartTitleTextSize(val);
 		mRenderer.setLabelsColor(Color.DKGRAY);
 		mRenderer.setYLabelsColor(0, Color.DKGRAY);
 		mRenderer.setXLabelsColor(Color.DKGRAY);
 		mRenderer.setLabelsTextSize(val);
-		mRenderer.setXTitle("Time");
-		mRenderer.setYTitle("Energy");
+		mRenderer.setXTitle("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n Time");
+		mRenderer.setYTitle("Energy (Wh)");
 		mRenderer.setAxisTitleTextSize(val);
 		mRenderer.setLegendTextSize(val);
 		mRenderer.setYLabelsAlign(Align.RIGHT);
@@ -165,7 +177,7 @@ public class EnergyWastageFragment extends Fragment{
 		mRenderer.setClickEnabled(true);
 		mRenderer.setSelectableBuffer(50);
 		mRenderer.setShowGrid(true);
-		int[] margins={20,80,10,0};
+		int[] margins={20,80,120,0};
 		mRenderer.setMargins(margins);
 
 		mDataset.addSeries(mSeries);
@@ -179,7 +191,7 @@ public class EnergyWastageFragment extends Fragment{
 				Log.v("ELSERVICES", "Graph clicked");
 				// handle the click event on the chart
 				SeriesSelection seriesSelection = chartView.getCurrentSeriesAndPoint();
-//				Log.v("ELSERVICES", "Selected: "+seriesSelection.getSeriesIndex());
+				//				Log.v("ELSERVICES", "Selected: "+seriesSelection.getSeriesIndex());
 			}
 		});
 
@@ -240,7 +252,10 @@ public class EnergyWastageFragment extends Fragment{
 		Log.v("ELSERVICES", "From: "+start.toString()+" To: "+end.toString());
 		if(Common.CURRENT_VISIBLE==0){
 			timeVisit=System.currentTimeMillis();
-			sendMessage();
+			if(System.currentTimeMillis()-Common.WASTAGE_LAST_SENT>Common.SEND_REQUEST_INTERVAL*60*1000){
+				Common.changeLastSent(0,System.currentTimeMillis());
+				sendMessage();
+			}
 		}
 	}
 
@@ -481,7 +496,7 @@ public class EnergyWastageFragment extends Fragment{
 
 	private void updateViews(long syncTime){
 		TextView totalVal=(TextView)inflateView.findViewById(R.id.totalValWaste);
-		totalVal.setText(Long.toString(totalWastage)+" Wh");
+		totalVal.setText(Long.toString(totalWastage)+" kWh");
 
 		DateFormat df=new DateFormat();
 		lastSyncTime=df.format("dd MMM yy HH:mm", syncTime).toString();
@@ -490,7 +505,7 @@ public class EnergyWastageFragment extends Fragment{
 
 		lastSyncInMillis=System.currentTimeMillis();
 	}
-	
+
 	private void setViews(){
 		TextView tv=(TextView)inflateView.findViewById(R.id.segText3);
 		tv.setVisibility(View.VISIBLE);
@@ -498,12 +513,12 @@ public class EnergyWastageFragment extends Fragment{
 		tv.setVisibility(View.VISIBLE);
 		tv=(TextView)inflateView.findViewById(R.id.distName);
 		tv.setVisibility(View.VISIBLE);
-		
+
 		tv=(TextView)inflateView.findViewById(R.id.sorryText);
 		tv.setVisibility(View.GONE);
-		
-		ImageView history=(ImageView)inflateView.findViewById(R.id.timeSelectBtn);
-		history.setVisibility(View.VISIBLE);
+
+//		ImageView history=(ImageView)inflateView.findViewById(R.id.timeSelectBtn);
+//		history.setVisibility(View.VISIBLE);
 	}
 
 	private BroadcastReceiver receiver = new BroadcastReceiver() {

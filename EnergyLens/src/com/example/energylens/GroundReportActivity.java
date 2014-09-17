@@ -1,6 +1,8 @@
 package com.example.energylens;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
@@ -9,6 +11,13 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,6 +26,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -25,6 +35,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,12 +53,15 @@ public class GroundReportActivity extends Activity {
 	ArrayList<Long> usage=new ArrayList<Long>();
 	ArrayList<Long> ids=new ArrayList<Long>();
 	ArrayList<long[]> period=new ArrayList<long[]>();
+	static ArrayList<Long> timeOfStay=new ArrayList<Long>();
 	ArrayList<String> apps=new ArrayList<String>();
 	ArrayList<String> locs=new ArrayList<String>();
 	private long lastSyncInMillis;
 
 	static ArrayList<Long> correctionIds=new ArrayList<Long>();
+	static ArrayList<Boolean> correctionTF=new ArrayList<Boolean>();
 	static ArrayList<String[]> correctionPairData=new ArrayList<String[]>();
+	static ArrayList<String> correctOccupant=new ArrayList<String>();
 
 	GoogleCloudMessaging gcm;
 	AtomicInteger msgId = new AtomicInteger();
@@ -56,25 +70,30 @@ public class GroundReportActivity extends Activity {
 
 	TextView start,end;
 	JSONArray activities;
+	JSONObject occupants;
 	JSONArray appliances;
+
+	static ArrayList<String> dev_ids=new ArrayList<String>();
+	static ArrayList<String> occupantList=new ArrayList<String>();
 
 	ArrayList<String> responses=new ArrayList<String>();
 	ArrayList<String> dates=new ArrayList<String>();
 	String current_response;
 	int report_index;
 	long current_date;
-	static int corrected_count=0;
 
+	private ProgressDialog progress;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_ground_report);
 
 		SharedPreferences sp=getSharedPreferences("GROUNDREPORT_PREFS",0);
-		
+
 		Intent intent=getIntent();
 		Bundle extras=intent.getExtras();
-		
+
 		report_index=extras.getInt("index");
 		Log.v("ELSERVICES", "Report no: "+report_index);
 
@@ -85,7 +104,7 @@ public class GroundReportActivity extends Activity {
 			String date=sp.getString("RESPONSE_DATES", "");
 			//			parsePref(sp.getString("JSON_RESPONSE", ""));
 			if(!string.equals("") && !date.equals("")){
-//				Toast.makeText(GroundReportActivity.this, "Loaded last uncorrected report", 1000).show();
+				//				Toast.makeText(GroundReportActivity.this, "Loaded last uncorrected report", 1000).show();
 				parseResponses(string,date);
 			}
 			else{
@@ -104,14 +123,16 @@ public class GroundReportActivity extends Activity {
 
 		String[] respArray=string.split("\\|");
 		for(String str:respArray){
-			responses.add(str);
+			if(!str.equals(""))
+				responses.add(str);
 			Log.v("ELSERVICES","Responses: " +str);
 		}
 
 		String[] dateArray=date.split("\\|");
 		for(String str:dateArray){
 			Log.v("ELSERVICES", "GroundReport Date: "+str);
-			dates.add(str);
+			if(!str.equals(""))
+				dates.add(str);
 		}
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yy HH:mm");
@@ -132,57 +153,95 @@ public class GroundReportActivity extends Activity {
 		}
 	}
 
-	static void changeCorrectionIds(long id,String[] pairData,int flag){
+	static void changeCorrectionIds(long id,String[] pairData,int occupant,long time,int flag){
 		if(flag>0){
-			correctionIds.add(id);
-			changeCorrectionPairData(id,pairData,1);
-			if(flag>1)
-				corrected_count--;
-			Log.v("ELSERVICES","Count "+corrected_count);
+			if(flag>1){
+				int index=correctionIds.indexOf(id);
+				correctionTF.remove(index);
+				correctionTF.add(index, true);
+			}
+			else{
+				correctionIds.add(id);
+				correctionTF.add(true);
+			}
+
 		}
 		else if(flag==0){
 			int index=3676;
 			if(correctionIds.contains(id)){
 				index=correctionIds.indexOf(id);
-				correctionIds.remove(index);
+				correctionTF.remove(index);
+				correctionTF.add(index, false);
 			}
-			corrected_count++;
-			Log.v("ELSERVICES","Count "+corrected_count);
-			if(correctionPairData.size()>index){
-				correctionPairData.remove(index);
-				Log.v("ELSERVICES", "removed");
+			else{
+				correctionIds.add(id);
+				correctionTF.add(false);
 			}
 		}
+		Log.v("ELSERVICES", "id added: "+correctionIds.indexOf(id));
+		changeTimeOfStay(id,time);
+		changeCorrectionPairData(id,pairData);
+		changeOccupant(id,occupant);
 	}
 
-	static void changeCorrectionPairData(long id,String[] pairData,int flag){
-		int index=correctionIds.indexOf(id);
-		if(flag==1){
-			if(correctionPairData.size()>index)
-				correctionPairData.remove(index);
-			correctionPairData.add(index,pairData);
-			
-
-		}else if(flag==0){
-			if(correctionPairData.size()>index)
-				correctionPairData.remove(index);
+	static Boolean checkTimeOfStay(){
+		for(long check:timeOfStay){
+			if(check==0){
+				Log.v("ELSERVICES", "time empty: "+timeOfStay.indexOf(check));
+				return false;
 			}
 		}
-	
+		return true;
+	}
+
+	static void changeTimeOfStay(long id,long time){
+		int index=correctionIds.indexOf(id);
+		if(timeOfStay.size()>index)
+			timeOfStay.remove(index);
+
+		if(index<timeOfStay.size())	
+			timeOfStay.add(index,time);
+		else
+			timeOfStay.add(time);
+	}
+
+	static void changeOccupant(long id, int pos){
+		int index=correctionIds.indexOf(id);
+		if(correctOccupant.size()>index)
+			correctOccupant.remove(index);
+
+		if(index<correctOccupant.size())	
+			correctOccupant.add(index,dev_ids.get(pos));
+		else
+			correctOccupant.add(dev_ids.get(pos));
+	}
+
+
+	static void changeCorrectionPairData(long id,String[] pairData){
+		int index=correctionIds.indexOf(id);
+		if(correctionPairData.size()>index)
+			correctionPairData.remove(index);
+
+		if(index<correctionPairData.size())
+			correctionPairData.add(index,pairData);
+		else
+			correctionPairData.add(pairData);
+	}
+
 	protected void onStart(){
 		super.onStart();
-		this.registerReceiver(receiver, new IntentFilter(GcmIntentService.RECEIVER));
+		//		this.registerReceiver(receiver, new IntentFilter(GcmIntentService.RECEIVER));
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		try{
-			this.unregisterReceiver(receiver);
-		}
-		catch(Exception e){
-			Log.e("ELSERVICES", e.getMessage());
-		}
+		//		try{
+		//			this.unregisterReceiver(receiver);
+		//		}
+		//		catch(Exception e){
+		//			Log.e("ELSERVICES", e.getMessage());
+		//		}
 	}
 
 
@@ -229,11 +288,14 @@ public class GroundReportActivity extends Activity {
 
 	public void onDoneBtn(View view){
 		Log.v("ELSERVICES", "Done");
-		Log.v("ELSERVICES", ids.size()+" == "+corrected_count+"+"+correctionIds.size()+" ?");
-		if(correctionIds.size()+corrected_count==ids.size() && ids.size()>0){
-			//					Log.v("ELSERVICES", correctionIds.get(0)+" "+correctionIds.get(1)+" "+correctionIds.get(2)+" ");
-			//			Log.v("ELSERVICES", "Correction pairs"+correctionPairData.get(0)[0]+" "+correctionPairData.get(0)[1]);
-			toCorrect();
+		Log.v("ELSERVICES", ids.size()+" == "+correctionIds.size()+" ?");
+		if((correctionIds.size()==ids.size() && ids.size()>0)){
+			if(checkTimeOfStay()){
+				Log.v("ELSERVICES", "going to correct");
+				toCorrect();
+			}
+			else
+				Toast.makeText(GroundReportActivity.this, "You've forgotten to fill time of stay", 1000).show();
 		}
 		else{
 			Toast.makeText(GroundReportActivity.this, "You've not corrected all the activities", 1000).show();
@@ -245,53 +307,79 @@ public class GroundReportActivity extends Activity {
 	public void toCorrect(){
 		Log.v("ELSERVICES", "correct");
 
-		Bundle data = new Bundle();
-		data.putString("msg_type", "request");
-		data.putString("api","inference/reassign/");
+		JSONObject data = new JSONObject();
+		try {
+			JSONObject options=new JSONObject();
+			JSONArray activities=new JSONArray();
 
-		JSONObject options=new JSONObject();
-		JSONArray activities=new JSONArray();
+			Iterator<Long> it = ids.iterator();
+			while(it.hasNext()){
+				JSONObject activity=new JSONObject();
+				Long id=it.next();
+				try {
+					if(correctionIds.contains(id)){
+						int index=correctionIds.indexOf(id);
+						activity.put("activity_id",id);
+						activity.put("time_of_stay", timeOfStay.get(index));
+						if(correctionPairData.size()>index){
+							activity.put("to_appliance", correctionPairData.get(index)[0]);
+							activity.put("to_location", correctionPairData.get(index)[1]);
+						}
+						if(correctOccupant.size()>index)
+							activity.put("to_occupant", correctOccupant.get(index));
+						activity.put("incorrect", correctionTF.get(index));
+					}
+					activities.put(activity);
+					//					Log.v("ELSERVICES", activities.toString());				
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 
-		Iterator<Long> it = ids.iterator();
-		while(it.hasNext()){
-			JSONObject activity=new JSONObject();
-			Long id=it.next();
 			try {
-				activity.put("activity_id",id);
-				if(correctionIds.contains(id)){
-					int index=correctionIds.indexOf(id);
-					activity.put("id",id);
-					if(correctionPairData.size()<index){
-						activity.put("to_appliance", correctionPairData.get(index)[0]);
-						activity.put("to_location", correctionPairData.get(index)[1]);
-					}
-					else{
-						activity.put("to_appliance","");
-						activity.put("to_location","");	
-					}
-					activity.put("incorrect", "true");
-				}
-				else{
-					activity.put("to_appliance", "");
-					activity.put("to_location", "");
-					activity.put("incorrect", "false");
-				}
-				activities.put(activity);
+				options.put("activities", activities);
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
 
-		try {
-			options.put("activities", activities);
-		} catch (JSONException e) {
+			TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+			Long devid=Long.parseLong(telephonyManager.getDeviceId());
+
+			data.put("dev_id", devid);
+			data.put("options", options);
+
+			progress = ProgressDialog.show(this, "Sending",
+					"Sending corrections. Please wait...", true);
+			setupHttp(data);
+
+		} catch (JSONException e1) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			e1.printStackTrace();
 		}
-		data.putString("options", options.toString());
 
-		sendMessage(data);
+	}
+
+	private void parseOccupants(){
+		TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+		String devid=telephonyManager.getDeviceId();
+
+		occupantList.clear();
+		Iterator it=occupants.keys();
+		while(it.hasNext()){
+			String key=it.next().toString();
+			if(!devid.equals(key)){
+				dev_ids.add(key);
+				try {
+					occupantList.add(occupants.getString(key));
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		dev_ids.add(0, "");
 	}
 
 	public void parsePref(String resp){
@@ -300,6 +388,10 @@ public class GroundReportActivity extends Activity {
 			JSONObject options=new JSONObject(response.getString("options"));
 
 			if(options!=null){
+				occupants=options.getJSONObject("occupants");
+				if(occupants!=null){
+					parseOccupants();
+				}
 				activities=options.getJSONArray("activities");
 				Log.v("ELSERVICES","GroundReport Activitiy count: " + activities.length());
 				if(activities!=null){
@@ -313,29 +405,9 @@ public class GroundReportActivity extends Activity {
 		}
 	}
 
-	//	private void storePreferences(String response){
-	//		SharedPreferences bundleData=getSharedPreferences("GROUNDREPORT_PREFS",0);
-	//
-	//		responses.add("|"+response);
-	//		StringBuilder strings=new StringBuilder("");
-	//		for(String str:responses)
-	//			strings.append(str);
-	//
-	//		Editor editor=bundleData.edit();
-	//		editor.putString("JSON_RESPONSES", strings.toString());
-	//
-	//		strings=new StringBuilder("");
-	//		dates.add("|"+Long.toString(System.currentTimeMillis()));
-	//		for(String str:dates)
-	//			strings.append(str);
-	//
-	//		editor.putString("RESPONSE_DATES", strings.toString());
-	//		editor.commit();
-	//
-	//	}
 
 	private void storeRemaining(){
-		corrected_count=0;
+
 		correctionIds=new ArrayList<Long>();
 		correctionPairData=new ArrayList<String[]>();
 
@@ -355,80 +427,42 @@ public class GroundReportActivity extends Activity {
 		editor.putString("RESPONSE_DATES", strings.toString());
 		editor.commit();
 
-//		if(responses.size()>0 && dates.size()>0){
-//			parseResponses(responses.get(responses.size()-1),dates.get(dates.size()-1));
-//		}
-//		else{
-//			Toast.makeText(GroundReportActivity.this, "No new reports", 1000).show();
-			finish();
-//		}
+		//		if(responses.size()>0 && dates.size()>0){
+		//			parseResponses(responses.get(responses.size()-1),dates.get(dates.size()-1));
+		//		}
+		//		else{
+		//			Toast.makeText(GroundReportActivity.this, "No new reports", 1000).show();
+		finish();
+		//		}
 	}
 
-	private void parseData(Bundle data){
+	private void parseData(String resp){
 		Log.v("ELSERVICES", "parsedata");
 
-		//		if(data.getString("api").equals("energy/report/notification/")){
-		//			try {
-		//				Set<String> keys=data.keySet();
-		//				JSONObject response=new JSONObject();
-		//				if(response!=null)
-		//					Log.v("ELSERVICES", "GroundReport not null");
-		//
-		//				for(String key:keys){
-		//					response.put(key, data.get(key));
-		//				}
-		//
-		//				JSONObject options=new JSONObject(response.getString("options"));
-		//
-		//				storePreferences(response.toString());
-		//
-		//				if(options!=null){
-		//					activities=options.getJSONArray("activities");
-		//
-		//					if(activities!=null){
-		//						parseActivities();
-		//					}
-		//				}
-		//			} catch (JSONException e) {
-		//				// TODO Auto-generated catch block
-		//				e.printStackTrace();
-		//			}
-		//		}
-		//		else 
-		if(data.getString("api").equals("inference/reassign/")){
-			try {
-				Set<String> keys=data.keySet();
-				JSONObject response=new JSONObject();
-				if(response!=null)
-					Log.v("ELSERVICES", "Reassign not null");
+		try {
+			JSONObject response=new JSONObject(resp);
+			if(response!=null)
+				Log.v("ELSERVICES", "Reassign not null");
 
-				for(String key:keys){
-					response.put(key, data.get(key));
+
+			Log.v("ELSERVICES","inference response: "+response.getString("status"));
+			if(response.getString("status").equals("true")){
+				if(responses.size()>0 && dates.size()>0){
+					responses.remove(report_index);
+					dates.remove(report_index);
+					storeRemaining();
 				}
-
-				JSONObject options=new JSONObject(response.getString("options"));
-
-				if(options!=null){
-
-					Log.v("ELSERVICES","inference response: "+options.getString("status"));
-					if(options.getString("status").equals("true")){
-						if(responses.size()>0 && dates.size()>0){
-							responses.remove(report_index);
-							dates.remove(report_index);
-							storeRemaining();
-						}
-					}
-					else{
-						Toast.makeText(GroundReportActivity.this, "There was an error. Try again", 1000).show();
-					}
-
-				}
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
-		} 
-	}
+			else{
+				Toast.makeText(GroundReportActivity.this, "There was an error. Try again", 1000).show();
+			}
+
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	} 
+
 
 
 	private void parseActivities(){
@@ -466,55 +500,81 @@ public class GroundReportActivity extends Activity {
 	}
 
 
-	public void setupMessage(){
-		Bundle data = new Bundle();
-		data.putString("msg_type", "request");
-		data.putString("api","energy/report/notification/");
-
-		JSONObject options=new JSONObject();
-
-		data.putString("options", options.toString());
-
-		sendMessage(data);
-	}
-
-	public void sendMessage(final Bundle data){
+	public void setupHttp(final JSONObject data){
 		new AsyncTask<Void,String,String>() {
 			@Override
 			protected String doInBackground(Void... params) {
 				String msg = "";
-				try {
-					SecureRandom random = new SecureRandom();
-					String randomId=new BigInteger(130, random).toString(32);
-
-					gcm.send(SENDER_ID + "@gcm.googleapis.com", randomId, data);
-					msg = "GroundReport sent message";
-					Log.i("ELSERVICES", "message sent to report: "+data.toString());
-
-				} catch (IOException ex) {
-					msg = "Error :" + ex.getMessage();
-				}
+				msg = sendHttp(data);
+				Log.i("ELSERVICES", "message sent to report: "+data.toString());
 				return msg;
 			}
 
 			@Override
 			protected void onPostExecute(String msg) {
-				Log.i("ELSERVICES", msg);
+				if(progress.isShowing())
+					progress.dismiss();
+				if(msg.contains("ERROR")){
+					Toast.makeText(GroundReportActivity.this, "There was an error. Try again", 1000).show();
+				}
+					Log.i("ELSERVICES", msg);
 			}
 		}.execute(null, null, null);
 	}
 
-	private BroadcastReceiver receiver = new BroadcastReceiver() {
+	public String sendHttp(JSONObject data){
+		InputStream inputStream = null;
 
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			Bundle bundle = intent.getExtras();
-			if (bundle != null) {
-				Bundle data = bundle.getBundle("Data");
-				parseData(data);
-				Log.i("ELSERVICES","GroundReport receiver " +data.getString("api"));
+		DefaultHttpClient httpclient = new DefaultHttpClient();
+		HttpPost httpPost = new HttpPost(Common.SERVER_URL+"inference/reassign/");
+
+		String json=data.toString();
+		StringEntity se;
+		try {
+			se = new StringEntity(json);
+			//	        se.setContentType("application/json;charset=UTF-8");
+			se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE,"application/json"));
+
+			httpPost.setEntity(se);
+
+			HttpResponse httpResponse = httpclient.execute(httpPost);
+
+			inputStream = httpResponse.getEntity().getContent();
+			StatusLine sl=httpResponse.getStatusLine();
+
+
+			Log.v("ELSERVICES", Integer.toString(sl.getStatusCode()));
+
+
+			StringBuffer sb=new StringBuffer();
+
+			String message="";
+
+			try {
+				int ch;
+				while ((ch = inputStream.read()) != -1) {
+					sb.append((char) ch);
+				}
+				Log.v("ELSERVICES", "Report input stream: "+sb.toString());
+				parseData(sb.toString());
+				message=sb.toString();
+			} catch (IOException e) {
+				message=e.toString();
+				throw e;
+			} finally {
+				if (inputStream != null) {
+					inputStream.close();
+				}
 			}
+			return "REPORT: "+message;
+
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return "ERROR: "+e1.toString();
+
 		}
-	};
+	}
+
 
 }

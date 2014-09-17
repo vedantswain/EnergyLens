@@ -25,12 +25,13 @@ import android.widget.Toast;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 public class GcmIntentService extends IntentService {
-	public static final int NOTIFICATION_ID = 1;
+	public static int WASTAGE_NOTIFICATION_ID = 1;
+	public static final int REPORT_NOTIFICATION_ID=1;
 	private NotificationManager mNotificationManager;
 	NotificationCompat.Builder builder;
 	private String TAG="GCMDemo";
 	public static String RECEIVER="com.example.energylens";
-	
+
 	ArrayList<String> groundReportResponses=new ArrayList<String>();
 	ArrayList<String> groundReportDates=new ArrayList<String>();
 
@@ -71,9 +72,9 @@ public class GcmIntentService extends IntentService {
 				// Post notification of received message.
 				if(extras.getString("api","none").contains("energy/report/notification/"))
 					sendNotification(extras);
-				else if(extras.getString("api","none").contains("energy/wastage/report/"))
-//					sendWastageNotification(extras);
-				
+				else if(extras.getString("api","none").contains("energy/wastage/notification/"))
+					sendWastageNotification(extras);
+
 				Log.i(TAG, "Received: " + extras.toString());
 				publishData(extras); 
 			}
@@ -95,6 +96,57 @@ public class GcmIntentService extends IntentService {
 		sendBroadcast(intent);
 	}
 
+	private void sendWastageNotification(Bundle data){
+		Log.i(TAG, "Received report: " + data.toString());
+		mNotificationManager = (NotificationManager)
+				this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+		String msg_type=data.getString("msg_type");
+		String api=data.getString("api");
+
+		if(api.equals("energy/wastage/notification/")){
+
+			Set<String> keys=data.keySet();
+			JSONObject response=new JSONObject();
+
+			String message="";
+			
+			try {
+				for(String key:keys){
+					response.put(key, data.get(key));
+				}
+				JSONObject options=new JSONObject(response.getString("options"));
+				message=options.getString("message");
+				WASTAGE_NOTIFICATION_ID=options.getInt("id");
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+
+			NotificationCompat.Builder mBuilder =
+					new NotificationCompat.Builder(this)
+			.setSmallIcon(R.drawable.ic_launcher)
+			.setContentTitle("Energy Wastage Detected")
+			.setStyle(new NotificationCompat.BigTextStyle()
+			.bigText(message))
+			.setAutoCancel(true)
+			.setContentText(message);
+
+			Notification wasteReportNote=mBuilder.build();
+			wasteReportNote.flags |= Notification.FLAG_AUTO_CANCEL;
+			wasteReportNote.defaults |= Notification.DEFAULT_VIBRATE;
+			wasteReportNote.defaults |= Notification.DEFAULT_LIGHTS;
+			wasteReportNote.flags |= Notification.FLAG_SHOW_LIGHTS;
+			wasteReportNote.ledARGB = 0xff00ff00;
+			wasteReportNote.ledOnMS = 300;
+			wasteReportNote.ledOffMS = 1000;
+
+			mNotificationManager.notify(WASTAGE_NOTIFICATION_ID, wasteReportNote);
+		}
+	}
+
 	// Put the message into a notification and post it.
 	// This is just one simple example of what you might choose to do with
 	// a GCM message.
@@ -102,7 +154,7 @@ public class GcmIntentService extends IntentService {
 		Log.i(TAG, "Received report: " + data.toString());
 		mNotificationManager = (NotificationManager)
 				this.getSystemService(Context.NOTIFICATION_SERVICE);
-			
+
 		String msg_type=data.getString("msg_type");
 		String api=data.getString("api");
 
@@ -114,17 +166,17 @@ public class GcmIntentService extends IntentService {
 		String message;
 
 		Intent intent=new Intent(this, GroundReportListActivity.class);
-		
+
 		if(groundReportResponses.size()>1){
 			message=Integer.toString(groundReportResponses.size())+" new reports available";
 		}
 		else{
 			message=" New report available";
 		}
-		
+
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
 				intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT);
-		
+
 		NotificationCompat.Builder mBuilder =
 				new NotificationCompat.Builder(this)
 		.setSmallIcon(R.drawable.ic_launcher)
@@ -134,7 +186,7 @@ public class GcmIntentService extends IntentService {
 		.setContentIntent(contentIntent)
 		.setAutoCancel(true)
 		.setContentText(message);
-		
+
 		Notification groundReportNote=mBuilder.build();
 		groundReportNote.flags |= Notification.FLAG_AUTO_CANCEL;
 		groundReportNote.defaults |= Notification.DEFAULT_VIBRATE;
@@ -144,21 +196,8 @@ public class GcmIntentService extends IntentService {
 		groundReportNote.ledOnMS = 300;
 		groundReportNote.ledOffMS = 1000;
 
-		SharedPreferences sp=getSharedPreferences(Common.EL_PREFS,0);
-		long timeRcvd=sp.getLong("LAST_NOTIF_ARRIVAL", 0);
-		boolean lastNotifClicked=sp.getBoolean("LAST_NOTIF_CLICKED", true);
-		if(timeRcvd!=0 && !lastNotifClicked)
-			LogWriter.notifLogWrite(timeRcvd+","+sp.getLong("LAST_NOTIF_ID",0)+","+"never");
-
-		//store notification data
-		Editor editor=sp.edit();
-		editor.putLong("LAST_NOTIF_ARRIVAL",System.currentTimeMillis());
-		editor.putLong("LAST_NOTIF_ID", NOTIFICATION_ID);
-		editor.putBoolean("LAST_NOTIF_CLICKED", false);
-		editor.commit();
-
 		mBuilder.setContentIntent(contentIntent);
-		mNotificationManager.notify(NOTIFICATION_ID, groundReportNote);
+		mNotificationManager.notify(REPORT_NOTIFICATION_ID, groundReportNote);
 
 	}
 
@@ -200,28 +239,30 @@ public class GcmIntentService extends IntentService {
 			}
 		}
 	}
-	
+
 	public void parseResponses(String string, String date){
 		groundReportResponses=new ArrayList<String>();
 		groundReportDates=new ArrayList<String>();
-		
+
 		int responseCount=0;
-		
+
 		String[] respArray=string.split("\\|");
 		for(String str:respArray){
-			groundReportResponses.add(str);
+			if(!str.equals(""))
+				groundReportResponses.add(str);
 			responseCount++;
 		}
-		
+
 		int dateCount=0;
 
 		String[] dateArray=date.split("\\|");
 		for(String str:dateArray){
 			Log.v("ELSERVICES", "GroundReport Date: "+str);
-			groundReportDates.add(str);
+			if(!str.equals(""))
+				groundReportDates.add(str);
 			dateCount++;
 		}
-		
+
 		Log.v("ELSERVICES", "GroundReport Responses: "+Integer.toString(responseCount)+" v/s "+groundReportResponses.size());
 		Log.v("ELSERVICES", "GroundReport Dates: "+Integer.toString(dateCount)+" v/s "+groundReportDates.size());
 
@@ -246,7 +287,7 @@ public class GcmIntentService extends IntentService {
 
 		editor.putString("RESPONSE_DATES", strings.toString());
 		editor.commit();
-		
+
 		Log.v("ELSERVICES", "store groundreport");
 	}
 

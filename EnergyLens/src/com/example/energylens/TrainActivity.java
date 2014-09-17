@@ -27,11 +27,11 @@ import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
@@ -77,13 +77,23 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 		}
 
 	}
+	
+	private void toggleServiceMessage(String message){
+		Intent intent = new Intent();
+		intent.setAction("EnergyLensPlus.toggleService");
+		  // add data
+		  intent.putExtra("message", message);
+
+		  Log.v("ELSERVICES", "Broadcast from Train to Main receiver");
+		  sendBroadcast(intent);
+	}
 
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			if(Common.TRAINING_STATUS==0){
 				if(Common.TRAINING_COUNT>0)
-					start();
+					toggleServiceMessage("startServices from Training");
 				super.onOptionsItemSelected(item);
 			}
 			else if(Common.TRAINING_STATUS==2){
@@ -101,7 +111,7 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 	public void onBackPressed() {
 		if(Common.TRAINING_STATUS==0){
 			if(Common.TRAINING_COUNT>0)
-				start();
+				toggleServiceMessage("startServices from Training");
 			super.onBackPressed();
 		}
 		else if(Common.TRAINING_STATUS==2){
@@ -205,7 +215,8 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 
 		clearNotification();
 		try {
-			stop();
+			stopTime=System.currentTimeMillis();
+			toggleServiceMessage("stopServices");
 		} catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -232,7 +243,7 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 	}
 
 	private void sendNotification(){
-		String message=Common.LABEL+" at "+Common.LOCATION+" running";
+		String message="Training for "+Common.LABEL+" in "+Common.LOCATION+" started";
 
 		mNotificationManager = (NotificationManager)
 				this.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -258,34 +269,6 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 		mNotificationManager.notify(26194, trainingNote);
 	}
 
-//	private void customNotification(){
-//		// Using RemoteViews to bind custom layouts into Notification
-//		RemoteViews remoteViews = new RemoteViews(getPackageName(),
-//				R.layout.customnotification);
-//
-//		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
-//		// Set Icon
-//		.setSmallIcon(R.drawable.ic_launcher)
-//		// Set Ticker Message
-//		.setTicker("appliance is running")
-//		.setContentTitle("EnergyLens+")
-//		// Dismiss Notification
-//		.setAutoCancel(true)
-//		// Set RemoteViews into Notification
-//		.setContent(remoteViews);
-//		
-//		Notification trainingNote=mBuilder.build();
-//		trainingNote.flags |= Notification.FLAG_ONGOING_EVENT;
-//		
-//		// Locate and set the Text into customnotificationtext.xml TextViews
-//		remoteViews.setTextViewText(R.id.notifMessage,"appliance left running at location");
-//
-//		// Create Notification Manager
-//		NotificationManager notificationmanager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-//		// Build Notification with Notification Manager
-//		notificationmanager.notify(0, mBuilder.build());
-//		
-//	}
 
 	public void clearNotification() {
 		NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -302,88 +285,13 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 			Toast.makeText(TrainActivity.this, "Training data collection started", LENGTH_SHORT).show();
 			sendNotification();
 //			customNotification();
-			start();
+			startTime=System.currentTimeMillis();
+			toggleServiceMessage("startServices from Training");
 		}
 		else
 			Toast.makeText(this, "Both appliance & location are required", LENGTH_SHORT).show();
 	}
 
-
-	public void start(){
-		Log.v("ELSERVICES","Service started");
-		startTime=System.currentTimeMillis();
-
-		axlServiceIntent = new Intent(TrainActivity.this, AxlService.class);
-		axlServicePendingIntent = PendingIntent.getService(TrainActivity.this,
-				26194, axlServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-		axlAlarmMgr= (AlarmManager)TrainActivity.this.getSystemService(TrainActivity.this.ALARM_SERVICE);
-		setAlarm(axlServiceIntent,axlServicePendingIntent,26194,axlAlarmMgr);
-
-		wifiServiceIntent = new Intent(TrainActivity.this, WiFiService.class);
-		wifiServicePendingIntent = PendingIntent.getService(TrainActivity.this,
-				12345, wifiServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-		wifiAlarmMgr= (AlarmManager)TrainActivity.this.getSystemService(TrainActivity.this.ALARM_SERVICE);
-		setAlarm(wifiServiceIntent,wifiServicePendingIntent,12345,wifiAlarmMgr);
-
-
-		audioServiceIntent = new Intent(TrainActivity.this, AudioService.class);
-		audioServicePendingIntent = PendingIntent.getService(TrainActivity.this,
-				2512, audioServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-		audioAlarmMgr= (AlarmManager)TrainActivity.this.getSystemService(TrainActivity.this.ALARM_SERVICE);
-		setAlarm(audioServiceIntent,audioServicePendingIntent,2512,audioAlarmMgr);
-
-		lightServiceIntent = new Intent(TrainActivity.this, LightService.class);
-		lightServicePendingIntent = PendingIntent.getService(TrainActivity.this,
-				11894, lightServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-		lightAlarmMgr= (AlarmManager)TrainActivity.this.getSystemService(TrainActivity.this.ALARM_SERVICE);
-		setAlarm(lightServiceIntent,lightServicePendingIntent,11894,lightAlarmMgr);
-
-		magServiceIntent = new Intent(TrainActivity.this, MagService.class);
-		magServicePendingIntent = PendingIntent.getService(TrainActivity.this,
-				20591, magServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-		magAlarmMgr= (AlarmManager)TrainActivity.this.getSystemService(TrainActivity.this.ALARM_SERVICE);
-		setAlarm(magServiceIntent,magServicePendingIntent,20591,magAlarmMgr);
-
-		uploaderServiceIntent = new Intent(TrainActivity.this, UploaderService.class);
-		uploaderServicePendingIntent = PendingIntent.getService(TrainActivity.this,
-				4816, uploaderServiceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-		uploaderAlarmMgr= (AlarmManager)TrainActivity.this.getSystemService(TrainActivity.this.ALARM_SERVICE);
-		uploaderAlarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-				System.currentTimeMillis()+Common.UPLOAD_INTERVAL*10*1000, Common.UPLOAD_INTERVAL*30*1000, uploaderServicePendingIntent); 
-		Log.v("ELSERVICES","Uploader alarm Set for service "+4816+" "+Common.INTERVAL);
-	}
-
-	public void setAlarm(Intent ServiceIntent,PendingIntent ServicePendingIntent,int ReqCode, AlarmManager alarmMgr){
-		Log.v("ELSERVICES","Services started "+ReqCode);
-
-		try{
-
-			alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-					System.currentTimeMillis()+100, Common.INTERVAL*1000, ServicePendingIntent); 
-			Log.v("ELSERVICES","Alarm Set for service "+ReqCode+" "+Common.INTERVAL);
-		}
-		catch(Exception e){
-			Log.e("ELSERVICES",e.toString(), e.getCause());
-		}
-	}
-
-
-	public void stop() throws Throwable{
-		Log.v("ELSERVICES","Services stopped");
-		stopTime=System.currentTimeMillis();
-
-		try{
-			axlAlarmMgr.cancel(axlServicePendingIntent);
-			wifiAlarmMgr.cancel(wifiServicePendingIntent);
-			audioAlarmMgr.cancel(audioServicePendingIntent);
-			lightAlarmMgr.cancel(lightServicePendingIntent);
-			magAlarmMgr.cancel(magServicePendingIntent);
-			uploaderAlarmMgr.cancel(uploaderServicePendingIntent);
-		}
-		catch(Exception e){
-			e.printStackTrace();
-		}
-	}
 
 	public void sendMessage(){
 		new AsyncTask<Void,String,String>() {
@@ -502,7 +410,7 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 			Common.changeTrainingStatus(0);
 			updatePreferences(Common.TRAINING_STATUS);
 			Toast.makeText(TrainActivity.this, "Regular data collection started", LENGTH_SHORT).show();
-			start();
+			toggleServiceMessage("startServices from Training");
 		} catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

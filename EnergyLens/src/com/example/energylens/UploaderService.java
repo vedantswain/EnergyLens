@@ -12,6 +12,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -50,6 +51,15 @@ public class UploaderService extends Service{
 	String lineEnd = "\r\n";
 	String twoHyphens = "--";
 	String boundary =  "*****";
+
+	public static String WIFIHEADER="time"+","+"mac"+","+"ssid"+","+"rssi"+","+"label";
+	public static String ACCLHEADER="time"+","+"x"+","+"y"+","+"z"+","+"label"+","+"location";
+	public static String RAWSOUNDHEADER="time"+","+"values"+","+"label"+","+"location";
+	public static String SOUNDHEADER="time"+","+"mfcc1"+","+"mfcc2"+","+"mfcc3"+","+"mfcc4"+","+"mfcc5"+","+"mfcc6"+","+"mfcc7"+","+"mfcc8"+","+"mfcc9"+","+"mfcc10"+","+"mfcc11"+","+"mfcc12"+","+"mfcc13"+","+"label"+","+"location";
+	public static String LIGHTHEADER = "time" + "," + "value" + "," + "label" +","+"location";
+	public static String MAGHEADER = "time" + "," + "x" + "," + "y" + "," + "z" + ","+"label"+","+"location"; 
+	public static String ERRHEADER = "error log";
+	public static String SCREENHEADER="time_of_day"+","+"screen_name"+","+"time_of_stay";
 
 	int bytesRead, bytesAvailable, bufferSize;
 	byte[] buffer;
@@ -129,7 +139,7 @@ public class UploaderService extends Service{
 
 			synchronized (mBinder) {
 				try {
-					
+
 					for(String filename:file){
 						upload_setup(filename);
 					}
@@ -159,15 +169,7 @@ public class UploaderService extends Service{
 			output = new FileOutputStream(dst);
 			byte[] buf = new byte[1024];
 			int bytesRead;
-			if(src.getAbsolutePath().equals(dataPath+"wifi_log.csv")){
-				BufferedReader br = new BufferedReader(new FileReader(src.getAbsolutePath()));     
-				if (!br.readLine().equals("time"+","+"mac"+","+"ssid"+","+"rssi"+","+"label")) {
-					BufferedWriter bw = new BufferedWriter(new FileWriter(src, true));
-					bw.append("time"+","+"mac"+","+"ssid"+","+"rssi"+","+"label");
-					bw.newLine();
-					bw.close();
-				}
-			}
+
 			while ((bytesRead = input.read(buf)) > 0) {
 				output.write(buf, 0, bytesRead);
 			}
@@ -207,9 +209,10 @@ public class UploaderService extends Service{
 			Log.i("ELSERVICES", "uploading pending research files");
 			if(file.length()==0)
 				file.delete();
-			else
-				upload(file,Common.SERVER_URL+Common.API);
+			else{
 
+				upload(file,Common.SERVER_URL+Common.API);
+			}
 		}
 	}
 
@@ -232,10 +235,70 @@ public class UploaderService extends Service{
 				Log.i("ELSERVICES", "uploading pending files");
 				if(file.length()==0)
 					file.delete();
-				else
+				else{
+					headerCheck(file);
 					upload(file,Common.SERVER_URL+Common.API);
+				}
+				
 			}
 		}
+	}
+
+
+	private void headerFix(File file, String header){
+		Log.v("ELSERVICES",header+": Header missing");
+		try {
+			String new_header=header;
+			RandomAccessFile f = new RandomAccessFile(file, "rw");
+			f.seek(0); // to the beginning
+			f.write(new_header.getBytes());
+			f.writeBytes(System.getProperty("line.separator"));
+			f.close();		
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void headerCheck(File file){
+		String header="";
+
+		if(file.getAbsolutePath().contains("wifi_log")){
+			header=WIFIHEADER;
+		}
+		else if(file.getAbsolutePath().contains("accelerometer_log")){
+			header=ACCLHEADER;
+		}
+		else if(file.getAbsolutePath().contains("_audio_log")){
+			header=SOUNDHEADER;
+		}
+		else if(file.getAbsolutePath().contains("rawaudio_log")){
+			header=RAWSOUNDHEADER;
+		}
+		else if(file.getAbsolutePath().contains("light_log")){
+			header=LIGHTHEADER;
+		}
+		else if(file.getAbsolutePath().contains("mag_log")){
+			header=MAGHEADER;
+		}
+		else if(file.getAbsolutePath().contains("screen_log")){
+			header=SCREENHEADER;
+		}
+
+		BufferedReader br;
+		try {
+			br = new BufferedReader(new FileReader(file.getAbsolutePath()));
+			String firstline=br.readLine();
+			Log.v("ELSERVICES", "Header: "+firstline);
+			if (!firstline.equals(header)) {
+				headerFix(file,header);
+				br.close();
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}     
+
 	}
 
 	public void research_upload_setup(String filename){
@@ -243,21 +306,22 @@ public class UploaderService extends Service{
 		String devId=telephonyManager.getDeviceId();
 		String pathToFile=researchPath+filename;
 		String uniqueID=getDate();
-		String upPathToFile=researchPath+devId+'_'+uniqueID+".csv"; 
+		String upPathToFile=researchPath+devId+'_'+filename+'_'+uniqueID+".csv";
 
 		File oldFile=new File(pathToFile);
 		File upFile=new File(upPathToFile);
 
 		if(oldFile.exists()){
 			fileCopy(oldFile,upFile);
+			headerCheck(upFile);
 			if(upFile.length()==0)
 				upFile.delete();
 			else{
 				Log.v("ELSERVICES", "Research upload: "+oldFile.toString()+"->"+upFile.toString());
-				upload(upFile,Common.SERVER_URL+Common.API);
-				
+				upload(upFile,Common.SERVER_URL+Common.STATS_API);
+
 			}
-				}
+		}
 	}
 
 	public void upload_setup(String filename){

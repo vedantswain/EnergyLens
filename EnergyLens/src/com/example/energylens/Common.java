@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 public class Common{
+	public static long WASTAGE_LAST_SENT,PERSONAL_LAST_SENT,DISAGG_LAST_SENT;
+	public static int SEND_REQUEST_INTERVAL=3;//minutes between each GCM server request
 	public static String apiToSend="energy/personal/";
 	public static String chartTitle="Your Energy Consumption";
 	public static Bundle PEN_SIS;
@@ -27,6 +29,7 @@ public class Common{
 	public static String REG_API="device/register/";
 	public static String REALTIME_API="power/real-time/";
 	public static String TRAINDATA_API="data/training/";
+	public static String STATS_API="stats/upload/";
 	public static int TRAINING_STATUS=0;
 	public static int TRAINING_COUNT=0;
 	public static long TIME_PERIOD_START=System.currentTimeMillis()-12*60*60*1000;
@@ -145,6 +148,19 @@ public class Common{
 	}
 	public static void changePEnSIS(Bundle src){
 		PEN_SIS=src;
+	}
+	public static void changeLastSent(int index,long time){
+		switch(index){
+		case 0:
+			WASTAGE_LAST_SENT=time;
+			break;
+		case 1:
+			PERSONAL_LAST_SENT=time;
+			break;
+		case 2:
+			DISAGG_LAST_SENT=time;
+			break;
+		}
 	}
 	
 }

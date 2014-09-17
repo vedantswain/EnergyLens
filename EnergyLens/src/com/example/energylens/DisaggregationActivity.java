@@ -64,7 +64,9 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 	int[] y2 = { 1000,4000,2500,5500,3500,700,3500,2000,1500,1700,4800,2900,3000,4000,2800,2800,5500,4700,4800,800,1000,1500,4000,1000};
 
 	ArrayList<Long> time=new ArrayList<Long>();
-	ArrayList<Long> usage=new ArrayList<Long>();
+	ArrayList<Long> wastage_times=new ArrayList<Long>();
+	ArrayList<Long> value=new ArrayList<Long>();
+	ArrayList<Long> wastage_value=new ArrayList<Long>();
 	ArrayList<Long> ids=new ArrayList<Long>();
 	ArrayList<long[]> terminals=new ArrayList<long[]>();
 
@@ -84,7 +86,8 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 	String initLoc;
 
 	String app="none";
-	int color=Color.LTGRAY;
+	int color=Color.rgb(0, 153, 153);
+	int wastageColor=Color.rgb(102, 0, 0);
 	String changeTimeOf;
 
 	GoogleCloudMessaging gcm;
@@ -98,7 +101,7 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 
 	Calendar c=Calendar.getInstance();
 	private boolean forCorrection=false;
-	private String toLocation,toApp;
+	private String toLocation,toApp,request_for;
 	private long lastSyncInMillis;
 
 	long timeOfVisit,timeOfStay;
@@ -107,7 +110,7 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_correction);
+		setContentView(R.layout.activity_disaggregation);
 		y=y1;
 
 		start=(TextView)findViewById(R.id.setStart);
@@ -119,7 +122,7 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 		appCounter=rand.nextInt(10)+1;
 
 		app=extras.getString("appliance");
-		color=extras.getInt("color");
+		//		color=extras.getInt("color");
 
 		timeOfVisit=System.currentTimeMillis();
 
@@ -151,7 +154,7 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 		super.onStart();
 		this.registerReceiver(receiver, new IntentFilter(GcmIntentService.RECEIVER));
 
-		if(time!=null && usage!=null)
+		if(time!=null && value!=null)
 			setupChart(false);
 	}
 
@@ -171,18 +174,17 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 		XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
 		XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
 
-
-		// Creating an  XYSeries for Income
 		TimeSeries mSeries = new TimeSeries("Consumption");
 		Date date=new Date();
 
 		XYSeriesRenderer renderer = new XYSeriesRenderer();
 
+		Log.v("ELSERVICE","Disagg: "+Long.toString(time.size())+" "+Long.toString(value.size()));
+
 		for (int i = 0; i < time.size(); i++) {
 			c.setTimeInMillis(time.get(i).longValue()*1000);
-			mSeries.add(c.getTime(), usage.get(i));
-			Log.v("ELSERVICES", "usage: "+usage.get(i)+" time: "+c.getTime().toString()
-					+"\n timeinmillis: "+time.get(i)+" v/s: "+c.getTimeInMillis()+" now: "+System.currentTimeMillis());
+			mSeries.add(c.getTime(), value.get(i));
+			Log.v("ELSERVICES", "value: "+value.get(i)+" time: "+c.getTime().toString());
 		}
 
 		renderer.setLineWidth(2);
@@ -190,9 +192,41 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 		// Include low and max value
 		renderer.setDisplayBoundingPoints(true);
 
+		FillOutsideLine fill = new FillOutsideLine(FillOutsideLine.Type.BOUNDS_ALL);
+
+		fill.setColor(Color.argb(125, 0, 130, 130));
+		renderer.addFillOutsideLine(fill);
+
+
+		TimeSeries wastageSeries = new TimeSeries("Wastage");
+
+		XYSeriesRenderer wastageRenderer = new XYSeriesRenderer();
+
+		wastageRenderer.setLineWidth(2);
+		wastageRenderer.setColor(wastageColor);
+		// Include low and max value
+		wastageRenderer.setDisplayBoundingPoints(true);
+
+		for (int j = 0; j < wastage_times.size(); j++) {
+			c.setTimeInMillis(wastage_times.get(j).longValue()*1000);
+			wastageSeries.add(c.getTime(), wastage_value.get(j));
+			Log.v("ELSERVICES", "wastage value: "+wastage_value.get(j)+"wastage time: "+c.getTime().toString());
+		}
+
+		FillOutsideLine fillWaste = new FillOutsideLine(FillOutsideLine.Type.BOUNDS_ALL);
+
+		
+		fillWaste.setColor(Color.argb(125, 102, 0, 0));
+		wastageRenderer.addFillOutsideLine(fillWaste);
+
+		mRenderer.setXLabelsAlign(Align.RIGHT);
+		mRenderer.setXLabelsAngle(-45);
+		
 		mRenderer.addSeriesRenderer(renderer);
+		mRenderer.addSeriesRenderer(wastageRenderer);
 
 		dataset.addSeries(mSeries);
+		dataset.addSeries(wastageSeries);
 
 		drawChart(mRenderer,dataset,isSlice);
 	}
@@ -236,10 +270,10 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 		mRenderer.setSelectableBuffer(20);
 		mRenderer.setYAxisMax(maxY*1.5);
 		mRenderer.setYAxisMin(0);
-//		if(time.size()>0){
-//			mRenderer.setXAxisMin((time.get(0).longValue()*1000)-1000);
-//			mRenderer.setXAxisMin((time.get(time.size()-1).longValue()*1000)+1000);
-//		}
+		//		if(time.size()>0){
+		//			mRenderer.setXAxisMin((time.get(0).longValue()*1000)-1000);
+		//			mRenderer.setXAxisMin((time.get(time.size()-1).longValue()*1000)+1000);
+		//		}
 		mRenderer.setChartTitleTextSize(val);
 		mRenderer.setLabelsColor(Color.DKGRAY);
 		mRenderer.setYLabelsColor(0, Color.DKGRAY);
@@ -247,15 +281,15 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 		mRenderer.setLabelsTextSize(val);
 		mRenderer.setLegendTextSize(val);
 		mRenderer.setYLabelsAlign(Align.RIGHT);
-		mRenderer.setXTitle("Hours");
-		mRenderer.setYTitle("Energy");
+		mRenderer.setXTitle("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n Time");
+		mRenderer.setYTitle("Power (Watts)");
 		mRenderer.setAxisTitleTextSize(val);
 		//		mRenderer.setXAxisMax(Calendar.getInstance().getTimeInMillis());
 		//		mRenderer.setXAxisMin(Calendar.getInstance().getTimeInMillis()-(24*60*60*1000));
 		mRenderer.setPanEnabled(false);
 		mRenderer.setZoomEnabled(false);
 		mRenderer.setShowGrid(true); // we show the grid
-		int[] margins={20,80,10,10};
+		int[] margins={20,80,120,10};
 		mRenderer.setMargins(margins);
 
 
@@ -540,21 +574,21 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 		TextView textView=(TextView) findViewById(R.id.appLocation);
 		textView.setText(app+" in "+loc);
 		Log.v("ELSERVICES", "New Loc: "+loc);
-		if(forCorrection){
-			parseApp(loc,index);
-			forCorrection=false;
-			TextView textView1=(TextView) findViewById(R.id.correctLoc);
-			textView1.setText(loc);
-			String[] currLocs=new String[locs.size()];
-			Common.changeActivityLocs(locs.toArray(currLocs));
-			toLocation=loc;
-		}
-		else{
+//		if(forCorrection){
+//			parseApp(loc,index);
+//			forCorrection=false;
+//			TextView textView1=(TextView) findViewById(R.id.correctLoc);
+//			textView1.setText(loc);
+//			String[] currLocs=new String[locs.size()];
+//			Common.changeActivityLocs(locs.toArray(currLocs));
+//			toLocation=loc;
+//		}
+//		else{
 			reset();
 			if(activities!=null)
 				parseActivities(loc);
 			setupChart(false);
-		}
+//		}
 	}
 
 	public void toCorrect(View view){
@@ -584,7 +618,7 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 	}
 
 	private void findYMax(){
-		for(long i:usage){
+		for(long i:value){
 			if(i>maxY)
 				maxY=i;
 		}
@@ -599,6 +633,10 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 		time=new ArrayList<Long>();
 		time.clear();
 		locs=new ArrayList<String>();
+		value.clear();
+		wastage_times.clear();
+		wastage_value.clear();
+		
 
 		int k=0;
 		for(int i=0;i<activities.length();i++){
@@ -610,6 +648,7 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 					locs.add(activity.getString("location"));
 				}
 				if(activity.getString("location").equals(loc)){
+					
 					long[] terminalPoints=new long[2];
 					ids.add(activity.getLong("id"));
 					terminalPoints[0]=activity.getLong("start_time");
@@ -619,16 +658,27 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 					terminals.add(terminalPoints);
 
 					//render points for each activity
-					time.add(terminalPoints[0]);usage.add((long) 0);
-					time.add(terminalPoints[0]);usage.add(activity.getLong("usage"));
+					time.add(terminalPoints[0]);value.add((long) 0);
+					time.add(terminalPoints[0]);value.add(activity.getLong("value"));
+					
+					time.add(terminalPoints[1]);value.add(activity.getLong("value"));
+					time.add(terminalPoints[1]);value.add((long) 0);
+					
+					Log.v("ELSERVICE","add Disagg: "+Long.toString(time.size())+" "+Long.toString(value.size()));
+					
+					JSONArray wastageTimeArray=activity.getJSONArray("wastage_times");
+					for(int j=0;j<wastageTimeArray.length();j++){
+						JSONObject wasteTime=wastageTimeArray.getJSONObject(j);
+						wastage_times.add(wasteTime.getLong("start_time"));wastage_value.add((long)0);
+						wastage_times.add(wasteTime.getLong("start_time"));wastage_value.add(activity.getLong("value"));
 
-					//					for(long j=activity.getLong("start_time");j<activity.getLong("end_time");j+=60){
-					//						time.add(j);usage.add(activity.getLong("usage"));
-					//						Log.v("ELSERVICES", "Rendered: "+time.get(k)+", "+usage.get(k++)+", id: "+activity.getLong("id"));
-					//					}
+						Log.v("ELSERVICES", "Wastage points: "+wasteTime.getLong("start_time")
+								+", "+wasteTime.getLong("end_time"));
 
-					time.add(terminalPoints[1]);usage.add(activity.getLong("usage"));
-					time.add(terminalPoints[1]);usage.add((long) 0);
+						wastage_times.add(wasteTime.getLong("end_time"));wastage_value.add(activity.getLong("value"));
+						wastage_times.add(wasteTime.getLong("end_time"));wastage_value.add((long)0);						
+					}
+
 				}
 				String[] currLocs=new String[locs.size()];
 				Common.changeActivityLocs(locs.toArray(currLocs));
