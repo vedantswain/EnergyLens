@@ -35,11 +35,15 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewPager;
 import android.text.format.DateFormat;
+import android.text.format.Time;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewParent;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -158,18 +162,20 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 			setupChart(false);
 	}
 
-	protected void onStop(){
-		super.onStop();
-		timeOfStay=System.currentTimeMillis()-timeOfVisit;
-		LogWriter.screenLogWrite(timeOfVisit+","+screenName+","+timeOfStay);
-	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
+		timeOfStay=System.currentTimeMillis()-timeOfVisit;
+		LogWriter.screenLogWrite(timeOfVisit+","+screenName+","+timeOfStay);
 		this.unregisterReceiver(receiver);
 	}
 
+	public boolean acrossTwoDays(long timeStart,long timeStop){
+	
+		return false;
+	}
+	
 	public void setupChart( boolean isSlice){
 		XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
 		XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
@@ -178,6 +184,7 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 		Date date=new Date();
 
 		XYSeriesRenderer renderer = new XYSeriesRenderer();
+		
 
 		Log.v("ELSERVICE","Disagg: "+Long.toString(time.size())+" "+Long.toString(value.size()));
 
@@ -218,7 +225,25 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 		
 		fillWaste.setColor(Color.argb(125, 102, 0, 0));
 		wastageRenderer.addFillOutsideLine(fillWaste);
+		
+		if(acrossTwoDays(time.get(0)*1000,time.get(time.size()-1)*1000)){
+			
+		}
 
+//		mRenderer.setXLabels(0);
+		
+//		for(int i=0;i<time.size();i++){
+//			long graphTime=time.get(i).longValue()*1000;
+//			String text=DateFormat.format("dd/MM HH:mm",graphTime).toString();
+//			mRenderer.addXTextLabel(new Date(time.get(i).longValue()*1000).getTime(), text);
+//		}
+		
+//		for(int i=0;i<wastage_times.size();i++){
+//			long graphTime=wastage_times.get(i).longValue()*1000;
+//			String text=DateFormat.format("dd/MM HH:mm",graphTime).toString();
+//			mRenderer.addXTextLabel(new Date(wastage_times.get(i).longValue()*1000).getTime(), text);
+//		}
+		
 		mRenderer.setXLabelsAlign(Align.RIGHT);
 		mRenderer.setXLabelsAngle(-45);
 		
@@ -268,12 +293,16 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 		mRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00)); // transparent margins
 		mRenderer.setClickEnabled(true);
 		mRenderer.setSelectableBuffer(20);
+		
+		mRenderer.setMarginsColor(Color.argb(0xff, 0xf0, 0xf0, 0xf0)); 
+		mRenderer.setPanEnabled(true);
+		mRenderer.setPanLimits(new double[] {time.get(0)*1000,time.get(time.size()-1)*1000,0,maxY*1.5});
+		mRenderer.setZoomButtonsVisible(true);
+		mRenderer.setZoomEnabled(true);
+		mRenderer.setXAxisMax((time.get(time.size()-1)*1000)+60000);
+		mRenderer.setXAxisMin((time.get(0)*1000)-60000);
 		mRenderer.setYAxisMax(maxY*1.5);
 		mRenderer.setYAxisMin(0);
-		//		if(time.size()>0){
-		//			mRenderer.setXAxisMin((time.get(0).longValue()*1000)-1000);
-		//			mRenderer.setXAxisMin((time.get(time.size()-1).longValue()*1000)+1000);
-		//		}
 		mRenderer.setChartTitleTextSize(val);
 		mRenderer.setLabelsColor(Color.DKGRAY);
 		mRenderer.setYLabelsColor(0, Color.DKGRAY);
@@ -284,10 +313,6 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 		mRenderer.setXTitle("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n Time");
 		mRenderer.setYTitle("Power (Watts)");
 		mRenderer.setAxisTitleTextSize(val);
-		//		mRenderer.setXAxisMax(Calendar.getInstance().getTimeInMillis());
-		//		mRenderer.setXAxisMin(Calendar.getInstance().getTimeInMillis()-(24*60*60*1000));
-		mRenderer.setPanEnabled(false);
-		mRenderer.setZoomEnabled(false);
 		mRenderer.setShowGrid(true); // we show the grid
 		int[] margins={20,80,120,10};
 		mRenderer.setMargins(margins);
@@ -298,19 +323,20 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 		LinearLayout chart_container=(LinearLayout)findViewById(R.id.chartComparison);
 		chart_container.addView(chartView,0);
 
-		//		chartView.setOnClickListener(new View.OnClickListener() {
-		//			public void onClick(View v) {
-		//				Log.v("ELSERVICES", "Graph clicked");
-		//				// handle the click event on the chart
-		//				SeriesSelection seriesSelection = chartView.getCurrentSeriesAndPoint();
-		//				if (seriesSelection == null) {
-		//					//	            Toast.makeText(getActivity(), "No chart element", Toast.LENGTH_SHORT).show();
-		//				} else {
-		//					// display information of the clicked point
-		//					setTimeSlice((long) seriesSelection.getXValue());
-		//				}
-		//			}
-		//		});
+		chartView.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				Log.v("ELSERVICES", "Graph clicked");
+				// handle the click event on the chart
+				SeriesSelection seriesSelection = chartView.getCurrentSeriesAndPoint();
+				if (seriesSelection == null) {
+					//	            Toast.makeText(getActivity(), "No chart element", Toast.LENGTH_SHORT).show();
+				} else {
+					// display information of the clicked point
+					setTimeSlice((long) seriesSelection.getXValue());
+				}
+			}
+		});
+		
 		//		Log.v("ELSERVICES", "Start slice: "+xOfStart+" Stop slice: "+xOfEnd);
 	}
 

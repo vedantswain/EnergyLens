@@ -35,6 +35,8 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
@@ -47,7 +49,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-public class GroundReportActivity extends Activity {
+public class GroundReportActivity extends FragmentActivity implements TryAgainConnectionRefusedDialogFragment.TryAgainDialogListener{
 
 	ArrayList<Fragment> fragmentList=new ArrayList<Fragment>();
 	ArrayList<Long> usage=new ArrayList<Long>();
@@ -515,13 +517,18 @@ public class GroundReportActivity extends Activity {
 				if(progress.isShowing())
 					progress.dismiss();
 				if(msg.contains("ERROR")){
-					Toast.makeText(GroundReportActivity.this, "There was an error. Try again", 1000).show();
+					refusedTryAgain();
 				}
 					Log.i("ELSERVICES", msg);
 			}
 		}.execute(null, null, null);
 	}
 
+	public void refusedTryAgain(){
+		DialogFragment newFragment = new TryAgainConnectionRefusedDialogFragment();
+		newFragment.show(getSupportFragmentManager(), "Connection Refused");
+	}
+	
 	public String sendHttp(JSONObject data){
 		InputStream inputStream = null;
 
@@ -545,6 +552,8 @@ public class GroundReportActivity extends Activity {
 
 			Log.v("ELSERVICES", Integer.toString(sl.getStatusCode()));
 
+			if(sl.getStatusCode()<200 || sl.getStatusCode()>=300)
+				return "ERROR: "+sl.getStatusCode();
 
 			StringBuffer sb=new StringBuffer();
 
@@ -574,6 +583,18 @@ public class GroundReportActivity extends Activity {
 			return "ERROR: "+e1.toString();
 
 		}
+	}
+
+	@Override
+	public void onOk() {
+		// TODO Auto-generated method stub
+		toCorrect();
+	}
+
+	@Override
+	public void onCancelNow() {
+		// TODO Auto-generated method stub
+		finish();
 	}
 
 

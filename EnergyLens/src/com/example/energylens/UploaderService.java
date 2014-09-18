@@ -305,8 +305,9 @@ public class UploaderService extends Service{
 		TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
 		String devId=telephonyManager.getDeviceId();
 		String pathToFile=researchPath+filename;
+		String[] split=filename.split("\\.");
 		String uniqueID=getDate();
-		String upPathToFile=researchPath+devId+'_'+filename+'_'+uniqueID+".csv";
+		String upPathToFile=researchPath+devId+'_'+split[0]+'_'+uniqueID+".csv";
 
 		File oldFile=new File(pathToFile);
 		File upFile=new File(upPathToFile);

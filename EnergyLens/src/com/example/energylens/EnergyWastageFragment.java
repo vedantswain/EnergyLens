@@ -146,6 +146,8 @@ public class EnergyWastageFragment extends Fragment{
 
 		mRenderer.setMarginsColor(Color.argb(0xff, 0xf0, 0xf0, 0xf0)); 
 
+		mRenderer.setXLabels(0);
+		
 		for(int i=0;i<y.length;i++){
 			long currTime=lastSyncInMillis;
 			long graphTime=currTime-((y.length-i)*60*60*1000);

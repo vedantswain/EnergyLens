@@ -124,6 +124,8 @@ public class PersonalEnergyFragment extends Fragment {
 //		String from_time=df.format("dd MMM yy HH:mm", Common.TIME_PERIOD_START).toString();
 //		String to_time=df.format("dd MMM yy HH:mm", Common.TIME_PERIOD_END).toString();
 		
+		mRenderer.setXLabels(0);
+		
 		for(int i=0;i<y.length;i++){
 			long currTime=lastSyncInMillis;
 			long graphTime=currTime-((y.length-i)*60*60*1000);

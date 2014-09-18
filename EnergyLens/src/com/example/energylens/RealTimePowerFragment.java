@@ -95,7 +95,7 @@ public class RealTimePowerFragment extends Fragment{
 //		drawChart(c.getTime(),Math.round(firstPowers.get(index)));
 //	}
 
-	static TimeSeries mSeries;
+	static TimeSeries mSeries=new TimeSeries("Real-Time Power");;
 
 
 	public static void drawChart(Date x, double y){
@@ -378,7 +378,7 @@ public class RealTimePowerFragment extends Fragment{
 			@Override
 			protected void onPostExecute(String msg) {
 				Log.i("ELSERVICES", msg);
-				if(!msg.contains("ERROR"))
+				if(msg.equals("RTP retrieved"))
 					setupChart();
 			}
 		}.execute(null, null, null);

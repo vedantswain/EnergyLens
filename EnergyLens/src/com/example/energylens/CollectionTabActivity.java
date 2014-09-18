@@ -109,6 +109,9 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 			Common.changeCurrentVisible(0);
 			toggleServiceMessage("startServices from Main");
 		}
+		
+
+		timeOfVisit=System.currentTimeMillis();
 
 		if(savedInstanceState!=null){
 			//			Common.changePEnSIS(savedInstanceState.getBundle("PEN_SIS"));
@@ -137,6 +140,7 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 					timeOfStay=System.currentTimeMillis()-timeOfVisit;
 					LogWriter.screenLogWrite(timeOfVisit+","+screenName+","+timeOfStay);
 				}
+				
 				prevTabNo=tabNo;
 				Common.changeCurrentVisible(tabNo);
 				Log.v("ELSERVICES", "Current visible: "+tabNo+" time since: "
@@ -173,7 +177,22 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 			}
 		});
 
-	} 
+	}
+	
+	@Override
+	public void onPause() {
+		super.onPause();
+		switch(Common.CURRENT_VISIBLE){
+		case 0:screenName="EnergyWastage";
+		break;
+		case 1:screenName="PersonalEnergy";
+		break;
+		case 2:screenName="RealTimePower";
+		break;
+		}		
+		timeOfStay=System.currentTimeMillis()-timeOfVisit;
+		LogWriter.screenLogWrite(timeOfVisit+","+screenName+","+timeOfStay);
+	}
 	
 	private void toggleServiceMessage(String message){
 		Intent intent = new Intent();
