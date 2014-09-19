@@ -175,7 +175,14 @@ public class RealTimePowerFragment extends Fragment{
 	}	
 
 	private void UpdateGUI() {
-		mHandler.post(mTask);
+		myTimer = new Timer();
+		myTimer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				if(Common.CURRENT_VISIBLE==2)
+					mHandler.post(mTask);
+			}
+		}, 0, 1000);
 	}
 
 //	public static void firstUpdate(){
@@ -191,14 +198,7 @@ public class RealTimePowerFragment extends Fragment{
 	@Override
 	public void onResume() {
 		super.onResume();
-		myTimer = new Timer();
-		myTimer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				if(Common.CURRENT_VISIBLE==2)
-					UpdateGUI();
-			}
-		}, 0, 1000);
+		UpdateGUI();
 	}
 
 	@Override

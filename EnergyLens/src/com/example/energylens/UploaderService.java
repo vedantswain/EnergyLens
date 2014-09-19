@@ -6,13 +6,14 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.RandomAccessFile;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -210,8 +211,8 @@ public class UploaderService extends Service{
 			if(file.length()==0)
 				file.delete();
 			else{
-
-				upload(file,Common.SERVER_URL+Common.API);
+				headerCheck(file);
+				upload(file,Common.SERVER_URL+Common.STATS_API);
 			}
 		}
 	}
@@ -239,25 +240,68 @@ public class UploaderService extends Service{
 					headerCheck(file);
 					upload(file,Common.SERVER_URL+Common.API);
 				}
-				
+
 			}
 		}
 	}
 
 
 	private void headerFix(File file, String header){
+		String tempFilePath=dataPath+"temp_log.csv";
 		Log.v("ELSERVICES",header+": Header missing");
+
+		//fixing header
+
 		try {
-			String new_header=header;
-			RandomAccessFile f = new RandomAccessFile(file, "rw");
-			f.seek(0); // to the beginning
-			f.write(new_header.getBytes());
-			f.writeBytes(System.getProperty("line.separator"));
-			f.close();		
+			BufferedReader br = new BufferedReader(new FileReader(file.getAbsolutePath()));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(tempFilePath));
+
+			bw.write(header);
+			bw.write(System.getProperty("line.separator"));
+
+			String newLine=br.readLine();
+			while(newLine!=null) {
+				bw.write(newLine);
+				bw.write(System.getProperty("line.separator"));
+				newLine=br.readLine();
+			}
+
+			br.close();
+			bw.close();
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		//copying temp contents back to main file
+		PrintWriter writer;
+		try {
+			writer = new PrintWriter(file);
+			writer.print("");
+			writer.close();
+
+			BufferedReader br = new BufferedReader(new FileReader(tempFilePath));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file.getAbsolutePath()));
+
+			String newLine=br.readLine();
+			while(newLine!=null) {
+				bw.write(newLine);
+				bw.write(System.getProperty("line.separator"));
+				newLine=br.readLine();
+			}
+
+			br.close();
+			bw.close();
+			
+			File fileTemp=new File(tempFilePath);
+			fileTemp.delete();
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 	private void headerCheck(File file){
@@ -289,7 +333,8 @@ public class UploaderService extends Service{
 		try {
 			br = new BufferedReader(new FileReader(file.getAbsolutePath()));
 			String firstline=br.readLine();
-			Log.v("ELSERVICES", "Header: "+firstline);
+			Log.v("ELSERVICES", "Header: "+firstline+" Second Line: "+br.readLine());
+
 			if (!firstline.equals(header)) {
 				headerFix(file,header);
 				br.close();
@@ -429,7 +474,8 @@ public class UploaderService extends Service{
 				String serverResponseType=response.getString("type");
 				int serverResponseCode=response.getInt("code");
 				String serverResponseMessage=response.getString("message");
-				Log.v("ELSERVICES", "type: "+serverResponseType+'\n'+"code: "+serverResponseCode+'\n'+"message+: "+serverResponseMessage);
+				Log.v("ELSERVICES","URL: "+URL+ 
+						" type: "+serverResponseType+'\n'+"code: "+serverResponseCode+'\n'+"message+: "+serverResponseMessage);
 
 				if(connection.getResponseCode()>=200 && connection.getResponseCode()<300 && serverResponseCode==1){
 					upFile.delete();	    	    

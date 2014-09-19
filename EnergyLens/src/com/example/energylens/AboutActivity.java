@@ -29,6 +29,7 @@ public class AboutActivity extends Activity {
 		keys.add("Apartment Number");
 		keys.add("Home AP");
 		keys.add("IMEI");
+		keys.add("Training Status");
 
 		SharedPreferences sp=getSharedPreferences(Common.EL_PREFS,0);
 		fields.add(sp.getString("USERNAME", ""));
@@ -37,6 +38,11 @@ public class AboutActivity extends Activity {
 		
 		TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
 		fields.add(telephonyManager.getDeviceId());
+		
+		if(sp.getInt("TRAINING_COUNT", 0)>0)
+			fields.add("Done");
+		else
+			fields.add("Not done");
 	
 		int index=0;
 		HashMap<String,String> item;

@@ -3,6 +3,7 @@ package com.example.energylens;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -35,16 +36,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.ViewPager;
 import android.text.format.DateFormat;
-import android.text.format.Time;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewParent;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
@@ -128,8 +124,6 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 		app=extras.getString("appliance");
 		//		color=extras.getInt("color");
 
-		timeOfVisit=System.currentTimeMillis();
-
 		if(savedInstanceState!=null){
 			Log.v("ELSERVICES", "Loading from savedInstance");
 		}
@@ -172,10 +166,14 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 	}
 
 	public boolean acrossTwoDays(long timeStart,long timeStop){
-	
+		if(Integer.parseInt(DateFormat.format("dd", timeStop).toString())
+				-Integer.parseInt(DateFormat.format("dd", timeStart).toString())
+				>0){
+			return true;
+		}
 		return false;
 	}
-	
+
 	public void setupChart( boolean isSlice){
 		XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
 		XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
@@ -184,7 +182,7 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 		Date date=new Date();
 
 		XYSeriesRenderer renderer = new XYSeriesRenderer();
-		
+
 
 		Log.v("ELSERVICE","Disagg: "+Long.toString(time.size())+" "+Long.toString(value.size()));
 
@@ -222,31 +220,42 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 
 		FillOutsideLine fillWaste = new FillOutsideLine(FillOutsideLine.Type.BOUNDS_ALL);
 
-		
+
 		fillWaste.setColor(Color.argb(125, 102, 0, 0));
 		wastageRenderer.addFillOutsideLine(fillWaste);
-		
-		if(acrossTwoDays(time.get(0)*1000,time.get(time.size()-1)*1000)){
-			
-		}
 
-//		mRenderer.setXLabels(0);
-		
-//		for(int i=0;i<time.size();i++){
-//			long graphTime=time.get(i).longValue()*1000;
-//			String text=DateFormat.format("dd/MM HH:mm",graphTime).toString();
-//			mRenderer.addXTextLabel(new Date(time.get(i).longValue()*1000).getTime(), text);
-//		}
-		
-//		for(int i=0;i<wastage_times.size();i++){
-//			long graphTime=wastage_times.get(i).longValue()*1000;
-//			String text=DateFormat.format("dd/MM HH:mm",graphTime).toString();
-//			mRenderer.addXTextLabel(new Date(wastage_times.get(i).longValue()*1000).getTime(), text);
-//		}
-		
+		if(time.size()>0)
+			if(acrossTwoDays(time.get(0)*1000,time.get(time.size()-1)*1000)){
+				SimpleDateFormat sdf=new SimpleDateFormat("dd/MM/yy");
+				Date division;
+				try {
+					division = sdf.parse(DateFormat.format("dd/MM/yy", time.get(time.size()-1)*1000).toString());
+					Log.v("ELSERVICES","Division date: "+ DateFormat.format("dd/MM/yy",division.getTime()).toString());
+					mSeries.addAnnotation(DateFormat.format("dd/MM",division.getTime()).toString(),division.getTime(), 10);
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+
+		//		mRenderer.setXLabels(0);
+
+		//		for(int i=0;i<time.size();i++){
+		//			long graphTime=time.get(i).longValue()*1000;
+		//			String text=DateFormat.format("dd/MM HH:mm",graphTime).toString();
+		//			mRenderer.addXTextLabel(new Date(time.get(i).longValue()*1000).getTime(), text);
+		//		}
+
+		//		for(int i=0;i<wastage_times.size();i++){
+		//			long graphTime=wastage_times.get(i).longValue()*1000;
+		//			String text=DateFormat.format("dd/MM HH:mm",graphTime).toString();
+		//			mRenderer.addXTextLabel(new Date(wastage_times.get(i).longValue()*1000).getTime(), text);
+		//		}
+
 		mRenderer.setXLabelsAlign(Align.RIGHT);
 		mRenderer.setXLabelsAngle(-45);
-		
+
 		mRenderer.addSeriesRenderer(renderer);
 		mRenderer.addSeriesRenderer(wastageRenderer);
 
@@ -293,14 +302,17 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 		mRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00)); // transparent margins
 		mRenderer.setClickEnabled(true);
 		mRenderer.setSelectableBuffer(20);
-		
+
 		mRenderer.setMarginsColor(Color.argb(0xff, 0xf0, 0xf0, 0xf0)); 
-		mRenderer.setPanEnabled(true);
-		mRenderer.setPanLimits(new double[] {time.get(0)*1000,time.get(time.size()-1)*1000,0,maxY*1.5});
+		mRenderer.setPanEnabled(true);		
+		if(time.size()>0){
+			mRenderer.setPanLimits(new double[] {time.get(0)*1000,time.get(time.size()-1)*1000,0,maxY*1.5});
+			mRenderer.setXAxisMax((time.get(time.size()-1)*1000)+60000);
+			mRenderer.setXAxisMin((time.get(0)*1000)-60000);
+		}
 		mRenderer.setZoomButtonsVisible(true);
 		mRenderer.setZoomEnabled(true);
-		mRenderer.setXAxisMax((time.get(time.size()-1)*1000)+60000);
-		mRenderer.setXAxisMin((time.get(0)*1000)-60000);
+
 		mRenderer.setYAxisMax(maxY*1.5);
 		mRenderer.setYAxisMin(0);
 		mRenderer.setChartTitleTextSize(val);
@@ -332,11 +344,11 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 					//	            Toast.makeText(getActivity(), "No chart element", Toast.LENGTH_SHORT).show();
 				} else {
 					// display information of the clicked point
-					setTimeSlice((long) seriesSelection.getXValue());
+					//					setTimeSlice((long) seriesSelection.getXValue());
 				}
 			}
 		});
-		
+
 		//		Log.v("ELSERVICES", "Start slice: "+xOfStart+" Stop slice: "+xOfEnd);
 	}
 
@@ -482,6 +494,7 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 
 	public void onResume(){
 		super.onResume();
+		timeOfVisit=System.currentTimeMillis();
 		setupChart(true);
 		this.registerReceiver(receiver, new IntentFilter(GcmIntentService.RECEIVER));
 	}
@@ -600,21 +613,21 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 		TextView textView=(TextView) findViewById(R.id.appLocation);
 		textView.setText(app+" in "+loc);
 		Log.v("ELSERVICES", "New Loc: "+loc);
-//		if(forCorrection){
-//			parseApp(loc,index);
-//			forCorrection=false;
-//			TextView textView1=(TextView) findViewById(R.id.correctLoc);
-//			textView1.setText(loc);
-//			String[] currLocs=new String[locs.size()];
-//			Common.changeActivityLocs(locs.toArray(currLocs));
-//			toLocation=loc;
-//		}
-//		else{
-			reset();
-			if(activities!=null)
-				parseActivities(loc);
-			setupChart(false);
-//		}
+		//		if(forCorrection){
+		//			parseApp(loc,index);
+		//			forCorrection=false;
+		//			TextView textView1=(TextView) findViewById(R.id.correctLoc);
+		//			textView1.setText(loc);
+		//			String[] currLocs=new String[locs.size()];
+		//			Common.changeActivityLocs(locs.toArray(currLocs));
+		//			toLocation=loc;
+		//		}
+		//		else{
+		reset();
+		if(activities!=null)
+			parseActivities(loc);
+		setupChart(false);
+		//		}
 	}
 
 	public void toCorrect(View view){
@@ -662,7 +675,7 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 		value.clear();
 		wastage_times.clear();
 		wastage_value.clear();
-		
+
 
 		int k=0;
 		for(int i=0;i<activities.length();i++){
@@ -674,7 +687,7 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 					locs.add(activity.getString("location"));
 				}
 				if(activity.getString("location").equals(loc)){
-					
+
 					long[] terminalPoints=new long[2];
 					ids.add(activity.getLong("id"));
 					terminalPoints[0]=activity.getLong("start_time");
@@ -686,12 +699,12 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 					//render points for each activity
 					time.add(terminalPoints[0]);value.add((long) 0);
 					time.add(terminalPoints[0]);value.add(activity.getLong("value"));
-					
+
 					time.add(terminalPoints[1]);value.add(activity.getLong("value"));
 					time.add(terminalPoints[1]);value.add((long) 0);
-					
+
 					Log.v("ELSERVICE","add Disagg: "+Long.toString(time.size())+" "+Long.toString(value.size()));
-					
+
 					JSONArray wastageTimeArray=activity.getJSONArray("wastage_times");
 					for(int j=0;j<wastageTimeArray.length();j++){
 						JSONObject wasteTime=wastageTimeArray.getJSONObject(j);

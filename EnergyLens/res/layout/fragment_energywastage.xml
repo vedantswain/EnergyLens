@@ -17,7 +17,7 @@
             android:id="@+id/sorryText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sorry we have no information to display"
+            android:text="Looks like you're a new user. Continue with your day to day activities and check back later"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <LinearLayout

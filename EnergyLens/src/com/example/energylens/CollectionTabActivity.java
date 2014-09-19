@@ -109,7 +109,6 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 			Common.changeCurrentVisible(0);
 			toggleServiceMessage("startServices from Main");
 		}
-		
 
 		timeOfVisit=System.currentTimeMillis();
 
@@ -227,6 +226,7 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 
 	protected void onResume(){
 		super.onResume();
+		timeOfVisit=System.currentTimeMillis();
 		getUpdatedPreferences();
 		
 //		LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,

@@ -105,12 +105,13 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 					setTimeView();
 					appSpinner.setVisibility(View.VISIBLE);
 					locSpinner.setVisibility(View.VISIBLE);
-					if(occList.size()>1)
+					if(occList.size()>1){
 						occSpinner.setVisibility(View.VISIBLE);
+						occIcon.setVisibility(View.VISIBLE);
+					}
 					appIcon.setVisibility(View.VISIBLE);
 					locIcon.setVisibility(View.VISIBLE);
-					occIcon.setVisibility(View.VISIBLE);
-
+					
 					if(wasClicked==0)
 						GroundReportActivity.changeCorrectionIds(id,pair,toOcc,timeOfStay,2);
 					else
