@@ -333,13 +333,13 @@ public class ReassignActivity extends FragmentActivity implements AppLocDialogFr
 
 	public void selectStart(View view){
 		TimePickerDialogFragment newFragment = new TimePickerDialogFragment();
-		newFragment.show(getFragmentManager(), "Appliances");
+		newFragment.show(getFragmentManager(), "Start Time Picker");
 		changeTimeOf="start";
 	}
 
 	public void selectEnd(View view){
 		TimePickerDialogFragment newFragment = new TimePickerDialogFragment();
-		newFragment.show(getFragmentManager(), "Time Picker");
+		newFragment.show(getFragmentManager(), "Stop Time Picker");
 		changeTimeOf="end";
 	}
 

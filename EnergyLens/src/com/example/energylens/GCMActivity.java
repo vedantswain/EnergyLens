@@ -324,6 +324,9 @@ TryAgainConnectionRefusedDialogFragment.TryAgainDialogListener{
 		else if(apptNo.getText().toString().matches("")){
 			Toast.makeText(context, "you forgot to give your appartment number", 1000).show();
 		}
+		else if(wifiSSID.matches("")){
+			Toast.makeText(context, "you need to select a home AP", 1000).show();
+		}
 		else{
 			regName=name.getText().toString();
 			regEmail=email.getText().toString();

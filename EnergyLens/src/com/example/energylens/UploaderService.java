@@ -6,7 +6,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -28,6 +27,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Binder;
 import android.os.Environment;
 import android.os.IBinder;
@@ -248,7 +249,7 @@ public class UploaderService extends Service{
 
 	private void headerFix(File file, String header){
 		String tempFilePath=dataPath+"temp_log.csv";
-		Log.v("ELSERVICES",header+": Header missing");
+//		Log.v("ELSERVICES",header+": Header missing");
 
 		//fixing header
 
@@ -293,10 +294,10 @@ public class UploaderService extends Service{
 
 			br.close();
 			bw.close();
-			
+
 			File fileTemp=new File(tempFilePath);
 			fileTemp.delete();
-			
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -333,7 +334,7 @@ public class UploaderService extends Service{
 		try {
 			br = new BufferedReader(new FileReader(file.getAbsolutePath()));
 			String firstline=br.readLine();
-			Log.v("ELSERVICES", "Header: "+firstline+" Second Line: "+br.readLine());
+//			Log.v("ELSERVICES", "Header: "+firstline+" Second Line: "+br.readLine());
 
 			if (!firstline.equals(header)) {
 				headerFix(file,header);
@@ -390,110 +391,123 @@ public class UploaderService extends Service{
 		}
 	}
 
+	public boolean checkWifi(){
+		ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+
+		if (mWifi.isConnected()) {
+			Log.v("ELSERVICES", "Wifi Connection: true");
+			return true;
+		}
+
+		Log.v("ELSERVICES", "Wifi Connection: false");
+		return false;
+	}
 
 	public void upload(File upFile,String URL){
-		try
-		{
-			Log.i("ELSERVICES", URL);
-			URL url = new URL(URL);
-			connection = (HttpURLConnection) url.openConnection();
+		if(checkWifi()){
+			try
+			{
+				Log.i("ELSERVICES", URL);
+				URL url = new URL(URL);
+				connection = (HttpURLConnection) url.openConnection();
 
-			// Allow Inputs &amp; Outputs.
-			connection.setDoInput(true);
-			connection.setDoOutput(true);
-			connection.setUseCaches(false);
+				// Allow Inputs &amp; Outputs.
+				connection.setDoInput(true);
+				connection.setDoOutput(true);
+				connection.setUseCaches(false);
 
-			// Set HTTP method to POST.
-			connection.setRequestMethod("POST");
+				// Set HTTP method to POST.
+				connection.setRequestMethod("POST");
 
-			connection.setRequestProperty("Connection", "Keep-Alive");
-			connection.setRequestProperty("Content-Type", "multipart/form-data;boundary="+boundary);
+				connection.setRequestProperty("Connection", "Keep-Alive");
+				connection.setRequestProperty("Content-Type", "multipart/form-data;boundary="+boundary);
 
-			//	    	    Log.v("ELSERVICES",upFile.getAbsolutePath());
+				//	    	    Log.v("ELSERVICES",upFile.getAbsolutePath());
 
 
-			FileInputStream fileInputStream = new FileInputStream(upFile);
-			//		    	Log.i("ELSERVICES", upFile.getAbsolutePath());
+				FileInputStream fileInputStream = new FileInputStream(upFile);
+				//		    	Log.i("ELSERVICES", upFile.getAbsolutePath());
 
-			if(connection!=null){
+				if(connection!=null){
 
-				outputStream = new DataOutputStream( connection.getOutputStream() );
-				outputStream.writeBytes(twoHyphens + boundary + lineEnd);
-				outputStream.writeBytes("Content-Disposition: form-data; name=\"uploadedfile\";filename=\"" +upFile.getAbsolutePath() +"\"" + lineEnd);
-				outputStream.writeBytes(lineEnd);
+					outputStream = new DataOutputStream( connection.getOutputStream() );
+					outputStream.writeBytes(twoHyphens + boundary + lineEnd);
+					outputStream.writeBytes("Content-Disposition: form-data; name=\"uploadedfile\";filename=\"" +upFile.getAbsolutePath() +"\"" + lineEnd);
+					outputStream.writeBytes(lineEnd);
 
-				bytesAvailable = fileInputStream.available();
-				bufferSize = Math.min(bytesAvailable, maxBufferSize);
-				buffer = new byte[bufferSize];
-
-				Log.i("ELSERVICES", Integer.toString(bufferSize));
-
-				// Read file
-				bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-
-				while (bytesRead > 0)
-				{
-					outputStream.write(buffer, 0, bufferSize);
 					bytesAvailable = fileInputStream.available();
 					bufferSize = Math.min(bytesAvailable, maxBufferSize);
+					buffer = new byte[bufferSize];
+
+					Log.i("ELSERVICES", Integer.toString(bufferSize));
+
+					// Read file
 					bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-				}
 
-				outputStream.writeBytes(lineEnd);
-				outputStream.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
-
-				// Responses from the server (code and message)
-				serverResponseCode = connection.getResponseCode();
-				serverResponseMessage = connection.getResponseMessage();
-
-				Log.v("ELSERVICES",Integer.toString(serverResponseCode)+" "+serverResponseMessage);
-
-				fileInputStream.close();
-				outputStream.flush();
-				outputStream.close();
-
-				InputStream in=null;
-				StringBuffer sb=new StringBuffer();
-
-				try {
-					in=connection.getInputStream();
-					int ch;
-					while ((ch = in.read()) != -1) {
-						sb.append((char) ch);
+					while (bytesRead > 0)
+					{
+						outputStream.write(buffer, 0, bufferSize);
+						bytesAvailable = fileInputStream.available();
+						bufferSize = Math.min(bytesAvailable, maxBufferSize);
+						bytesRead = fileInputStream.read(buffer, 0, bufferSize);
 					}
-					Log.v("ELSERVICES", "input stream: "+sb.toString());
-				} catch (IOException e) {
-					throw e;
-				} finally {
-					if (in != null) {
-						in.close();
+
+					outputStream.writeBytes(lineEnd);
+					outputStream.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+
+					// Responses from the server (code and message)
+					serverResponseCode = connection.getResponseCode();
+					serverResponseMessage = connection.getResponseMessage();
+
+					Log.v("ELSERVICES",Integer.toString(serverResponseCode)+" "+serverResponseMessage);
+
+					fileInputStream.close();
+					outputStream.flush();
+					outputStream.close();
+
+					InputStream in=null;
+					StringBuffer sb=new StringBuffer();
+
+					try {
+						in=connection.getInputStream();
+						int ch;
+						while ((ch = in.read()) != -1) {
+							sb.append((char) ch);
+						}
+						Log.v("ELSERVICES", "input stream: "+sb.toString());
+					} catch (IOException e) {
+						throw e;
+					} finally {
+						if (in != null) {
+							in.close();
+						}
 					}
-				}
 
-				JSONObject response=new JSONObject(sb.toString());
-				String serverResponseType=response.getString("type");
-				int serverResponseCode=response.getInt("code");
-				String serverResponseMessage=response.getString("message");
-				Log.v("ELSERVICES","URL: "+URL+ 
-						" type: "+serverResponseType+'\n'+"code: "+serverResponseCode+'\n'+"message+: "+serverResponseMessage);
+					JSONObject response=new JSONObject(sb.toString());
+					String serverResponseType=response.getString("type");
+					int serverResponseCode=response.getInt("code");
+					String serverResponseMessage=response.getString("message");
+					Log.v("ELSERVICES","URL: "+URL+ 
+							" type: "+serverResponseType+'\n'+"code: "+serverResponseCode+'\n'+"message+: "+serverResponseMessage);
 
-				if(connection.getResponseCode()>=200 && connection.getResponseCode()<300 && serverResponseCode==1){
-					upFile.delete();	    	    
-					Log.v("ELSERVICES", "Upload complete "+System.currentTimeMillis());
+					if(connection.getResponseCode()>=200 && connection.getResponseCode()<300 && serverResponseCode==1){
+						upFile.delete();	    	    
+						Log.v("ELSERVICES", "Upload complete "+System.currentTimeMillis());
 
+					}
+					else{
+						Log.i("ELSERVICES", "can't upload due to Code: "+Integer.toString(serverResponseCode)+serverResponseMessage);
+					}
 				}
 				else{
-					Log.i("ELSERVICES", "can't upload due to Code: "+Integer.toString(serverResponseCode)+serverResponseMessage);
+					Log.v("ELSERVICES", "Upload failed "+System.currentTimeMillis());
 				}
 			}
-			else{
-				Log.v("ELSERVICES", "Upload failed "+System.currentTimeMillis());
+			catch (Exception e)
+			{
+				e.printStackTrace();
 			}
 		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-
 	}
 }

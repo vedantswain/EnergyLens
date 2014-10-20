@@ -2,11 +2,14 @@ package com.example.energylens;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
+import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,12 +18,13 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public class UsageReportFragment extends Fragment implements OnItemSelectedListener {
+public class UsageReportFragment extends Fragment implements OnItemSelectedListener,TimePickerDialogFragment.TimePickerDialogListener{
 
 	View inflateView;
 	private String[] locations={"New Location","Kitchen","Dining Room","Bedroom1","Bedroom2","Bedroom3","Study","Corridor"};
@@ -40,7 +44,13 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 	String[] pair={"",""};
 	long timeOfStay=0;
 	int corrected_count=0;
+	TextView startTimeText, stopTimeText;
+	Button startTimeBtn, stopTimeBtn;
+	private String changeTimeOf="";
+	private long startTime=0, stopTime=0;
 
+	static final int FRAGMENT_ID=2512;
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -48,12 +58,12 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 		inflateView=inflater.inflate(R.layout.fragment_usagereport, container, false);
 		String appliance=getArguments().getString("appliance");
 		long usage=getArguments().getLong("usage");
-		long from=getArguments().getLong("from")*1000;
-		long to=getArguments().getLong("to")*1000;
+		final long from=getArguments().getLong("from")*1000;
+		final long to=getArguments().getLong("to")*1000;
 		id=getArguments().getLong("id");
 		String loc=getArguments().getString("loc");
 
-		SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
 		dateFormat.format(from);
 		TextView activityText=(TextView)inflateView.findViewById(R.id.activityText);
 		final String activityLine="Using "+appliance+" from "+dateFormat.format(from).toString()+" to "+dateFormat.format(to).toString()
@@ -67,7 +77,45 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 		setMinsSpinner();
 		setHoursSpinner();
 
+		startTimeText=(TextView)inflateView.findViewById(R.id.startTimeText);
+		startTimeText.setVisibility(View.GONE);
+		startTimeBtn=(Button)inflateView.findViewById(R.id.startTimeBtn);
+		startTimeBtn.setText(dateFormat.format(from).toString());
+		startTimeBtn.setVisibility(View.GONE);
+		startTimeBtn.setOnClickListener(new OnClickListener()
+		{
 
+			@Override
+			public void onClick(View v)
+			{
+				TimePickerDialogFragment newFragment = new TimePickerDialogFragment();
+				newFragment.changeInitTime(from);
+				newFragment.setTargetFragment(UsageReportFragment.this,FRAGMENT_ID);
+				newFragment.show(getFragmentManager(), "Start Time Picker");
+				changeTimeOf="start";
+			} 
+		}); 
+
+
+		stopTimeText=(TextView)inflateView.findViewById(R.id.stopTimeText);
+		stopTimeText.setVisibility(View.GONE);
+		stopTimeBtn=(Button)inflateView.findViewById(R.id.stopTimeBtn);
+		stopTimeBtn.setText(dateFormat.format(to).toString());
+		stopTimeBtn.setVisibility(View.GONE);
+		stopTimeBtn.setOnClickListener(new OnClickListener()
+		{
+
+			@Override
+			public void onClick(View v)
+			{
+				TimePickerDialogFragment newFragment = new TimePickerDialogFragment();
+				newFragment.changeInitTime(to);
+				newFragment.setTargetFragment(UsageReportFragment.this,FRAGMENT_ID);
+				newFragment.show(getFragmentManager(), "Stop Time Picker");
+				changeTimeOf="stop";
+			} 
+		}); 
+		
 		RadioButton isCorrect=(RadioButton) inflateView.findViewById(R.id.radio_correct);
 		isCorrect.setOnClickListener(new OnClickListener(){
 			//			@Override
@@ -87,7 +135,12 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 					occSpinner.setVisibility(View.GONE);
 					occSpinner.setSelection(0);
 					occIcon.setVisibility(View.GONE);
-					GroundReportActivity.changeCorrectionIds(id,pair,0,timeOfStay, 0);
+					startTimeText.setVisibility(View.GONE);
+					startTimeBtn.setVisibility(View.GONE);
+					stopTimeText.setVisibility(View.GONE);
+					stopTimeBtn.setVisibility(View.GONE);
+					String[] pairEmpty={"",""};
+					GroundReportActivity.changeCorrectionIds(id,pairEmpty,0,timeOfStay,0,0, 0);
 					wasClicked=0;
 				}
 			}
@@ -111,11 +164,16 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 					}
 					appIcon.setVisibility(View.VISIBLE);
 					locIcon.setVisibility(View.VISIBLE);
-					
+
+					startTimeText.setVisibility(View.VISIBLE);
+					startTimeBtn.setVisibility(View.VISIBLE);
+					stopTimeText.setVisibility(View.VISIBLE);
+					stopTimeBtn.setVisibility(View.VISIBLE);
+
 					if(wasClicked==0)
-						GroundReportActivity.changeCorrectionIds(id,pair,toOcc,timeOfStay,2);
+						GroundReportActivity.changeCorrectionIds(id,pair,toOcc,timeOfStay,startTime,stopTime,2);
 					else
-						GroundReportActivity.changeCorrectionIds(id,pair,toOcc,timeOfStay, 1);
+						GroundReportActivity.changeCorrectionIds(id,pair,toOcc,timeOfStay,startTime,stopTime, 1);
 
 					wasClicked=1;
 				}
@@ -299,13 +357,6 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 
 	}
 
-	public void onTimeSelect(View view){
-
-	}
-
-	public void offTimeSelect(View view){
-
-	}
 
 	@Override
 	public void onNothingSelected(AdapterView<?> arg0) {
@@ -314,4 +365,47 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 	}
 
 
+	@Override
+	public void onSetTime(int hourOfDay, int minute) {
+		// TODO Auto-generated method stub
+
+	}
+
+	
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		
+		switch(requestCode) {
+		case FRAGMENT_ID:
+
+			if (resultCode == Activity.RESULT_OK) {
+				Bundle bundle=data.getExtras();
+				int hourOfDay=bundle.getInt("hourOfDay",0);
+				int minute=bundle.getInt("minute",0);
+				long time=(hourOfDay*60*60+minute*60)*1000;
+				
+				Calendar c=Calendar.getInstance();
+				Calendar reportDate=Calendar.getInstance();
+				reportDate.setTime(new Date(GroundReportActivity.current_date));
+				c.set(reportDate.get(Calendar.YEAR),reportDate.get(Calendar.MONTH) ,reportDate.get(Calendar.DAY_OF_MONTH), hourOfDay, minute);
+								
+				SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+				String timeString=dateFormat.format(c.getTimeInMillis()).toString();
+				if(changeTimeOf=="start"){
+					startTime=c.getTimeInMillis();
+					startTimeBtn.setText(timeString);
+					GroundReportActivity.changeStartTime(id, time);
+				}
+				else if(changeTimeOf=="stop"){
+					stopTime=c.getTimeInMillis();
+					stopTimeBtn.setText(timeString);
+					GroundReportActivity.changeStopTime(id, time);
+				}
+				
+//				Log.v("ELSERVICES", "Correction Time: "+c.toString());
+			} else if (resultCode == Activity.RESULT_CANCELED){
+														
+			}
+		break;
+		}
+	}
 }

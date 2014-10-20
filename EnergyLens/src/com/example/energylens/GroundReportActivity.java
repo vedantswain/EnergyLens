@@ -49,13 +49,15 @@ import android.widget.Toast;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-public class GroundReportActivity extends FragmentActivity implements TryAgainConnectionRefusedDialogFragment.TryAgainDialogListener{
+public class GroundReportActivity extends FragmentActivity implements TimePickerDialogFragment.TimePickerDialogListener, TryAgainConnectionRefusedDialogFragment.TryAgainDialogListener{
 
 	ArrayList<Fragment> fragmentList=new ArrayList<Fragment>();
 	ArrayList<Long> usage=new ArrayList<Long>();
 	ArrayList<Long> ids=new ArrayList<Long>();
 	ArrayList<long[]> period=new ArrayList<long[]>();
 	static ArrayList<Long> timeOfStay=new ArrayList<Long>();
+	static ArrayList<Long> startTime=new ArrayList<Long>();
+	static ArrayList<Long> stopTime=new ArrayList<Long>();
 	ArrayList<String> apps=new ArrayList<String>();
 	ArrayList<String> locs=new ArrayList<String>();
 	private long lastSyncInMillis;
@@ -82,7 +84,7 @@ public class GroundReportActivity extends FragmentActivity implements TryAgainCo
 	ArrayList<String> dates=new ArrayList<String>();
 	String current_response;
 	int report_index;
-	long current_date;
+	static long current_date;
 
 	private ProgressDialog progress;
 	
@@ -155,7 +157,7 @@ public class GroundReportActivity extends FragmentActivity implements TryAgainCo
 		}
 	}
 
-	static void changeCorrectionIds(long id,String[] pairData,int occupant,long time,int flag){
+	static void changeCorrectionIds(long id,String[] pairData,int occupant,long time,long startTime,long stopTime,int flag){
 		if(flag>0){
 			if(flag>1){
 				int index=correctionIds.indexOf(id);
@@ -182,6 +184,8 @@ public class GroundReportActivity extends FragmentActivity implements TryAgainCo
 		}
 		Log.v("ELSERVICES", "id added: "+correctionIds.indexOf(id));
 		changeTimeOfStay(id,time);
+		changeStartTime(id,startTime);
+		changeStopTime(id,stopTime);
 		changeCorrectionPairData(id,pairData);
 		changeOccupant(id,occupant);
 	}
@@ -196,6 +200,27 @@ public class GroundReportActivity extends FragmentActivity implements TryAgainCo
 		return true;
 	}
 
+	static void changeStartTime(long id,long time){
+		int index=correctionIds.indexOf(id);
+		if(startTime.size()>index)
+			startTime.remove(index);
+
+		if(index<startTime.size())	
+			startTime.add(index,time);
+		else
+			startTime.add(time);
+	}
+	static void changeStopTime(long id,long time){
+		int index=correctionIds.indexOf(id);
+		if(stopTime.size()>index)
+			stopTime.remove(index);
+
+		if(index<stopTime.size())	
+			stopTime.add(index,time);
+		else
+			stopTime.add(time);
+	}
+	
 	static void changeTimeOfStay(long id,long time){
 		int index=correctionIds.indexOf(id);
 		if(timeOfStay.size()>index)
@@ -329,6 +354,12 @@ public class GroundReportActivity extends FragmentActivity implements TryAgainCo
 						}
 						if(correctOccupant.size()>index)
 							activity.put("to_occupant", correctOccupant.get(index));
+						if(startTime.size()>index && stopTime.size()>index){
+							if(startTime.get(index)!=0)
+								activity.put("start_time", startTime.get(index));
+							if(stopTime.get(index)!=0)
+								activity.put("stop_time", stopTime.get(index));
+						}
 						activity.put("incorrect", correctionTF.get(index));
 					}
 					activities.put(activity);
@@ -595,6 +626,12 @@ public class GroundReportActivity extends FragmentActivity implements TryAgainCo
 	public void onCancelNow() {
 		// TODO Auto-generated method stub
 		finish();
+	}
+
+	@Override
+	public void onSetTime(int hourOfDay, int minute) {
+		// TODO Auto-generated method stub
+		
 	}
 
 

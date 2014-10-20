@@ -24,7 +24,7 @@ public class Common{
 	public static String LOCATION="none";
 	public static long UPLOAD_INTERVAL = 2; //minutes between each upload
 	public static String FILE_PREFIX="";
-	public static String SERVER_URL="http://192.168.20.217:9010/";
+	public static String SERVER_URL="http://energy.iiitd.edu.in:9030/";
 	public static String API="data/upload/";
 	public static String REG_API="device/register/";
 	public static String REALTIME_API="power/real-time/";
