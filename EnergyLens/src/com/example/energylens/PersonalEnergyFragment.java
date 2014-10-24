@@ -273,9 +273,9 @@ public class PersonalEnergyFragment extends Fragment {
 
 		SharedPreferences sp=getActivity().getSharedPreferences(PREFS_NAME,0);
 
-		if(sp.contains("LAST_SYNC")){
+		if(sp.contains(LAST_SYNC_TIME)){
 			Log.v("ELSERVICES", "Loading PEn from saved data");
-			lastSyncInMillis=sp.getLong("LAST_SYNC",System.currentTimeMillis());
+			lastSyncInMillis=sp.getLong(LAST_SYNC_TIME,System.currentTimeMillis());
 			parsePref(sp.getString("JSON_RESPONSE", ""));
 			setViews();
 			updateChart();
@@ -435,7 +435,7 @@ public class PersonalEnergyFragment extends Fragment {
 				SharedPreferences bundleData=getActivity().getSharedPreferences(PREFS_NAME,0);
 				Editor editor=bundleData.edit();
 				editor.putString("JSON_RESPONSE", response.toString());
-				editor.putLong("LAST_SYNC", lastSyncInMillis);
+				editor.putLong(LAST_SYNC_TIME, lastSyncInMillis);
 				editor.commit();
 
 				JSONObject options=new JSONObject(response.getString("options"));
@@ -497,7 +497,6 @@ public class PersonalEnergyFragment extends Fragment {
 		TextView textView=(TextView)inflateView.findViewById(R.id.lastSyncText);
 		textView.setText("Last synced on: "+lastSyncTime);
 
-		lastSyncInMillis=System.currentTimeMillis();
 	}
 
 	private BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -509,10 +508,11 @@ public class PersonalEnergyFragment extends Fragment {
 				Bundle data = bundle.getBundle("Data");
 				parseData(data);
 				if(data.getString("api").equals("energy/personal/")){
+					lastSyncInMillis=System.currentTimeMillis();
 					setViews();
 					updateChart();
 					updateApps();
-					updateViews(System.currentTimeMillis());
+					updateViews(lastSyncInMillis);
 				}
 			}
 		}

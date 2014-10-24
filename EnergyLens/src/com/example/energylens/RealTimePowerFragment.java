@@ -27,6 +27,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint.Align;
@@ -42,6 +43,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
@@ -51,15 +53,23 @@ public class RealTimePowerFragment extends Fragment{
 	GoogleCloudMessaging gcm;
 	String SENDER_ID = "166229175411";
 	Double power;
+	int minute=10;
 	static Double timestamp;
 	static ArrayList<Double> firstTimes=new ArrayList<Double>();
 	static ArrayList<Double> firstPowers=new ArrayList<Double>();
-	Timer myTimer = new Timer();
+	static Timer myTimer = new Timer();
+
+	static double maxY=0;
 
 	static Context context;
 	static View rootView;
 
 	private static int counter=0;
+
+	static ProgressDialog progress;
+
+	static XYMultipleSeriesRenderer mRenderer;
+	static LinearLayout chart_container;	
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -70,61 +80,21 @@ public class RealTimePowerFragment extends Fragment{
 
 		context=getActivity();
 
-		firstUpdate();
-
 		return rootView;
 	}
 
-	public void setupChart(){
-		Calendar c=Calendar.getInstance();
-		c.setTimeInMillis((long) (timestamp*1));
-		drawChart(c.getTime(),Math.round(power));
-	}
-
-	//	public static void firstSetupChart(){
-	//		mSeries=new TimeSeries("Real-Time Power");
-	//		Log.v("ELSERVICES", "First chart setup");
-	//		Calendar c=Calendar.getInstance();
-	//		int index=0;
-	//		for(index=0;index<firstTimes.size()-1;index++){
-	//			c.setTimeInMillis((long) (firstTimes.get(index)*1000));
-	//			mSeries.add(c.getTime(), firstPowers.get(index));
-	//			counter++;
-	//			Log.v("ELSERVICES", "First data: "+c.getTime().toString()+", "+firstPowers.get(index)+" index: "+index);
-	//		}
-	//		c.setTimeInMillis((long) (firstTimes.get(index)*1000));
-	//		drawChart(c.getTime(),Math.round(firstPowers.get(index)));
-	//	}
-
-	static TimeSeries mSeries=new TimeSeries("Real-Time Power");;
-
-
-	public static void drawChart(Date x, double y){
-
-
-		//		Log.v("ELSERVICES", "Realtime draw chart");
-
-		counter++;
-		if(counter>60){
-			mSeries.remove(0);
-		}
-		mSeries.add(x, y);
-
-		//		Log.v("ELSERVICES", "Realtime mSeries ready set");
-
+	public void setupRenderer(){
 		XYSeriesRenderer renderer = new XYSeriesRenderer();
 		renderer.setLineWidth(2);
 		renderer.setColor(Color.RED);
 
 		renderer.setDisplayBoundingPoints(true);
-		//		renderer.setPointStyle(PointStyle.CIRCLE);
-		//		renderer.setPointStrokeWidth(3);
-		renderer.setDisplayChartValues(true);
+		renderer.setDisplayChartValues(false);
 
 		DisplayMetrics metrics = context.getResources().getDisplayMetrics();
 		float val = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, metrics);
 
-		final XYMultipleSeriesRenderer mRenderer = new XYMultipleSeriesRenderer();
+		mRenderer = new XYMultipleSeriesRenderer();
 		mRenderer.addSeriesRenderer(renderer);
 
 		mRenderer.setMarginsColor(Color.argb(0x00, 0xff, 0x00, 0x00)); 
@@ -135,7 +105,6 @@ public class RealTimePowerFragment extends Fragment{
 		mRenderer.setZoomEnabled(false);
 		mRenderer.setPanEnabled(false);
 		mRenderer.setYAxisMin(0);
-		mRenderer.setYAxisMax(y+500);
 		mRenderer.setChartTitleTextSize(val);
 		mRenderer.setLabelsColor(Color.DKGRAY);
 		mRenderer.setYLabelsColor(0, Color.DKGRAY);
@@ -151,44 +120,99 @@ public class RealTimePowerFragment extends Fragment{
 		int[] margins={20,80,120,0};
 		mRenderer.setMargins(margins);
 
+		chart_container=(LinearLayout)rootView.findViewById(R.id.chartComparison);
+	}
+
+	public void setupChart(){
+		Calendar c=Calendar.getInstance();
+		c.setTimeInMillis((long) (timestamp*1));
+		//		drawChart(c.getTime(),Math.round(power));
+	}
+
+
+	public static void firstSetupChart(){
+		try{
+			TimeSeries mSeries=new TimeSeries("Real-Time Power");
+			Log.v("ELSERVICES", "First chart setup");
+			Calendar c=Calendar.getInstance();
+			int index=0;
+
+			Iterator<Double> timeIt=firstTimes.iterator();
+			Iterator<Double> powerIt=firstPowers.iterator();
+
+			double maxPow=0;
+
+			while(timeIt.hasNext() && powerIt.hasNext()){
+				c.setTimeInMillis((long)(timeIt.next()*1));
+				double power=powerIt.next();
+				mSeries.add(c.getTime(), power);
+				if(power>maxPow)
+					maxPow=power;
+			}
+
+			firstTimes.clear();
+			firstPowers.clear();
+
+			drawChart(mSeries);
+		}
+		catch(Exception e){
+			Log.e("ELSERVICES", e.toString());
+		}
+
+	}
+
+	public static void drawChart(TimeSeries mSeries){
+
+		Log.v("ELSERVICES", "Realtime draw chart");
+
+		//		counter++;
+		//		if(counter>60*10){
+		//			mSeries.remove(0);
+		//		}
+		//		mSeries.add(x, y);
+
+		//		if(y>maxY)
+
+		//		Log.v("ELSERVICES", "Realtime mSeries ready set");
+
+
 		//		Log.v("ELSERVICES", "Realtime renderer set");
 
 		final XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
 		dataset.addSeries(mSeries);
 
+		mRenderer.setYAxisMax(mSeries.getMaxY()+500);
 
 		//		Log.v("ELSERVICES", "Realtime dataset ready");
 
 		GraphicalView chartView = ChartFactory.getTimeChartView(context, dataset, mRenderer,"Real Time Power");
 
-
-		//		Log.v("ELSERVICES", "Realtime chartview ready");
-
-		LinearLayout chart_container=(LinearLayout)rootView.findViewById(R.id.chartComparison);
-		//		Log.i("ELSERVICES", "RTP "+chart_container.toString()+" "+System.currentTimeMillis());  
-
 		chart_container.addView(chartView,0);
-
-		//		Log.v("ELSERVICES", "Realtime chartview added");
+		Log.v("ELSERVICES", "Realtime chartview added; "+mSeries.getItemCount());
 
 		TextView textView=(TextView) rootView.findViewById(R.id.RealTimeText);
-		textView.setText("Current power consumption: "+y+" Watts");
+		textView.setText("Current power consumption: "+mSeries.getY(mSeries.getItemCount()-1)+" Watts");
 	}	
 
 	private void UpdateGUI() {
+
 		myTimer = new Timer();
 		myTimer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				if(Common.CURRENT_VISIBLE==2)
-					mHandler.post(mTask);
+				mHandler.post(mTask);
 			}
 		}, 0, 1000);
 	}
 
-		public static void firstUpdate(){
-			mHandler.post(firstTask);
-		}
+	public static void showProgress(){
+		progress = ProgressDialog.show(context, "Fetching",
+				"Fetching real-time data from server. Please wait...", true);
+	}
+
+	public static void firstUpdate(){
+		//		mHandler.post(firstTask);
+	}
 
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -199,6 +223,7 @@ public class RealTimePowerFragment extends Fragment{
 	@Override
 	public void onResume() {
 		super.onResume();
+		setupRenderer();
 		UpdateGUI();
 	}
 
@@ -217,12 +242,13 @@ public class RealTimePowerFragment extends Fragment{
 
 
 			DefaultHttpClient httpclient = new DefaultHttpClient();
-			HttpPost httpPost = new HttpPost(Common.SERVER_URL+Common.REALTIME_API);
+			HttpPost httpPost = new HttpPost(Common.SERVER_URL+Common.REALTIME_API+"past/");
 
 			String json = "";
 
 			JSONObject jsonObject = new JSONObject();
 			jsonObject.put("dev_id", devid);
+			jsonObject.put("minutes", minute);
 
 			json = jsonObject.toString();
 
@@ -262,10 +288,11 @@ public class RealTimePowerFragment extends Fragment{
 			String key=it.next().toString();
 			timestamp=Double.parseDouble(key);
 			power=Double.parseDouble(response.getString(key));
-			
+
 			SimpleDateFormat ft = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
-			
-			Log.v("ELSERVICES", "RTP retrieved at "+ft.format(timestamp).toString()+": "+power);		
+
+			Log.v("ELSERVICES", "RTP retrieved at "+ft.format(timestamp).toString()+": "+power);
+			Log.v("ELSERVICES", "Current Visible: "+Common.CURRENT_VISIBLE);
 			return "RTP retrieved";
 
 		} catch (Exception e) {
@@ -275,114 +302,140 @@ public class RealTimePowerFragment extends Fragment{
 
 	}
 
-		public static String getFirstTimeData(){
-			InputStream inputStream = null;
+	public static String getFirstTimeData(){
+		InputStream inputStream = null;
+		try {
+
+			TelephonyManager telephonyManager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+			Long devid=Long.parseLong(telephonyManager.getDeviceId());
+
+
+			DefaultHttpClient httpclient = new DefaultHttpClient();
+			HttpPost httpPost = new HttpPost(Common.SERVER_URL+Common.REALTIME_API+"past/");
+
+			String json = "";
+
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("dev_id", devid);
+			jsonObject.put("minutes", 1);
+
+			json = jsonObject.toString();
+
+			StringEntity se = new StringEntity(json);
+			//	        se.setContentType("application/json;charset=UTF-8");
+			se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE,"application/json"));
+
+			httpPost.setEntity(se);
+
+			HttpResponse httpResponse = httpclient.execute(httpPost);
+
+			inputStream = httpResponse.getEntity().getContent();
+			StatusLine sl=httpResponse.getStatusLine();
+
+
+			Log.v("ELSERVICES", Integer.toString(sl.getStatusCode()));
+
+
+			StringBuffer sb=new StringBuffer();
+
 			try {
-	
-				TelephonyManager telephonyManager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
-				Long devid=Long.parseLong(telephonyManager.getDeviceId());
-	
-	
-				DefaultHttpClient httpclient = new DefaultHttpClient();
-				HttpPost httpPost = new HttpPost(Common.SERVER_URL+Common.REALTIME_API+"past/");
-	
-				String json = "";
-	
-				JSONObject jsonObject = new JSONObject();
-				jsonObject.put("dev_id", devid);
-	
-				json = jsonObject.toString();
-	
-				StringEntity se = new StringEntity(json);
-				//	        se.setContentType("application/json;charset=UTF-8");
-				se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE,"application/json"));
-	
-				httpPost.setEntity(se);
-	
-				HttpResponse httpResponse = httpclient.execute(httpPost);
-	
-				inputStream = httpResponse.getEntity().getContent();
-				StatusLine sl=httpResponse.getStatusLine();
-	
-	
-				Log.v("ELSERVICES", Integer.toString(sl.getStatusCode()));
-	
-	
-				StringBuffer sb=new StringBuffer();
-	
-				try {
-					int ch;
-					while ((ch = inputStream.read()) != -1) {
-						sb.append((char) ch);
-					}
-					Log.v("ELSERVICES", "first input stream: "+sb.toString());
-				} catch (IOException e) {
-					throw e;
-				} finally {
-					if (inputStream != null) {
-						inputStream.close();
-					}
+				int ch;
+				while ((ch = inputStream.read()) != -1) {
+					sb.append((char) ch);
 				}
-	
-				JSONObject response=new JSONObject(sb.toString());
-				Iterator it=response.keys();
-	
-				firstTimes=new ArrayList<Double>();
-				firstPowers=new ArrayList<Double>();
-	
-				while(it.hasNext()){
-					String key=it.next().toString();
-					firstTimes.add(Double.parseDouble(key));
-					firstPowers.add(Double.parseDouble(response.getString(key)));
-	
-					//				Log.v("ELSERVICES","Realtime pair"+ key+" "+response.getString(key));
+				//				Log.v("ELSERVICES", "first input stream: "+sb.toString());
+			} catch (IOException e) {
+				throw e;
+			} finally {
+				if (inputStream != null) {
+					inputStream.close();
 				}
-	
-				Log.v("ELSERVICES", "First time received");	
-	
-				return "RTP first retrieved";
-	
-	
-			} catch (Exception e) {
-				e.printStackTrace();
-				return "ERROR: RTP response";
 			}
-	
-		}
-	
-		public static void sendFirst(){
-			new AsyncTask<Void,String,String>() {
-				@Override
-				protected String doInBackground(Void... params) {
-					String msg = "Realtime First Data retrieved";
-					msg=getFirstTimeData();
-					Log.v("ELSERVICES", "Realtime First: "+msg);
-					return msg;
-				}
-	
-				@Override
-				protected void onPostExecute(String msg) {
-					//				Log.i("ELSERVICES", msg);
-//					firstSetupChart();
-				}
-			}.execute(null, null, null);
+
+			JSONObject response=new JSONObject(sb.toString());
+			Iterator it=response.keys();
+
+			firstTimes=new ArrayList<Double>();
+			firstPowers=new ArrayList<Double>();
+
+			while(it.hasNext()){
+				String key=it.next().toString();
+				firstTimes.add(Double.parseDouble(key));
+				firstPowers.add(Double.parseDouble(response.getString(key)));
+
+				//				Log.v("ELSERVICES","Realtime pair"+ key+" "+response.getString(key));
+			}
+
+			Log.v("ELSERVICES", "First time received");	
+
+			return "RTP first retrieved";
+
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "ERROR: RTP response";
 		}
 
-	public void sendMessage(){
+	}
+
+	public static void sendFirst(){
 		new AsyncTask<Void,String,String>() {
+			
 			@Override
 			protected String doInBackground(Void... params) {
-				String msg = "Realtime Data retrieved";
-				msg=getRealTimeData();
-				//				Log.v("ELSERVICES", "Realtime: "+msg);
+				String msg = "Realtime First Data retrieved";
+				msg=getFirstTimeData();
+				Log.v("ELSERVICES", "Realtime First: "+msg);
 				return msg;
 			}
 
 			@Override
 			protected void onPostExecute(String msg) {
-				Log.i("ELSERVICES", msg);
-				if(msg.equals("RTP retrieved"))
-					setupChart();
+				//				Log.i("ELSERVICES", msg);
+				//					firstSetupChart();
+				if(progress.isShowing())
+					progress.dismiss();
+				if(msg.equals("Realtime First Data retrieved") || msg.equals("ERROR: RTP response"))
+					Toast.makeText(context, "Error in retreiving past data", 1000).show();
+				else{
+					//					firstSetupChart();
+				}
+			}
+
+		}.execute(null, null, null);
+	}
+
+	public void sendMessage(){
+		new AsyncTask<Void,String,String>() {
+			@Override
+			protected void onPreExecute() {
+				super.onPreExecute();
+//				chart_container.removeAllViews();
+				firstTimes.clear();
+				firstPowers.clear();
+				Log.v("ELSERVICES", "Realtime preExecute");
+			}
+			
+			@Override
+			protected String doInBackground(Void... params) {
+				String msg = "Realtime Data retrieved";
+				if(Common.CURRENT_VISIBLE==2)
+					msg=getFirstTimeData();
+
+				Log.v("ELSERVICES", "Realtime: "+msg);
+				return msg;
+			}
+
+			@Override
+			protected void onPostExecute(String msg) {
+				//				Log.i("ELSERVICES", msg);
+				if(progress.isShowing())
+					progress.dismiss();
+				if(msg.equals("RTP first retrieved")){
+					//					setupChart();
+					firstSetupChart();				
+
+				}
 			}
 		}.execute(null, null, null);
 	}
@@ -390,10 +443,25 @@ public class RealTimePowerFragment extends Fragment{
 	Runnable mTask = new Runnable() {
 		public void run() {
 
+			synchronized (this) { 
+				try {
+					if(Common.CURRENT_VISIBLE==2)
+						sendMessage();
+				}
+
+				catch (Exception e) {
+				}
+			}
+		}
+	};
+
+	static Runnable firstTask = new Runnable() {
+		public void run() {
+
 			synchronized (this) {
 				try {
-					//					Log.v("ELSERVICES", "RTP ping: "+System.currentTimeMillis());
-					sendMessage();
+					Log.v("ELSERVICES", "RTP first ping: "+System.currentTimeMillis());
+					sendFirst();
 
 				}
 
@@ -403,22 +471,6 @@ public class RealTimePowerFragment extends Fragment{
 		}
 	};
 
-		static Runnable firstTask = new Runnable() {
-			public void run() {
-	
-				synchronized (this) {
-					try {
-						Log.v("ELSERVICES", "RTP ping: "+System.currentTimeMillis());
-						sendFirst();
-	
-					}
-	
-					catch (Exception e) {
-					}
-				}
-			}
-		};
-
 	private void parseData(Bundle data){
 		String msg_type, api;
 		if(data.getString("msg_type")=="response" && data.getString("api")=="power/real-time/")
@@ -426,17 +478,4 @@ public class RealTimePowerFragment extends Fragment{
 
 	} 
 
-
-	//	private BroadcastReceiver receiver = new BroadcastReceiver() {
-	//
-	//		@Override
-	//		public void onReceive(Context context, Intent intent) {
-	//			Bundle bundle = intent.getExtras();
-	//			if (bundle != null) {
-	//				Bundle data = bundle.getBundle("Data");
-	//				parseData(data);
-	//				Log.i("ELSERVICES","RealTime receiver " +data.getString("api"));
-	//			}
-	//		}
-	//	};
 }

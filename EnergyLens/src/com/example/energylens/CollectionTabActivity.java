@@ -10,6 +10,7 @@ import android.app.AlarmManager;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -92,7 +93,7 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 		gcm = GoogleCloudMessaging.getInstance(this);
 
 		getUpdatedPreferences();
-//		addShortcut();
+		//		addShortcut();
 
 		if(Common.TRAINING_COUNT==0){
 			DialogFragment newFragment = new TrainMoreDialogFragment();
@@ -139,7 +140,7 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 					timeOfStay=System.currentTimeMillis()-timeOfVisit;
 					LogWriter.screenLogWrite(timeOfVisit+","+screenName+","+timeOfStay);
 				}
-				
+
 				prevTabNo=tabNo;
 				Common.changeCurrentVisible(tabNo);
 				Log.v("ELSERVICES", "Current visible: "+tabNo+" time since: "
@@ -157,6 +158,10 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 						Common.changeLastSent(1,System.currentTimeMillis());
 						PersonalEnergyFragment.sendMessage();
 					}
+					break;
+				case 2:
+					RealTimePowerFragment.showProgress();
+					RealTimePowerFragment.firstUpdate();
 					break;
 
 				}
@@ -177,7 +182,7 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 		});
 
 	}
-	
+
 	@Override
 	public void onPause() {
 		super.onPause();
@@ -192,15 +197,15 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 		timeOfStay=System.currentTimeMillis()-timeOfVisit;
 		LogWriter.screenLogWrite(timeOfVisit+","+screenName+","+timeOfStay);
 	}
-	
+
 	private void toggleServiceMessage(String message){
 		Intent intent = new Intent();
 		intent.setAction("EnergyLensPlus.toggleService");
-		  // add data
-		  intent.putExtra("message", message);
+		// add data
+		intent.putExtra("message", message);
 
-		  Log.v("ELSERVICES", "Broadcast from Train to Main receiver");
-		  sendBroadcast(intent);
+		Log.v("ELSERVICES", "Broadcast from Train to Main receiver");
+		sendBroadcast(intent);
 	}
 
 	public void addShortcut(){
@@ -228,9 +233,9 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 		super.onResume();
 		timeOfVisit=System.currentTimeMillis();
 		getUpdatedPreferences();
-		
-//		LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
-//			      new IntentFilter("toggleService"));
+
+		//		LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+		//			      new IntentFilter("toggleService"));
 	}
 
 	@Override
@@ -337,7 +342,7 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 		Intent intent = new Intent(this,SettingsActivity.class);
 		startActivity(intent);
 	}
-	
+
 	public void openAbout(){
 		Intent intent = new Intent(this,AboutActivity.class);
 		startActivity(intent);
@@ -455,27 +460,27 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 	public void onSend(View view){
 		sendMessage();
 	}
-	
+
 	//BroadcastManager for getting calls from running services
 	// handler for received Intents for the "my-event" event 
-//	private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-//	  @Override
-//	  public void onReceive(Context context, Intent intent) {
-//	    // Extract data included in the Intent
-//	    String message = intent.getStringExtra("message");
-//	    Log.v("ELSERVICES", "Main receiver got message: " + message);
-//	    if(message.contains("startServices"))
-//	    	toggleServiceMessage("startServices from Main");
-//	    else if(message.equals("stopServices"))
-//			try {
-//				stop();
-//			} catch (Throwable e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//	  }
-//	};
-	
+	//	private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+	//	  @Override
+	//	  public void onReceive(Context context, Intent intent) {
+	//	    // Extract data included in the Intent
+	//	    String message = intent.getStringExtra("message");
+	//	    Log.v("ELSERVICES", "Main receiver got message: " + message);
+	//	    if(message.contains("startServices"))
+	//	    	toggleServiceMessage("startServices from Main");
+	//	    else if(message.equals("stopServices"))
+	//			try {
+	//				stop();
+	//			} catch (Throwable e) {
+	//				// TODO Auto-generated catch block
+	//				e.printStackTrace();
+	//			}
+	//	  }
+	//	};
+
 
 	/**
 	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to

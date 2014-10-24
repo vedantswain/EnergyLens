@@ -274,9 +274,9 @@ public class EnergyWastageFragment extends Fragment{
 
 		SharedPreferences sp=getActivity().getSharedPreferences(PREFS_NAME,0);
 
-		if(sp.contains("LAST_SYNC")){
+		if(sp.contains(LAST_SYNC_TIME)){
 			Log.v("ELSERVICES", "Loading PEn from saved data");
-			lastSyncInMillis=sp.getLong("LAST_SYNC",System.currentTimeMillis());
+			lastSyncInMillis=sp.getLong(LAST_SYNC_TIME,System.currentTimeMillis());
 			parsePref(sp.getString("JSON_RESPONSE", ""));
 			setViews();
 			updateChart();
@@ -289,12 +289,6 @@ public class EnergyWastageFragment extends Fragment{
 	public void onSaveInstanceState(Bundle savedInstanceState) {
 		// Always call the superclass so it can save the view hierarchy state
 		super.onSaveInstanceState(savedInstanceState);
-
-		// Save the last sync time and last data received
-		savedInstanceState.putLong(LAST_SYNC_TIME, lastSyncInMillis);
-		if(latestData!=null)
-			savedInstanceState.putBundle(LAST_DATA,latestData);
-		Log.v("ELSERVICES", "Instance saved");
 
 	}
 
@@ -425,7 +419,7 @@ public class EnergyWastageFragment extends Fragment{
 				SharedPreferences bundleData=getActivity().getSharedPreferences(PREFS_NAME,0);
 				Editor editor=bundleData.edit();
 				editor.putString("JSON_RESPONSE", response.toString());
-				editor.putLong("LAST_SYNC", lastSyncInMillis);
+				editor.putLong(LAST_SYNC_TIME, lastSyncInMillis);
 				editor.commit();
 
 				JSONObject options=new JSONObject(response.getString("options"));
@@ -505,7 +499,6 @@ public class EnergyWastageFragment extends Fragment{
 		TextView textView=(TextView)inflateView.findViewById(R.id.lastSyncWastage);
 		textView.setText("Last synced on: "+lastSyncTime);
 
-		lastSyncInMillis=System.currentTimeMillis();
 	}
 
 	private void setViews(){
@@ -532,6 +525,7 @@ public class EnergyWastageFragment extends Fragment{
 				Bundle data = bundle.getBundle("Data");
 				parseData(data);
 				if(data.getString("api").equals("energy/wastage/report/")){
+					lastSyncInMillis=System.currentTimeMillis();
 					setViews();
 					updateChart();
 					updateApps();
