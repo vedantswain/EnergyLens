@@ -53,7 +53,8 @@ public class RealTimePowerFragment extends Fragment{
 	GoogleCloudMessaging gcm;
 	String SENDER_ID = "166229175411";
 	Double power;
-	int minute=10;
+	protected static boolean firstFlag=true;
+	static int minute=10;
 	static Double timestamp;
 	static ArrayList<Double> firstTimes=new ArrayList<Double>();
 	static ArrayList<Double> firstPowers=new ArrayList<Double>();
@@ -70,6 +71,7 @@ public class RealTimePowerFragment extends Fragment{
 
 	static XYMultipleSeriesRenderer mRenderer;
 	static LinearLayout chart_container;	
+	static TimeSeries mSeries;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -119,7 +121,9 @@ public class RealTimePowerFragment extends Fragment{
 		mRenderer.setShowGrid(true);
 		int[] margins={20,80,120,0};
 		mRenderer.setMargins(margins);
-
+		
+		mSeries=new TimeSeries("Real-Time Power");
+		
 		chart_container=(LinearLayout)rootView.findViewById(R.id.chartComparison);
 	}
 
@@ -132,16 +136,30 @@ public class RealTimePowerFragment extends Fragment{
 
 	public static void firstSetupChart(){
 		try{
-			TimeSeries mSeries=new TimeSeries("Real-Time Power");
 			Log.v("ELSERVICES", "First chart setup");
 			Calendar c=Calendar.getInstance();
-			int index=0;
-
+			
 			Iterator<Double> timeIt=firstTimes.iterator();
 			Iterator<Double> powerIt=firstPowers.iterator();
 
 			double maxPow=0;
 
+			if(!firstFlag){
+				mSeries.remove(0);
+				int i=(mSeries.getItemCount()-firstTimes.size())+1;
+				Log.v("ELSERVICES", "index: "+i);
+				int datapoints=mSeries.getItemCount();
+				if(i<0)
+					i=0;
+				int index=i;
+				while(i<datapoints){
+					mSeries.remove(index);
+					i++;
+				}
+			}
+			
+			Log.v("ELSERVICES", "datapoints: "+mSeries.getItemCount()+" new points: "+firstTimes.size());
+			
 			while(timeIt.hasNext() && powerIt.hasNext()){
 				c.setTimeInMillis((long)(timeIt.next()*1));
 				double power=powerIt.next();
@@ -163,7 +181,7 @@ public class RealTimePowerFragment extends Fragment{
 
 	public static void drawChart(TimeSeries mSeries){
 
-		Log.v("ELSERVICES", "Realtime draw chart");
+//		Log.v("ELSERVICES", "Realtime draw chart");
 
 		//		counter++;
 		//		if(counter>60*10){
@@ -188,7 +206,7 @@ public class RealTimePowerFragment extends Fragment{
 		GraphicalView chartView = ChartFactory.getTimeChartView(context, dataset, mRenderer,"Real Time Power");
 
 		chart_container.addView(chartView,0);
-		Log.v("ELSERVICES", "Realtime chartview added; "+mSeries.getItemCount());
+//		Log.v("ELSERVICES", "Realtime chartview added; "+mSeries.getItemCount());
 
 		TextView textView=(TextView) rootView.findViewById(R.id.RealTimeText);
 		textView.setText("Current power consumption: "+mSeries.getY(mSeries.getItemCount()-1)+" Watts");
@@ -224,6 +242,7 @@ public class RealTimePowerFragment extends Fragment{
 	public void onResume() {
 		super.onResume();
 		setupRenderer();
+		firstFlag=true;
 		UpdateGUI();
 	}
 
@@ -317,7 +336,7 @@ public class RealTimePowerFragment extends Fragment{
 
 			JSONObject jsonObject = new JSONObject();
 			jsonObject.put("dev_id", devid);
-			jsonObject.put("minutes", 1);
+			jsonObject.put("minutes", minute);
 
 			json = jsonObject.toString();
 
@@ -413,7 +432,11 @@ public class RealTimePowerFragment extends Fragment{
 //				chart_container.removeAllViews();
 				firstTimes.clear();
 				firstPowers.clear();
-				Log.v("ELSERVICES", "Realtime preExecute");
+//				Log.v("ELSERVICES", "Realtime preExecute");
+				if(firstFlag)
+					minute=10;
+				else
+					minute=1;
 			}
 			
 			@Override
@@ -434,7 +457,8 @@ public class RealTimePowerFragment extends Fragment{
 				if(msg.equals("RTP first retrieved")){
 					//					setupChart();
 					firstSetupChart();				
-
+					if(firstFlag)
+						firstFlag=false;
 				}
 			}
 		}.execute(null, null, null);
