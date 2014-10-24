@@ -161,7 +161,6 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 					break;
 				case 2:
 					RealTimePowerFragment.showProgress();
-					RealTimePowerFragment.firstUpdate();
 					break;
 
 				}

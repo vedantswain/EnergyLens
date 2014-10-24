@@ -56,8 +56,8 @@ public class RealTimePowerFragment extends Fragment{
 	protected static boolean firstFlag=true;
 	static int minute=10;
 	static Double timestamp;
-	static ArrayList<Double> firstTimes=new ArrayList<Double>();
-	static ArrayList<Double> firstPowers=new ArrayList<Double>();
+	static ArrayList<Double> realTimes=new ArrayList<Double>();
+	static ArrayList<Double> realPowers=new ArrayList<Double>();
 	static Timer myTimer = new Timer();
 
 	static double maxY=0;
@@ -139,14 +139,14 @@ public class RealTimePowerFragment extends Fragment{
 			Log.v("ELSERVICES", "First chart setup");
 			Calendar c=Calendar.getInstance();
 			
-			Iterator<Double> timeIt=firstTimes.iterator();
-			Iterator<Double> powerIt=firstPowers.iterator();
+			Iterator<Double> timeIt=realTimes.iterator();
+			Iterator<Double> powerIt=realPowers.iterator();
 
 			double maxPow=0;
 
 			if(!firstFlag){
 				mSeries.remove(0);
-				int i=(mSeries.getItemCount()-firstTimes.size())+1;
+				int i=(mSeries.getItemCount()-realTimes.size())+1;
 				Log.v("ELSERVICES", "index: "+i);
 				int datapoints=mSeries.getItemCount();
 				if(i<0)
@@ -158,7 +158,7 @@ public class RealTimePowerFragment extends Fragment{
 				}
 			}
 			
-			Log.v("ELSERVICES", "datapoints: "+mSeries.getItemCount()+" new points: "+firstTimes.size());
+			Log.v("ELSERVICES", "datapoints: "+mSeries.getItemCount()+" new points: "+realTimes.size());
 			
 			while(timeIt.hasNext() && powerIt.hasNext()){
 				c.setTimeInMillis((long)(timeIt.next()*1));
@@ -168,8 +168,8 @@ public class RealTimePowerFragment extends Fragment{
 					maxPow=power;
 			}
 
-			firstTimes.clear();
-			firstPowers.clear();
+			realTimes.clear();
+			realPowers.clear();
 
 			drawChart(mSeries);
 		}
@@ -180,21 +180,6 @@ public class RealTimePowerFragment extends Fragment{
 	}
 
 	public static void drawChart(TimeSeries mSeries){
-
-//		Log.v("ELSERVICES", "Realtime draw chart");
-
-		//		counter++;
-		//		if(counter>60*10){
-		//			mSeries.remove(0);
-		//		}
-		//		mSeries.add(x, y);
-
-		//		if(y>maxY)
-
-		//		Log.v("ELSERVICES", "Realtime mSeries ready set");
-
-
-		//		Log.v("ELSERVICES", "Realtime renderer set");
 
 		final XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
 		dataset.addSeries(mSeries);
@@ -228,10 +213,6 @@ public class RealTimePowerFragment extends Fragment{
 				"Fetching real-time data from server. Please wait...", true);
 	}
 
-	public static void firstUpdate(){
-		//		mHandler.post(firstTask);
-	}
-
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onViewCreated(view, savedInstanceState);
@@ -251,77 +232,9 @@ public class RealTimePowerFragment extends Fragment{
 		super.onPause();
 		myTimer.cancel();
 	}
+	
 
-	private String getRealTimeData() {
-		InputStream inputStream = null;
-		try {
-
-			TelephonyManager telephonyManager = (TelephonyManager)getActivity().getSystemService(Context.TELEPHONY_SERVICE);
-			Long devid=Long.parseLong(telephonyManager.getDeviceId());
-
-
-			DefaultHttpClient httpclient = new DefaultHttpClient();
-			HttpPost httpPost = new HttpPost(Common.SERVER_URL+Common.REALTIME_API+"past/");
-
-			String json = "";
-
-			JSONObject jsonObject = new JSONObject();
-			jsonObject.put("dev_id", devid);
-			jsonObject.put("minutes", minute);
-
-			json = jsonObject.toString();
-
-			StringEntity se = new StringEntity(json);
-			//	        se.setContentType("application/json;charset=UTF-8");
-			se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE,"application/json"));
-
-			httpPost.setEntity(se);
-
-			HttpResponse httpResponse = httpclient.execute(httpPost);
-
-			inputStream = httpResponse.getEntity().getContent();
-			StatusLine sl=httpResponse.getStatusLine();
-
-
-			//			Log.v("ELSERVICES", Integer.toString(sl.getStatusCode()));
-
-
-			StringBuffer sb=new StringBuffer();
-
-			try {
-				int ch;
-				while ((ch = inputStream.read()) != -1) {
-					sb.append((char) ch);
-				}
-				//				Log.v("ELSERVICES", "input stream: "+sb.toString());
-			} catch (IOException e) {
-				throw e;
-			} finally {
-				if (inputStream != null) {
-					inputStream.close();
-				}
-			}
-
-			JSONObject response=new JSONObject(sb.toString());
-			Iterator it=response.keys();
-			String key=it.next().toString();
-			timestamp=Double.parseDouble(key);
-			power=Double.parseDouble(response.getString(key));
-
-			SimpleDateFormat ft = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
-
-			Log.v("ELSERVICES", "RTP retrieved at "+ft.format(timestamp).toString()+": "+power);
-			Log.v("ELSERVICES", "Current Visible: "+Common.CURRENT_VISIBLE);
-			return "RTP retrieved";
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			return "ERROR: RTP response";
-		}
-
-	}
-
-	public static String getFirstTimeData(){
+	public static String getRealTimeData(){
 		InputStream inputStream = null;
 		try {
 
@@ -374,13 +287,13 @@ public class RealTimePowerFragment extends Fragment{
 			JSONObject response=new JSONObject(sb.toString());
 			Iterator it=response.keys();
 
-			firstTimes=new ArrayList<Double>();
-			firstPowers=new ArrayList<Double>();
+			realTimes=new ArrayList<Double>();
+			realPowers=new ArrayList<Double>();
 
 			while(it.hasNext()){
 				String key=it.next().toString();
-				firstTimes.add(Double.parseDouble(key));
-				firstPowers.add(Double.parseDouble(response.getString(key)));
+				realTimes.add(Double.parseDouble(key));
+				realPowers.add(Double.parseDouble(response.getString(key)));
 
 				//				Log.v("ELSERVICES","Realtime pair"+ key+" "+response.getString(key));
 			}
@@ -397,41 +310,14 @@ public class RealTimePowerFragment extends Fragment{
 
 	}
 
-	public static void sendFirst(){
-		new AsyncTask<Void,String,String>() {
-			
-			@Override
-			protected String doInBackground(Void... params) {
-				String msg = "Realtime First Data retrieved";
-				msg=getFirstTimeData();
-				Log.v("ELSERVICES", "Realtime First: "+msg);
-				return msg;
-			}
-
-			@Override
-			protected void onPostExecute(String msg) {
-				//				Log.i("ELSERVICES", msg);
-				//					firstSetupChart();
-				if(progress.isShowing())
-					progress.dismiss();
-				if(msg.equals("Realtime First Data retrieved") || msg.equals("ERROR: RTP response"))
-					Toast.makeText(context, "Error in retreiving past data", 1000).show();
-				else{
-					//					firstSetupChart();
-				}
-			}
-
-		}.execute(null, null, null);
-	}
-
 	public void sendMessage(){
 		new AsyncTask<Void,String,String>() {
 			@Override
 			protected void onPreExecute() {
 				super.onPreExecute();
 //				chart_container.removeAllViews();
-				firstTimes.clear();
-				firstPowers.clear();
+				realTimes.clear();
+				realPowers.clear();
 //				Log.v("ELSERVICES", "Realtime preExecute");
 				if(firstFlag)
 					minute=10;
@@ -443,7 +329,7 @@ public class RealTimePowerFragment extends Fragment{
 			protected String doInBackground(Void... params) {
 				String msg = "Realtime Data retrieved";
 				if(Common.CURRENT_VISIBLE==2)
-					msg=getFirstTimeData();
+					msg=getRealTimeData();
 
 				Log.v("ELSERVICES", "Realtime: "+msg);
 				return msg;
@@ -471,22 +357,6 @@ public class RealTimePowerFragment extends Fragment{
 				try {
 					if(Common.CURRENT_VISIBLE==2)
 						sendMessage();
-				}
-
-				catch (Exception e) {
-				}
-			}
-		}
-	};
-
-	static Runnable firstTask = new Runnable() {
-		public void run() {
-
-			synchronized (this) {
-				try {
-					Log.v("ELSERVICES", "RTP first ping: "+System.currentTimeMillis());
-					sendFirst();
-
 				}
 
 				catch (Exception e) {
