@@ -91,6 +91,7 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
+			Log.v("ELSERVICES", "Training Status: "+Common.TRAINING_STATUS);
 			if(Common.TRAINING_STATUS==0){
 				if(Common.TRAINING_COUNT>0)
 					toggleServiceMessage("startServices from Training");
@@ -401,7 +402,7 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 		TextView textView=(TextView) findViewById(R.id.appList);
 		textView.setText("");
 		textView=(TextView) findViewById(R.id.setLoc);
-		textView.setText("select location");
+		textView.setText("Select Location");
 	}
 
 	public void onCancel(View view) {

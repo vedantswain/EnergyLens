@@ -275,8 +275,9 @@ public class EnergyWastageFragment extends Fragment{
 		SharedPreferences sp=getActivity().getSharedPreferences(PREFS_NAME,0);
 
 		if(sp.contains(LAST_SYNC_TIME)){
-			Log.v("ELSERVICES", "Loading PEn from saved data");
+			Log.v("ELSERVICES", "Loading EnW from saved data");
 			lastSyncInMillis=sp.getLong(LAST_SYNC_TIME,System.currentTimeMillis());
+			//Log.v("ELSERVICES", "Last sync time loaded: "+lastSyncInMillis);
 			parsePref(sp.getString("JSON_RESPONSE", ""));
 			setViews();
 			updateChart();
@@ -419,6 +420,8 @@ public class EnergyWastageFragment extends Fragment{
 				SharedPreferences bundleData=getActivity().getSharedPreferences(PREFS_NAME,0);
 				Editor editor=bundleData.edit();
 				editor.putString("JSON_RESPONSE", response.toString());
+				lastSyncInMillis=System.currentTimeMillis();
+				//Log.v("ELSERVICES", "Last sync time saved: "+lastSyncInMillis);
 				editor.putLong(LAST_SYNC_TIME, lastSyncInMillis);
 				editor.commit();
 

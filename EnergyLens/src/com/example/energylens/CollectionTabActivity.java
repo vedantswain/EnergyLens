@@ -374,6 +374,10 @@ public class CollectionTabActivity extends FragmentActivity implements TrainMore
 			openAbout();
 			return true;
 		}
+		else if(id==R.id.appForceStart){
+			toggleServiceMessage("Force startServices");
+			return true;
+		}
 		else if(id == R.id.groundReport){
 			getUpdatedPreferences();
 			Intent intent = new Intent(this,GroundReportListActivity.class);

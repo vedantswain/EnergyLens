@@ -431,10 +431,11 @@ public class PersonalEnergyFragment extends Fragment {
 				for(String key:keys){
 					response.put(key, data.get(key));
 				}
-
+				
 				SharedPreferences bundleData=getActivity().getSharedPreferences(PREFS_NAME,0);
 				Editor editor=bundleData.edit();
 				editor.putString("JSON_RESPONSE", response.toString());
+				lastSyncInMillis=System.currentTimeMillis();
 				editor.putLong(LAST_SYNC_TIME, lastSyncInMillis);
 				editor.commit();
 
