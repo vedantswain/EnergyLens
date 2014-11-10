@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.energylens"
+    package="com.iiitd.muc.energylens"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -46,36 +46,36 @@
         android:largeHeap="true"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".RegisterActivity"
+            android:name="com.iiitd.muc.energylens.RegisterActivity"
             android:label="@string/title_activity_register" >
         </activity>
         <activity
-            android:name=".CollectionTabActivity"
+            android:name="com.iiitd.muc.energylens.CollectionTabActivity"
             android:label="@string/title_activity_collection_tab"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".AxlServ"
+            android:name="com.iiitd.muc.energylens.AxlServ"
             android:label="@string/title_activity_axl_serv" >
         </activity>
 
         <service
-            android:name=".AxlService"
+            android:name="com.iiitd.muc.energylens.AxlService"
             android:enabled="true" />
         <service
-            android:name=".WiFiService"
+            android:name="com.iiitd.muc.energylens.WiFiService"
             android:enabled="true" />
         <service
-            android:name=".AudioService"
+            android:name="com.iiitd.muc.energylens.AudioService"
             android:enabled="true" />
         <service
-            android:name=".LightService"
+            android:name="com.iiitd.muc.energylens.LightService"
             android:enabled="true" />
         <service
-            android:name=".MagService"
+            android:name="com.iiitd.muc.energylens.MagService"
             android:enabled="true" />
         <service
-            android:name=".UploaderService"
+            android:name="com.iiitd.muc.energylens.UploaderService"
             android:enabled="true" />
 
         <meta-data
@@ -86,9 +86,9 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".TrainActivity"
+            android:name="com.iiitd.muc.energylens.TrainActivity"
             android:label="@string/title_activity_train"
-            android:parentActivityName=".CollectionTabActivity"
+            android:parentActivityName="com.iiitd.muc.energylens.CollectionTabActivity"
             android:screenOrientation="portrait" >
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
@@ -97,32 +97,32 @@
                 android:value=".CollectionTabActivity" />
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name="com.iiitd.muc.energylens.SettingsActivity"
             android:label="@string/title_activity_settings" >
         </activity>
         <activity
-            android:name=".ReassignActivity"
+            android:name="com.iiitd.muc.energylens.ReassignActivity"
             android:label="@string/title_activity_reassign" >
         </activity>
 
-        <receiver android:name=".ToggleServiceReceiver" >
+        <receiver android:name="com.iiitd.muc.energylens.ToggleServiceReceiver" >
             <intent-filter>
                 <action android:name="EnergyLensPlus.toggleService" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".BootupReceiver" >
+        <receiver android:name="com.iiitd.muc.energylens.BootupReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".WiFiService$WifiReceiver" >
+        <receiver android:name="com.iiitd.muc.energylens.WiFiService$WifiReceiver" >
             <intent-filter>
                 <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
                 <action android:name="android.net.wifi.WifiManager.SCAN_RESULTS_AVAILABLE_ACTION" />
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".GcmBroadcastReceiver"
+            android:name="com.iiitd.muc.energylens.GcmBroadcastReceiver"
             android:exported="true"
             android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
@@ -132,10 +132,10 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".GcmIntentService" />
+        <service android:name="com.iiitd.muc.energylens.GcmIntentService" />
 
         <activity
-            android:name=".GCMActivity"
+            android:name="com.iiitd.muc.energylens.GCMActivity"
             android:label="@string/title_activity_collection_tab"
             android:screenOrientation="portrait" >
             <intent-filter>
@@ -145,39 +145,39 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".TimeSelectActivity"
+            android:name="com.iiitd.muc.energylens.TimeSelectActivity"
             android:label="@string/title_activity_time_select"
-            android:parentActivityName=".CollectionTabActivity" >
+            android:parentActivityName="com.iiitd.muc.energylens.CollectionTabActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.energylens.CollectionTabActivity" />
         </activity>
         <activity
-            android:name=".DisaggregationActivity"
+            android:name="com.iiitd.muc.energylens.DisaggregationActivity"
             android:label="@string/title_activity_correction"
-            android:parentActivityName=".CollectionTabActivity" >
+            android:parentActivityName="com.iiitd.muc.energylens.CollectionTabActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.energylens.CollectionTabActivity" />
         </activity>
         <activity
-            android:name=".GroundReportActivity"
+            android:name="com.iiitd.muc.energylens.GroundReportActivity"
             android:label="@string/title_activity_ground_report"
-            android:parentActivityName=".GroundReportListActivity" >
+            android:parentActivityName="com.iiitd.muc.energylens.GroundReportListActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.energylens.GroundReportListActivity" />
         </activity>
         <activity
-            android:name=".GroundReportListActivity"
+            android:name="com.iiitd.muc.energylens.GroundReportListActivity"
             android:label="@string/title_activity_ground_report_list"
-            android:parentActivityName=".CollectionTabActivity" >
+            android:parentActivityName="com.iiitd.muc.energylens.CollectionTabActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.energylens.CollectionTabActivity" />
         </activity>
         <activity
-            android:name=".SocketActivity"
+            android:name="com.iiitd.muc.energylens.SocketActivity"
             android:label="@string/title_activity_socket"
             android:parentActivityName="com.example.hw_3.MainActivity" >
             <meta-data
@@ -185,9 +185,9 @@
                 android:value="com.example.hw_3.MainActivity" />
         </activity>
         <activity
-            android:name=".AboutActivity"
+            android:name="com.iiitd.muc.energylens.AboutActivity"
             android:label="@string/title_activity_about"
-            android:parentActivityName=".CollectionTabActivity" >
+            android:parentActivityName="com.iiitd.muc.energylens.CollectionTabActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.energylens.CollectionTabActivity" />
