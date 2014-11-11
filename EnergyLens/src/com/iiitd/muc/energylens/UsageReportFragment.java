@@ -5,13 +5,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-import com.iiitd.muc.energylens.R;
-
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,7 +35,7 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 	private ArrayList<String> labelsList=new ArrayList<String>();
 	private ArrayList<String> locList=new ArrayList<String>();
 	private ArrayList<String> occList=new ArrayList<String>();
-	private ArrayList<Long> hourList,minList;
+	private ArrayList<String> hourList,minList;
 	private Spinner appSpinner,locSpinner,hoursSpinner,minsSpinner,occSpinner;	
 	private ImageView appIcon,locIcon,occIcon;
 	private String toApp="none",toLoc="none";
@@ -52,7 +53,7 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 	private long startTime=0, stopTime=0;
 
 	static final int FRAGMENT_ID=2512;
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -68,8 +69,18 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 		SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
 		dateFormat.format(from);
 		TextView activityText=(TextView)inflateView.findViewById(R.id.activityText);
-		final String activityLine="Using "+appliance+" from "+dateFormat.format(from).toString()+" to "+dateFormat.format(to).toString()
+		String fromTimeString=dateFormat.format(from).toString();
+		String toTimeString=dateFormat.format(to).toString();
+		final String activityLine="Used "+appliance+" from "+fromTimeString
+				+" to "+toTimeString
 				+" in "+loc+" consumed: "+Long.toString(usage)+" Wh";
+		
+//		Spannable sb = new SpannableString( activityLine );
+//		sb.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), activityLine.indexOf(appliance), appliance.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE); //bold
+//		sb.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), activityLine.indexOf(loc), loc.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE); //bold
+//		sb.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), activityLine.indexOf(toTimeString), toTimeString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE); //bold
+//		sb.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), activityLine.indexOf(fromTimeString), toTimeString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE); //bold
+
 		activityText.setText(activityLine);
 
 		getUpdatedPreferences();
@@ -117,7 +128,7 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 				changeTimeOf="stop";
 			} 
 		}); 
-		
+
 		RadioButton isCorrect=(RadioButton) inflateView.findViewById(R.id.radio_correct);
 		isCorrect.setOnClickListener(new OnClickListener(){
 			//			@Override
@@ -216,11 +227,12 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 
 	private void setHoursSpinner(){
 		hoursSpinner=(Spinner) inflateView.findViewById(R.id.hourSpinner);
-		hourList=new ArrayList<Long>();
+		hourList=new ArrayList<String>();
+		hourList.add("--");
 		for(long i=0;i<=24;i++)
-			hourList.add(i);
+			hourList.add(Long.toString(i));
 
-		ArrayAdapter<Long> dataAdapter = new ArrayAdapter<Long>(getActivity(),
+		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity(),
 				android.R.layout.simple_spinner_item, hourList);
 		dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		hoursSpinner.setAdapter(dataAdapter);
@@ -229,11 +241,11 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 
 	private void setMinsSpinner(){
 		minsSpinner=(Spinner) inflateView.findViewById(R.id.minSpinner);
-		minList=new ArrayList<Long>();
+		minList=new ArrayList<String>();
 		for(long i=0;i<=60;i++)
-			minList.add(i);
+			minList.add(Long.toString(i));
 
-		ArrayAdapter<Long> dataAdapter = new ArrayAdapter<Long>(getActivity(),
+		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity(),
 				android.R.layout.simple_spinner_item, minList);
 		dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		minsSpinner.setAdapter(dataAdapter);
@@ -334,19 +346,23 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 			}
 		}
 		else if(parent.equals(minsSpinner)){
-			mins=(long)minList.get(pos);
-			timeOfStay=(hrs*60*60*1000)+(mins*60*1000);
-			if(timeOfStay!=0){
-				Log.v("ELSERVICES", timeOfStay+" will be added");
-				GroundReportActivity.changeTimeOfStay(id,timeOfStay);
+			if(pos!=0){
+				mins=Long.parseLong(minList.get(pos));
+				timeOfStay=(hrs*60*60*1000)+(mins*60*1000);
+				if(timeOfStay!=0){
+					Log.v("ELSERVICES", timeOfStay+" will be added");
+					GroundReportActivity.changeTimeOfStay(id,timeOfStay);
+				}
 			}
 		}
 		else if(parent.equals(hoursSpinner)){
-			hrs=(long)hourList.get(pos);
-			timeOfStay=(hrs*60*60*1000)+(mins*60*1000);
-			if(timeOfStay!=0){
-				Log.v("ELSERVICES", timeOfStay+" will be added");
-				GroundReportActivity.changeTimeOfStay(id,timeOfStay);
+			if(pos!=0){
+				hrs=Long.parseLong(hourList.get(pos));
+				timeOfStay=(hrs*60*60*1000)+(mins*60*1000);
+				if(timeOfStay!=0){
+					Log.v("ELSERVICES", timeOfStay+" will be added");
+					GroundReportActivity.changeTimeOfStay(id,timeOfStay);
+				}
 			}
 		}
 		else if(parent.equals(occSpinner)){
@@ -373,9 +389,9 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 
 	}
 
-	
+
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		
+
 		switch(requestCode) {
 		case FRAGMENT_ID:
 
@@ -384,12 +400,12 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 				int hourOfDay=bundle.getInt("hourOfDay",0);
 				int minute=bundle.getInt("minute",0);
 				long time=(hourOfDay*60*60+minute*60)*1000;
-				
+
 				Calendar c=Calendar.getInstance();
 				Calendar reportDate=Calendar.getInstance();
 				reportDate.setTime(new Date(GroundReportActivity.current_date));
 				c.set(reportDate.get(Calendar.YEAR),reportDate.get(Calendar.MONTH) ,reportDate.get(Calendar.DAY_OF_MONTH), hourOfDay, minute);
-								
+
 				SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
 				String timeString=dateFormat.format(c.getTimeInMillis()).toString();
 				if(changeTimeOf=="start"){
@@ -402,12 +418,12 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 					stopTimeBtn.setText(timeString);
 					GroundReportActivity.changeStopTime(id, time);
 				}
-				
-//				Log.v("ELSERVICES", "Correction Time: "+c.toString());
+
+				//				Log.v("ELSERVICES", "Correction Time: "+c.toString());
 			} else if (resultCode == Activity.RESULT_CANCELED){
-														
+
 			}
-		break;
+			break;
 		}
 	}
 }

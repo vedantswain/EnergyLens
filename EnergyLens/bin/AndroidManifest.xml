@@ -54,11 +54,7 @@
             android:label="@string/title_activity_collection_tab"
             android:screenOrientation="portrait" >
         </activity>
-        <activity
-            android:name="com.iiitd.muc.energylens.AxlServ"
-            android:label="@string/title_activity_axl_serv" >
-        </activity>
-
+        
         <service
             android:name="com.iiitd.muc.energylens.AxlService"
             android:enabled="true" />
@@ -163,7 +159,8 @@
         <activity
             android:name="com.iiitd.muc.energylens.GroundReportActivity"
             android:label="@string/title_activity_ground_report"
-            android:parentActivityName="com.iiitd.muc.energylens.GroundReportListActivity" >
+            android:parentActivityName="com.iiitd.muc.energylens.GroundReportListActivity" 
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.energylens.GroundReportListActivity" />
@@ -171,7 +168,8 @@
         <activity
             android:name="com.iiitd.muc.energylens.GroundReportListActivity"
             android:label="@string/title_activity_ground_report_list"
-            android:parentActivityName="com.iiitd.muc.energylens.CollectionTabActivity" >
+            android:parentActivityName="com.iiitd.muc.energylens.CollectionTabActivity" 
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.energylens.CollectionTabActivity" />

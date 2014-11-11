@@ -12,7 +12,7 @@
     <string name="title_activity_collection_tab">EnergyLens+</string>
     <string name="title_section1">Train</string>
     <string name="title_section2">Energy Wastage</string>
-    <string name="title_section3">Personal Energy</string>
+    <string name="title_section3">Energy Usage</string>
     <string name="title_activity_train">EnergyLens+</string>
     <string name="ok">Ok</string>
     <string name="cancel">Cancel</string>
@@ -41,5 +41,6 @@
     <string name="title_activity_ground_report_list">EnergyLens+</string>
     <string name="title_activity_socket">SocketActivity</string>
     <string name="title_activity_about">EnergyLens+</string>
+    <string name="instruction_ground_report">"Please mark each entry as Correct/Incorrect. If incorrect, please correct the individual values (in bold) by selecting appropriate values"</string>
 
 </resources>

@@ -28,7 +28,7 @@ public class DistributionFragment extends Fragment {
 		TextView appName=(TextView)inflateView.findViewById(R.id.distName);
 		appName.setText(appliance);
 		TextView appPercent=(TextView)inflateView.findViewById(R.id.distPercent);
-		appPercent.setText(Integer.toString(getArguments().getInt("percent"))+"%");
+		appPercent.setText(Long.toString(getArguments().getLong("value"))+"Wh ("+Integer.toString(getArguments().getInt("percent"))+"%)");
 
 		if(appliance.equals("Unknown")){
 			appName.setTextColor(Color.GRAY);
@@ -89,11 +89,12 @@ public class DistributionFragment extends Fragment {
 		return inflateView;
 	}
 
-	public static DistributionFragment newInstance(String appliance,int percent) {
+	public static DistributionFragment newInstance(String appliance,long value,int percent) {
 		DistributionFragment myFragment = new DistributionFragment();
 
 		Bundle args = new Bundle();
 		args.putString("appliance", appliance);
+		args.putLong("value", value);
 		args.putInt("percent", percent);
 		myFragment.setArguments(args);
 

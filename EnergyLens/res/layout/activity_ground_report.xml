@@ -17,13 +17,21 @@
             android:layout_height="wrap_content"
             android:text="Date" />
 
+        <TextView
+            android:id="@+id/reportInstruction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/reportDate"
+            android:layout_marginTop="20dp"
+            android:text="@string/instruction_ground_report" />
+        
         <LinearLayout
             android:id="@+id/groundReport"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/reportDate"
             android:layout_alignParentRight="true"
-            android:layout_below="@+id/reportDate"
+            android:layout_below="@+id/reportInstruction"
             android:layout_marginTop="20dp"
             android:orientation="vertical" >
         </LinearLayout>

@@ -63,11 +63,12 @@ public class PersonalEnergyFragment extends Fragment {
 	static GoogleCloudMessaging gcm;
 	static String SENDER_ID = "166229175411";
 
-	long totalConsumption;
-	long[] hourlyConsumption;
+	long totalUsage;
+	long[] hourlyUsage;
 	JSONArray activities;
 	ArrayList<String> activity_names=new ArrayList<String>();
 	ArrayList<Integer> activity_usage=new ArrayList<Integer>();
+	ArrayList<Long> activity_values=new ArrayList<Long>();
 
 	ArrayList<Fragment> fragmentList=new ArrayList<Fragment>();
 
@@ -149,7 +150,7 @@ public class PersonalEnergyFragment extends Fragment {
 		mRenderer.setXAxisMin(0);
 		mRenderer.setYAxisMax(maxY*1.5);
 		mRenderer.setXAxisMax(y.length+1);
-		mRenderer.setChartTitle("Your energy consumption for the last 12 hours");
+		mRenderer.setChartTitle("Your energy usage in the last 12 hours");
 		mRenderer.setChartTitleTextSize(val);
 		mRenderer.setLabelsColor(Color.DKGRAY);
 		mRenderer.setYLabelsColor(0, Color.DKGRAY);
@@ -230,14 +231,14 @@ public class PersonalEnergyFragment extends Fragment {
 
 
 
-	public void setApps(ArrayList<String> apps,ArrayList<Integer> use){
+	public void setApps(ArrayList<String> apps,ArrayList<Long> vals, ArrayList<Integer> use){
 		FragmentManager fragmentManager = getFragmentManager();
 		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 		DistributionFragment fragment = new DistributionFragment();
 
 		int index=0;
 		for(String activity:apps){
-			fragment=DistributionFragment.newInstance(activity, use.get(index++));
+			fragment=DistributionFragment.newInstance(activity,vals.get(index),use.get(index++));
 			fragmentTransaction.add(R.id.PEnDist, fragment,activity);
 			fragmentList.add(fragment);
 		}
@@ -291,10 +292,10 @@ public class PersonalEnergyFragment extends Fragment {
 			JSONObject options=new JSONObject(response.getString("options"));
 
 			if(options!=null){
-				totalConsumption=options.getLong("total_consumption");
-				parseConsumption(options.getString("hourly_consumption"));
+				totalUsage=options.getLong("total_usage");
+				parseUsage(options.getString("hourly_usage"));
 
-				Log.v("ELSERVICES", "Response Options: "+options.getLong("total_consumption")+" "+options.getString("hourly_consumption"));	
+				Log.v("ELSERVICES", "Response Options: "+options.getLong("total_usage")+" "+options.getString("hourly_usage"));	
 				activities=options.getJSONArray("activities");
 
 				if(activities!=null){
@@ -380,32 +381,33 @@ public class PersonalEnergyFragment extends Fragment {
 			try {
 				activity = activities.getJSONObject(i);
 				activity_names.add(activity.getString("name"));
-				activity_usage.add((int) ((activity.getLong("usage")*100)/totalConsumption));
+				activity_values.add(activity.getLong("usage"));
+				activity_usage.add((int) ((activity.getLong("usage")*100)/totalUsage));
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		Log.v("ELSERVICES", "parseactivities: "+activity_names.get(0).toString());
-		Log.v("ELSERVICES", "parseactivities: "+activity_usage.get(0).toString());
+//		Log.v("ELSERVICES", "parseactivities: "+activity_names.get(0).toString());
+//		Log.v("ELSERVICES", "parseactivities: "+activity_usage.get(0).toString());
 	}
 
-	public void parseConsumption(String arr){
-		Log.v("ELSERVICES", "parseconsumption");
+	public void parseUsage(String arr){
+		Log.v("ELSERVICES", "parseusage");
 
 		String[] items = arr.replaceAll("\\[", "").replaceAll("\\]", "").split(",");
 
-		hourlyConsumption = new long[items.length];
+		hourlyUsage = new long[items.length];
 
 		for (int i = 0; i < items.length; i++) {
 			try {
-				hourlyConsumption[i] = Long.parseLong(items[i]);
-				if(hourlyConsumption[i]>maxY)
-					maxY=hourlyConsumption[i];
+				hourlyUsage[i] = Long.parseLong(items[i]);
+				if(hourlyUsage[i]>maxY)
+					maxY=hourlyUsage[i];
 			} catch (NumberFormatException nfe) {};
 		}
 
-		Log.v("ELSERVICES", "parseconsumption: "+Arrays.toString(hourlyConsumption));
+		Log.v("ELSERVICES", "parseusage: "+Arrays.toString(hourlyUsage));
 	}
 
 	private void parseData(Bundle data){
@@ -420,6 +422,7 @@ public class PersonalEnergyFragment extends Fragment {
 			Log.v("ELSERVICES","Remove all views: " + appDist.getChildCount());
 
 			activity_names.clear();
+			activity_values.clear();
 			activity_usage.clear();
 
 			try {
@@ -443,10 +446,10 @@ public class PersonalEnergyFragment extends Fragment {
 				JSONObject options=new JSONObject(response.getString("options"));
 
 				if(options!=null){
-					totalConsumption=options.getLong("total_consumption");
-					parseConsumption(options.getString("hourly_consumption"));
+					totalUsage=options.getLong("total_usage");
+					parseUsage(options.getString("hourly_usage"));
 
-					Log.v("ELSERVICES", "Response Options: "+options.getLong("total_consumption")+" "+options.getString("hourly_consumption"));	
+					Log.v("ELSERVICES", "Response Options: "+options.getLong("total_usage")+" "+options.getString("hourly_usage"));	
 					activities=options.getJSONArray("activities");
 
 					if(activities!=null){
@@ -465,12 +468,12 @@ public class PersonalEnergyFragment extends Fragment {
 		mRenderer = new XYMultipleSeriesRenderer();
 		mDataset = new XYMultipleSeriesDataset();
 
-		if(hourlyConsumption!=null)
-			drawChart(hourlyConsumption);
+		if(hourlyUsage!=null)
+			drawChart(hourlyUsage);
 	}
 
 	private void updateApps(){
-		setApps(activity_names,activity_usage);
+		setApps(activity_names,activity_values,activity_usage);
 	}
 	
 	private void setViews(){
@@ -493,7 +496,7 @@ public class PersonalEnergyFragment extends Fragment {
 
 	private void updateViews(long syncTime){
 		TextView totalVal=(TextView)inflateView.findViewById(R.id.totalVal);
-		totalVal.setText(Long.toString(totalConsumption)+" Wh");
+		totalVal.setText(Long.toString(totalUsage)+" Wh");
 
 		DateFormat df=new DateFormat();
 		lastSyncTime=df.format("dd MMM yy HH:mm", syncTime).toString();

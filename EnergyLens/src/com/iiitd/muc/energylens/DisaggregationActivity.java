@@ -17,6 +17,7 @@ import org.achartengine.GraphicalView;
 import org.achartengine.model.SeriesSelection;
 import org.achartengine.model.TimeSeries;
 import org.achartengine.model.XYMultipleSeriesDataset;
+import org.achartengine.renderer.BasicStroke;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer.FillOutsideLine;
@@ -66,10 +67,10 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 
 	ArrayList<Long> time=new ArrayList<Long>();
 	ArrayList<Long> wastage_times=new ArrayList<Long>();
-	ArrayList<Long> shared_times=new ArrayList<Long>();
+	ArrayList<Long> usage_times=new ArrayList<Long>();
 	ArrayList<Long> value=new ArrayList<Long>();
 	ArrayList<Long> wastage_value=new ArrayList<Long>();
-	ArrayList<Long> shared_value=new ArrayList<Long>();
+	ArrayList<Long> usage_value=new ArrayList<Long>();
 	ArrayList<Long> ids=new ArrayList<Long>();
 	ArrayList<long[]> terminals=new ArrayList<long[]>();
 
@@ -89,9 +90,9 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 	String initLoc;
 
 	String app="none";
-	int color=Color.rgb(0, 153, 153);
+	int color=Color.rgb(0, 0, 0);
 	int wastageColor=Color.rgb(102, 0, 0);
-	int sharedColor=Color.rgb(0, 0, 102);
+	int usageColor=Color.rgb(0, 153, 153);
 	String changeTimeOf;
 
 	GoogleCloudMessaging gcm;
@@ -183,11 +184,11 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 		XYMultipleSeriesDataset dataset = new XYMultipleSeriesDataset();
 
 		//consumption series
-		TimeSeries mSeries = new TimeSeries("Consumption");
+		TimeSeries mSeries = new TimeSeries("Appliance usage duration");
 		Date date=new Date();
 
 		XYSeriesRenderer renderer = new XYSeriesRenderer();
-
+		renderer.setStroke(BasicStroke.DOTTED);
 
 		Log.v("ELSERVICE","Disagg: "+Long.toString(time.size())+" "+Long.toString(value.size()));
 
@@ -202,13 +203,13 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 		// Include low and max value
 		renderer.setDisplayBoundingPoints(true);
 
-		FillOutsideLine fill = new FillOutsideLine(FillOutsideLine.Type.BOUNDS_ALL);
-
-		fill.setColor(Color.argb(125, 0, 130, 130));
-		renderer.addFillOutsideLine(fill);
+//		FillOutsideLine fill = new FillOutsideLine(FillOutsideLine.Type.BOUNDS_ALL);
+//
+//		fill.setColor(Color.argb(125, 0, 130, 130));
+//		renderer.addFillOutsideLine(fill);
 
 		//wastage series
-		TimeSeries wastageSeries = new TimeSeries("Wastage");
+		TimeSeries wastageSeries = new TimeSeries("Your wastage period");
 
 		XYSeriesRenderer wastageRenderer = new XYSeriesRenderer();
 
@@ -219,37 +220,41 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 
 		for (int j = 0; j < wastage_times.size(); j++) {
 			c.setTimeInMillis(wastage_times.get(j).longValue()*1000);
-			wastageSeries.add(c.getTime(), wastage_value.get(j));
-			Log.v("ELSERVICES", "wastage value: "+wastage_value.get(j)+"wastage time: "+c.getTime().toString());
+			if(j<wastage_value.size()){
+				wastageSeries.add(c.getTime(), wastage_value.get(j));
+				Log.v("ELSERVICES", "wastage value: "+wastage_value.get(j)+"wastage time: "+c.getTime().toString());
+			}
 		}
 
 		FillOutsideLine fillWaste = new FillOutsideLine(FillOutsideLine.Type.BOUNDS_ALL);
 
 
-		fillWaste.setColor(Color.argb(125, 102, 0, 0));
+		fillWaste.setColor(wastageColor);
 		wastageRenderer.addFillOutsideLine(fillWaste);
 
-		//shared series
-		TimeSeries sharedSeries = new TimeSeries("Shared Consumption");
+		//usage series
+		TimeSeries usageSeries = new TimeSeries("Your usage period");
 
-		XYSeriesRenderer sharedRenderer = new XYSeriesRenderer();
+		XYSeriesRenderer usageRenderer = new XYSeriesRenderer();
 
-		sharedRenderer.setLineWidth(2);
-		sharedRenderer.setColor(sharedColor);
+		usageRenderer.setLineWidth(2);
+		usageRenderer.setColor(usageColor);
 		// Include low and max value
-		sharedRenderer.setDisplayBoundingPoints(true);
+		usageRenderer.setDisplayBoundingPoints(true);
 
-		for (int j = 0; j < shared_times.size(); j++) {
-			c.setTimeInMillis(shared_times.get(j).longValue()*1000);
-			sharedSeries.add(c.getTime(), shared_value.get(j));
-			Log.v("ELSERVICES", "shared value: "+shared_value.get(j)+"shared time: "+c.getTime().toString());
+		for (int j = 0; j < usage_times.size(); j++) {
+			c.setTimeInMillis(usage_times.get(j).longValue()*1000);
+			if(j<usage_value.size()){
+				usageSeries.add(c.getTime(), usage_value.get(j));
+				Log.v("ELSERVICES", "usage value: "+usage_value.get(j)+"usage time: "+c.getTime().toString());
+			}
 		}
 
 		FillOutsideLine fillShared = new FillOutsideLine(FillOutsideLine.Type.BOUNDS_ALL);
 
 
-		fillShared.setColor(Color.argb(125, 0, 0, 102));
-		sharedRenderer.addFillOutsideLine(fillShared);
+		fillShared.setColor(usageColor);
+		usageRenderer.addFillOutsideLine(fillShared);
 		
 		if(time.size()>0)
 			if(acrossTwoDays(time.get(0)*1000,time.get(time.size()-1)*1000)){
@@ -285,11 +290,11 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 
 		mRenderer.addSeriesRenderer(renderer);
 		mRenderer.addSeriesRenderer(wastageRenderer);
-		mRenderer.addSeriesRenderer(sharedRenderer);
+		mRenderer.addSeriesRenderer(usageRenderer);
 		
 		dataset.addSeries(mSeries);
 		dataset.addSeries(wastageSeries);
-		dataset.addSeries(sharedSeries);
+		dataset.addSeries(usageSeries);
 		
 		drawChart(mRenderer,dataset,isSlice);
 	}
@@ -360,6 +365,7 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 
 
 		chartView = ChartFactory.getTimeChartView(this, dataset, mRenderer, "Reassign");
+		//chartView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 
 		LinearLayout chart_container=(LinearLayout)findViewById(R.id.chartComparison);
 		chart_container.addView(chartView,0);
@@ -704,8 +710,8 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 		value.clear();
 		wastage_times.clear();
 		wastage_value.clear();
-		shared_times.clear();
-		shared_value.clear();
+		usage_times.clear();
+		usage_value.clear();
 
 
 		int k=0;
@@ -751,17 +757,17 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 					}
 					
 					//render shared points
-					JSONArray sharedTimeArray=activity.getJSONArray("shared");
-					for(int j=0;j<sharedTimeArray.length();j++){
-						JSONObject sharedTime=sharedTimeArray.getJSONObject(j);
-						shared_times.add(sharedTime.getLong("start_time"));shared_value.add((long)0);
-						shared_times.add(sharedTime.getLong("start_time"));shared_value.add(sharedTime.getLong("value"));
+					JSONArray usageTimeArray=activity.getJSONArray("usage_times");
+					for(int j=0;j<usageTimeArray.length();j++){
+						JSONObject usageTime=usageTimeArray.getJSONObject(j);
+						usage_times.add(usageTime.getLong("start_time"));usage_value.add((long)0);
+						usage_times.add(usageTime.getLong("start_time"));usage_value.add(activity.getLong("value"));
 
-						Log.v("ELSERVICES", "shared points: "+sharedTime.getLong("start_time")
-								+", "+sharedTime.getLong("end_time"));
+						Log.v("ELSERVICES", "shared points: "+usageTime.getLong("start_time")
+								+", "+usageTime.getLong("end_time"));
 
-						shared_times.add(sharedTime.getLong("end_time"));shared_value.add(sharedTime.getLong("value"));
-						shared_times.add(sharedTime.getLong("end_time"));shared_value.add((long)0);						
+						usage_times.add(usageTime.getLong("end_time"));usage_value.add(activity.getLong("value"));
+						usage_times.add(usageTime.getLong("end_time"));usage_value.add((long)0);						
 					}
 
 				}
@@ -851,7 +857,7 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 							parseActivities(initLoc);
 					}
 
-					appliances=options.getJSONArray("appliances");
+//					appliances=options.getJSONArray("appliances");
 
 					if(appliances!=null){
 						parseAppLoc();
@@ -904,7 +910,7 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 						parseActivities(initLoc);
 				}
 
-				appliances=options.getJSONArray("appliances");
+				//appliances=options.getJSONArray("appliances");
 
 				if(appliances!=null){
 					parseAppLoc();

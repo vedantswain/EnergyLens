@@ -71,6 +71,7 @@ public class EnergyWastageFragment extends Fragment{
 	JSONArray activities;
 	ArrayList<String> activity_names=new ArrayList<String>();
 	ArrayList<Integer> activity_wastage=new ArrayList<Integer>();
+	ArrayList<Long> activity_values=new ArrayList<Long>();
 
 	String lastSyncTime;
 	private Bundle latestData;
@@ -365,14 +366,15 @@ public class EnergyWastageFragment extends Fragment{
 			try {
 				activity = activities.getJSONObject(i);
 				activity_names.add(activity.getString("name"));
+				activity_values.add(activity.getLong("wastage"));
 				activity_wastage.add((int) ((activity.getLong("wastage")*100)/totalWastage));
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		Log.v("ELSERVICES", "parseactivities: "+activity_names.get(0).toString());
-		Log.v("ELSERVICES", "parseactivities: "+activity_wastage.get(0).toString());
+//		Log.v("ELSERVICES", "parseactivities: "+activity_names.get(0).toString());
+//		Log.v("ELSERVICES", "parseactivities: "+activity_wastage.get(0).toString());
 	}
 
 	public void parseWastage(String arr){
@@ -405,6 +407,7 @@ public class EnergyWastageFragment extends Fragment{
 			Log.v("ELSERVICES","Remove all views: " + appDist.getChildCount());
 
 			activity_names.clear();
+			activity_values.clear();
 			activity_wastage.clear();
 
 			try {
@@ -478,21 +481,21 @@ public class EnergyWastageFragment extends Fragment{
 			drawChart(hourlyWastage);
 	}
 
-	public void setApps(ArrayList<String> apps,ArrayList<Integer> use){
+	public void setApps(ArrayList<String> apps,ArrayList<Long> vals,ArrayList<Integer> use){
 		FragmentManager fragmentManager = getFragmentManager();
 		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 		DistributionFragment fragment = new DistributionFragment();
 
 		int index=0;
 		for(String activity:apps){
-			fragment=DistributionFragment.newInstance(activity, use.get(index++));
+			fragment=DistributionFragment.newInstance(activity,vals.get(index), use.get(index++));
 			fragmentTransaction.add(R.id.WasteDist, fragment,activity);
 		}
 		fragmentTransaction.commit();
 		fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);	}
 
 	private void updateApps(){
-		setApps(activity_names,activity_wastage);
+		setApps(activity_names,activity_values,activity_wastage);
 	}
 
 	private void updateViews(long syncTime){
