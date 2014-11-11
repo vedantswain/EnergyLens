@@ -242,6 +242,7 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 	private void setMinsSpinner(){
 		minsSpinner=(Spinner) inflateView.findViewById(R.id.minSpinner);
 		minList=new ArrayList<String>();
+		minList.add("--");
 		for(long i=0;i<=60;i++)
 			minList.add(Long.toString(i));
 
