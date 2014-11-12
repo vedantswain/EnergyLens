@@ -10,9 +10,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.StyleSpan;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,12 +43,12 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 	long hrs=0;
 	long id;
 	String[] pair={"",""};
-	long timeOfStay=0;
+	long timeOfStay=-1;
 	int corrected_count=0;
-	TextView startTimeText, stopTimeText;
-	Button startTimeBtn, stopTimeBtn;
+	TextView startTimeText, endTimeText;
+	Button startTimeBtn, endTimeBtn;
 	private String changeTimeOf="";
-	private long startTime=0, stopTime=0;
+	private long startTime=0, endTime=0;
 
 	static final int FRAGMENT_ID=2512;
 
@@ -71,17 +69,18 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 		TextView activityText=(TextView)inflateView.findViewById(R.id.activityText);
 		String fromTimeString=dateFormat.format(from).toString();
 		String toTimeString=dateFormat.format(to).toString();
-		final String activityLine="Used "+appliance+" from "+fromTimeString
-				+" to "+toTimeString
-				+" in "+loc+" consumed: "+Long.toString(usage)+" Wh";
 		
-//		Spannable sb = new SpannableString( activityLine );
-//		sb.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), activityLine.indexOf(appliance), appliance.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE); //bold
-//		sb.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), activityLine.indexOf(loc), loc.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE); //bold
-//		sb.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), activityLine.indexOf(toTimeString), toTimeString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE); //bold
-//		sb.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), activityLine.indexOf(fromTimeString), toTimeString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE); //bold
+		final String activityLine="Used <b>"+appliance+"</b> from <b>"+fromTimeString
+				+"</b> to <b>"+toTimeString
+				+"</b> in <b>"+loc+"</b> consumed: <b>"+Long.toString(usage)+" Wh</b>";
 
-		activityText.setText(activityLine);
+		//		Spannable sb = new SpannableString( activityLine );
+		//		sb.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), activityLine.indexOf(appliance), appliance.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE); //bold
+		//		sb.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), activityLine.indexOf(loc), loc.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE); //bold
+		//		sb.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), activityLine.indexOf(toTimeString), toTimeString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE); //bold
+		//		sb.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), activityLine.indexOf(fromTimeString), toTimeString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE); //bold
+
+		activityText.setText(Html.fromHtml(activityLine));
 
 		getUpdatedPreferences();
 		setAppSpinner();
@@ -110,12 +109,12 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 		}); 
 
 
-		stopTimeText=(TextView)inflateView.findViewById(R.id.stopTimeText);
-		stopTimeText.setVisibility(View.GONE);
-		stopTimeBtn=(Button)inflateView.findViewById(R.id.stopTimeBtn);
-		stopTimeBtn.setText(dateFormat.format(to).toString());
-		stopTimeBtn.setVisibility(View.GONE);
-		stopTimeBtn.setOnClickListener(new OnClickListener()
+		endTimeText=(TextView)inflateView.findViewById(R.id.stopTimeText);
+		endTimeText.setVisibility(View.GONE);
+		endTimeBtn=(Button)inflateView.findViewById(R.id.stopTimeBtn);
+		endTimeBtn.setText(dateFormat.format(to).toString());
+		endTimeBtn.setVisibility(View.GONE);
+		endTimeBtn.setOnClickListener(new OnClickListener()
 		{
 
 			@Override
@@ -150,8 +149,8 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 					occIcon.setVisibility(View.GONE);
 					startTimeText.setVisibility(View.GONE);
 					startTimeBtn.setVisibility(View.GONE);
-					stopTimeText.setVisibility(View.GONE);
-					stopTimeBtn.setVisibility(View.GONE);
+					endTimeText.setVisibility(View.GONE);
+					endTimeBtn.setVisibility(View.GONE);
 					String[] pairEmpty={"",""};
 					GroundReportActivity.changeCorrectionIds(id,pairEmpty,0,timeOfStay,0,0, 0);
 					wasClicked=0;
@@ -180,13 +179,13 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 
 					startTimeText.setVisibility(View.VISIBLE);
 					startTimeBtn.setVisibility(View.VISIBLE);
-					stopTimeText.setVisibility(View.VISIBLE);
-					stopTimeBtn.setVisibility(View.VISIBLE);
+					endTimeText.setVisibility(View.VISIBLE);
+					endTimeBtn.setVisibility(View.VISIBLE);
 
 					if(wasClicked==0)
-						GroundReportActivity.changeCorrectionIds(id,pair,toOcc,timeOfStay,startTime,stopTime,2);
+						GroundReportActivity.changeCorrectionIds(id,pair,toOcc,timeOfStay,startTime,endTime,2);
 					else
-						GroundReportActivity.changeCorrectionIds(id,pair,toOcc,timeOfStay,startTime,stopTime, 1);
+						GroundReportActivity.changeCorrectionIds(id,pair,toOcc,timeOfStay,startTime,endTime, 1);
 
 					wasClicked=1;
 				}
@@ -350,21 +349,21 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 			if(pos!=0){
 				mins=Long.parseLong(minList.get(pos));
 				timeOfStay=(hrs*60*60*1000)+(mins*60*1000);
-				if(timeOfStay!=0){
-					Log.v("ELSERVICES", timeOfStay+" will be added");
-					GroundReportActivity.changeTimeOfStay(id,timeOfStay);
-				}
+				Log.v("ELSERVICES", timeOfStay+" will be added");
+				GroundReportActivity.changeTimeOfStay(id,timeOfStay);
 			}
+			else
+				GroundReportActivity.changeTimeOfStay(id,-1);
 		}
 		else if(parent.equals(hoursSpinner)){
 			if(pos!=0){
 				hrs=Long.parseLong(hourList.get(pos));
 				timeOfStay=(hrs*60*60*1000)+(mins*60*1000);
-				if(timeOfStay!=0){
-					Log.v("ELSERVICES", timeOfStay+" will be added");
-					GroundReportActivity.changeTimeOfStay(id,timeOfStay);
-				}
+				Log.v("ELSERVICES", timeOfStay+" will be added");
+				GroundReportActivity.changeTimeOfStay(id,timeOfStay);
 			}
+			else
+				GroundReportActivity.changeTimeOfStay(id,-1);
 		}
 		else if(parent.equals(occSpinner)){
 			toOcc=pos;
@@ -415,8 +414,8 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 					GroundReportActivity.changeStartTime(id, time);
 				}
 				else if(changeTimeOf=="stop"){
-					stopTime=c.getTimeInMillis();
-					stopTimeBtn.setText(timeString);
+					endTime=c.getTimeInMillis();
+					endTimeBtn.setText(timeString);
 					GroundReportActivity.changeStopTime(id, time);
 				}
 

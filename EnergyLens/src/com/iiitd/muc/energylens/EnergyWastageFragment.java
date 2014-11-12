@@ -66,6 +66,7 @@ public class EnergyWastageFragment extends Fragment{
 	static GoogleCloudMessaging gcm;
 	static String SENDER_ID = "166229175411";
 
+	long totalConsumption;
 	long totalWastage;
 	long[] hourlyWastage;
 	JSONArray activities;
@@ -432,6 +433,7 @@ public class EnergyWastageFragment extends Fragment{
 				JSONObject options=new JSONObject(response.getString("options"));
 
 				if(options!=null){
+					totalConsumption=options.getLong("total_consumption");
 					totalWastage=options.getLong("total_wastage");
 					parseWastage(options.getString("hourly_wastage"));
 
@@ -456,6 +458,7 @@ public class EnergyWastageFragment extends Fragment{
 			JSONObject options=new JSONObject(response.getString("options"));
 
 			if(options!=null){
+				totalConsumption=options.getLong("total_consumption");
 				totalWastage=options.getLong("total_wastage");
 				parseWastage(options.getString("hourly_wastage"));
 
@@ -499,8 +502,12 @@ public class EnergyWastageFragment extends Fragment{
 	}
 
 	private void updateViews(long syncTime){
+		long percent=(long) (((double)totalWastage/(double)totalConsumption)*100);
 		TextView totalVal=(TextView)inflateView.findViewById(R.id.totalValWaste);
-		totalVal.setText(Long.toString(totalWastage)+" kWh");
+		totalVal.setText(Long.toString(totalWastage)+" Wh"+" ("+(Long.toString(percent))+"%)");
+		
+		TextView totalConVal=(TextView)inflateView.findViewById(R.id.totalConWaste);
+		totalConVal.setText(Long.toString(totalConsumption)+" Wh");
 
 		DateFormat df=new DateFormat();
 		lastSyncTime=df.format("dd MMM yy HH:mm", syncTime).toString();
@@ -511,6 +518,8 @@ public class EnergyWastageFragment extends Fragment{
 
 	private void setViews(){
 		TextView tv=(TextView)inflateView.findViewById(R.id.segText3);
+		tv.setVisibility(View.VISIBLE);
+		tv=(TextView)inflateView.findViewById(R.id.totCon2);
 		tv.setVisibility(View.VISIBLE);
 		tv=(TextView)inflateView.findViewById(R.id.lastSyncWastage);
 		tv.setVisibility(View.VISIBLE);

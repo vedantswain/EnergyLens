@@ -163,7 +163,7 @@
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/startTimeBtn"
         android:layout_alignBottom="@+id/startTimeBtn"
-        android:layout_toRightOf="@+id/occSpinner"
+        android:layout_toRightOf="@+id/stopTimeText"
         android:text="00:00" 
         android:padding="10dp"
         android:layout_alignParentBottom="true" />
@@ -175,6 +175,6 @@
         android:layout_alignBaseline="@+id/stopTimeBtn"
         android:layout_alignBottom="@+id/stopTimeBtn"
         android:layout_alignLeft="@+id/app_spinner"
-        android:text="Stop Time" />
+        android:text="End Time" />
     
 </RelativeLayout>

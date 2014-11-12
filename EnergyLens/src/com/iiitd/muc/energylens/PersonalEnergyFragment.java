@@ -63,6 +63,7 @@ public class PersonalEnergyFragment extends Fragment {
 	static GoogleCloudMessaging gcm;
 	static String SENDER_ID = "166229175411";
 
+	long totalConsumption;
 	long totalUsage;
 	long[] hourlyUsage;
 	JSONArray activities;
@@ -292,6 +293,7 @@ public class PersonalEnergyFragment extends Fragment {
 			JSONObject options=new JSONObject(response.getString("options"));
 
 			if(options!=null){
+				totalConsumption=options.getLong("total_consumption");
 				totalUsage=options.getLong("total_usage");
 				parseUsage(options.getString("hourly_usage"));
 
@@ -446,6 +448,7 @@ public class PersonalEnergyFragment extends Fragment {
 				JSONObject options=new JSONObject(response.getString("options"));
 
 				if(options!=null){
+					totalConsumption=options.getLong("total_consumption");
 					totalUsage=options.getLong("total_usage");
 					parseUsage(options.getString("hourly_usage"));
 
@@ -482,6 +485,8 @@ public class PersonalEnergyFragment extends Fragment {
 		
 		TextView tv=(TextView)inflateView.findViewById(R.id.segText2);
 		tv.setVisibility(View.VISIBLE);
+		tv=(TextView)inflateView.findViewById(R.id.totCon1);
+		tv.setVisibility(View.VISIBLE);
 		tv=(TextView)inflateView.findViewById(R.id.lastSyncText);
 		tv.setVisibility(View.VISIBLE);
 		tv=(TextView)inflateView.findViewById(R.id.distName2);
@@ -495,8 +500,12 @@ public class PersonalEnergyFragment extends Fragment {
 
 
 	private void updateViews(long syncTime){
+		long percent=(long) (((double)totalUsage/(double)totalConsumption)*100);
 		TextView totalVal=(TextView)inflateView.findViewById(R.id.totalVal);
-		totalVal.setText(Long.toString(totalUsage)+" Wh");
+		totalVal.setText(Long.toString(totalUsage)+" Wh"+" ("+(Long.toString(percent))+"%)");
+		
+		TextView totalConVal=(TextView)inflateView.findViewById(R.id.totalConVal);
+		totalConVal.setText(Long.toString(totalConsumption)+" Wh");
 
 		DateFormat df=new DateFormat();
 		lastSyncTime=df.format("dd MMM yy HH:mm", syncTime).toString();

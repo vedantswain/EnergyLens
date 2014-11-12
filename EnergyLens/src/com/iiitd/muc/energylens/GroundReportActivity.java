@@ -58,7 +58,7 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 	ArrayList<long[]> period=new ArrayList<long[]>();
 	static ArrayList<Long> timeOfStay=new ArrayList<Long>();
 	static ArrayList<Long> startTime=new ArrayList<Long>();
-	static ArrayList<Long> stopTime=new ArrayList<Long>();
+	static ArrayList<Long> endTime=new ArrayList<Long>();
 	ArrayList<String> apps=new ArrayList<String>();
 	ArrayList<String> locs=new ArrayList<String>();
 	private long lastSyncInMillis;
@@ -130,7 +130,7 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 		for(String str:respArray){
 			if(!str.equals(""))
 				responses.add(str);
-			Log.v("ELSERVICES","Responses: " +str);
+			//Log.v("ELSERVICES","Responses: " +str);
 		}
 
 		String[] dateArray=date.split("\\|");
@@ -158,7 +158,7 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 		}
 	}
 
-	static void changeCorrectionIds(long id,String[] pairData,int occupant,long time,long startTime,long stopTime,int flag){
+	static void changeCorrectionIds(long id,String[] pairData,int occupant,long time,long startTime,long endTime,int flag){
 		if(flag>0){
 			if(flag>1){
 				int index=correctionIds.indexOf(id);
@@ -186,14 +186,15 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 		Log.v("ELSERVICES", "id added: "+correctionIds.indexOf(id));
 		changeTimeOfStay(id,time);
 		changeStartTime(id,startTime);
-		changeStopTime(id,stopTime);
+		changeStopTime(id,endTime);
 		changeCorrectionPairData(id,pairData);
 		changeOccupant(id,occupant);
 	}
 
 	static Boolean checkTimeOfStay(){
 		for(long check:timeOfStay){
-			if(check==0){
+			Log.v("ELSERVICES", "time: "+check);
+			if(check<0 && timeOfStay.indexOf(check)<correctionIds.size()){
 				Log.v("ELSERVICES", "time empty: "+timeOfStay.indexOf(check));
 				return false;
 			}
@@ -213,21 +214,22 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 	}
 	static void changeStopTime(long id,long time){
 		int index=correctionIds.indexOf(id);
-		if(stopTime.size()>index)
-			stopTime.remove(index);
+		if(endTime.size()>index)
+			endTime.remove(index);
 
-		if(index<stopTime.size())	
-			stopTime.add(index,time);
+		if(index<endTime.size())	
+			endTime.add(index,time);
 		else
-			stopTime.add(time);
+			endTime.add(time);
 	}
 	
 	static void changeTimeOfStay(long id,long time){
 		int index=correctionIds.indexOf(id);
-		if(timeOfStay.size()>index)
+		Log.v("ELSERVICES", "time added: "+time);
+		if(timeOfStay.size()>index && index>-1)
 			timeOfStay.remove(index);
 
-		if(index<timeOfStay.size())	
+		if(index<timeOfStay.size() && index>-1)	
 			timeOfStay.add(index,time);
 		else
 			timeOfStay.add(time);
@@ -348,23 +350,27 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 					if(correctionIds.contains(id)){
 						int index=correctionIds.indexOf(id);
 						activity.put("activity_id",id);
-						activity.put("time_of_stay", timeOfStay.get(index));
+						activity.put("time_of_stay", timeOfStay.get(index)/1000);
 						if(correctionPairData.size()>index){
 							activity.put("to_appliance", correctionPairData.get(index)[0]);
 							activity.put("to_location", correctionPairData.get(index)[1]);
 						}
 						if(correctOccupant.size()>index)
 							activity.put("to_occupant", correctOccupant.get(index));
-						if(startTime.size()>index && stopTime.size()>index){
-							if(startTime.get(index)!=0)
-								activity.put("start_time", startTime.get(index));
-							if(stopTime.get(index)!=0)
-								activity.put("stop_time", stopTime.get(index));
+						if(startTime.size()>index && endTime.size()>index){
+							if(startTime.get(index)!=0){
+								if(startTime.get(index)>endTime.get(index))
+									activity.put("start_time", (startTime.get(index)-24*60*60*1000)/1000);
+								else
+									activity.put("start_time", startTime.get(index)/1000);
+							}
+							if(endTime.get(index)!=0)
+								activity.put("end_time", endTime.get(index)/1000);
 						}
 						activity.put("incorrect", correctionTF.get(index));
 					}
 					activities.put(activity);
-					//					Log.v("ELSERVICES", activities.toString());				
+					Log.v("ELSERVICES", activities.toString());				
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
