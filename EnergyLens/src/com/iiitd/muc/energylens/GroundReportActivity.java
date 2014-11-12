@@ -61,6 +61,8 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 	static ArrayList<Long> endTime=new ArrayList<Long>();
 	ArrayList<String> apps=new ArrayList<String>();
 	ArrayList<String> locs=new ArrayList<String>();
+	public static ArrayList<String> correction_apps=new ArrayList<String>();
+	public static ArrayList<String> correction_locs=new ArrayList<String>();
 	private long lastSyncInMillis;
 
 	static ArrayList<Long> correctionIds=new ArrayList<Long>();
@@ -360,12 +362,16 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 						if(startTime.size()>index && endTime.size()>index){
 							if(startTime.get(index)!=0){
 								if(startTime.get(index)>endTime.get(index))
-									activity.put("start_time", (startTime.get(index)-24*60*60*1000)/1000);
+									activity.put("start_time",(long) (startTime.get(index)-24*60*60*1000)/1000);
 								else
-									activity.put("start_time", startTime.get(index)/1000);
+									activity.put("start_time",(long) startTime.get(index)/1000);
 							}
+							else
+								activity.put("start_time","");
 							if(endTime.get(index)!=0)
 								activity.put("end_time", endTime.get(index)/1000);
+							else
+								activity.put("end_time","");
 						}
 						activity.put("incorrect", correctionTF.get(index));
 					}
@@ -433,6 +439,12 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 					parseOccupants();
 				}
 				activities=options.getJSONArray("activities");
+				appliances=options.getJSONArray("appliances");
+				for(int i=0;i<appliances.length();i++){
+					JSONObject appliance=appliances.getJSONObject(i);
+					correction_apps.add(appliance.getString("appliance"));
+					correction_locs.add(appliance.getString("location"));
+				}					
 				Log.v("ELSERVICES","GroundReport Activitiy count: " + activities.length());
 				if(activities!=null){
 					parseActivities();
@@ -564,7 +576,7 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 
 	public void refusedTryAgain(){
 		DialogFragment newFragment = new TryAgainConnectionRefusedDialogFragment();
-		newFragment.show(getSupportFragmentManager(), "Connection Refused");
+		newFragment.show(getSupportFragmentManager(), "Report submission failed. Contact administrator.");
 	}
 	
 	public String sendHttp(JSONObject data){

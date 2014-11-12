@@ -72,7 +72,7 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 		
 		final String activityLine="Used <b>"+appliance+"</b> from <b>"+fromTimeString
 				+"</b> to <b>"+toTimeString
-				+"</b> in <b>"+loc+"</b> consumed: <b>"+Long.toString(usage)+" Wh</b>";
+				+"</b> in <b>"+loc+"</b> consumed: "+Long.toString(usage)+" Wh";
 
 		//		Spannable sb = new SpannableString( activityLine );
 		//		sb.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), activityLine.indexOf(appliance), appliance.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE); //bold
@@ -254,10 +254,10 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 
 	private void setAppSpinner(){
 		appSpinner = (Spinner) inflateView.findViewById(R.id.app_spinner);
-		for(String app:labels)
+		for(String app:GroundReportActivity.correction_apps)
 			labelsList.add(app);
-		labelsList.add("Unknown");
-		labelsList.remove(0);
+//		labelsList.add("Unknown");
+//		labelsList.remove(0);
 		labelsList.add(0, "none");
 		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity(),
 				android.R.layout.simple_spinner_item, labelsList);
@@ -271,9 +271,9 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 
 	private void setLocSpinner(){
 		locSpinner = (Spinner) inflateView.findViewById(R.id.loc_spinner);
-		for(String loc:locations)
+		for(String loc:GroundReportActivity.correction_locs)
 			locList.add(loc);
-		locList.remove(0);
+//		locList.remove(0);
 		locList.add(0, "none");
 		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity(),
 				android.R.layout.simple_spinner_item, locList);

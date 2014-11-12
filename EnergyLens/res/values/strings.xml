@@ -32,7 +32,7 @@
     <string name="title_activity_register">RegisterActivity</string>
     <string name="title_activity_gcm">GCMActivity</string>
     <string name="dialog_try_again">Registration failed. Give it another try?</string>
-    <string name="dialog_refused_try_again">Connection refused. Check connection and try again</string>
+    <string name="dialog_refused_try_again">Report submission failed. Contact administrator.</string>
     <string name="title_activity_time_select">EnergyLens+</string>
     <string name="title_activity_correction">EnergyLens+</string>
     <string name="action_report">Report</string>
