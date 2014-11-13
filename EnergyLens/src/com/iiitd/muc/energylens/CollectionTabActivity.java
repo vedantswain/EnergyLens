@@ -392,10 +392,10 @@ public boolean onOptionsItemSelected(MenuItem item) {
 			if(groundReportDates.length()>2)
 				startActivity(intent);
 			else
-				Toast.makeText(getApplicationContext(), "No new reports", 2000).show();
+				Toast.makeText(getApplicationContext(), "No new requests made", 2000).show();
 		}
 		else
-			Toast.makeText(getApplicationContext(), "No new reports", 2000).show();
+			Toast.makeText(getApplicationContext(), "No new requests made", 2000).show();
 		return true;
 	}
 	else if(id == R.id.training){

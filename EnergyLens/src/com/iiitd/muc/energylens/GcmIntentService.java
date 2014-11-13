@@ -169,10 +169,10 @@ public class GcmIntentService extends IntentService {
 		Intent intent=new Intent(this, GroundReportListActivity.class);
 
 		if(groundReportResponses.size()>1){
-			message=Integer.toString(groundReportResponses.size())+" new reports available";
+			message=Integer.toString(groundReportResponses.size())+" new verification reports received";
 		}
 		else{
-			message=" New report available";
+			message=" New verification reports received";
 		}
 
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,

@@ -90,7 +90,7 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 	String initLoc;
 
 	String app="none";
-	int color=Color.rgb(0, 0, 0);
+	int color=Color.argb(60,0, 0, 0);
 	int wastageColor=Color.rgb(102, 0, 0);
 	int usageColor=Color.rgb(0, 153, 153);
 	String changeTimeOf;
@@ -188,8 +188,7 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 		Date date=new Date();
 
 		XYSeriesRenderer renderer = new XYSeriesRenderer();
-		renderer.setStroke(BasicStroke.DOTTED);
-
+		
 		Log.v("ELSERVICE","Disagg: "+Long.toString(time.size())+" "+Long.toString(value.size()));
 
 		for (int i = 0; i < time.size(); i++) {
@@ -198,7 +197,7 @@ public class DisaggregationActivity extends FragmentActivity implements Applianc
 			Log.v("ELSERVICES", "value: "+value.get(i)+" time: "+c.getTime().toString());
 		}
 
-		renderer.setLineWidth(2);
+		renderer.setLineWidth(3);
 		renderer.setColor(color);
 		// Include low and max value
 		renderer.setDisplayBoundingPoints(true);

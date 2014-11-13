@@ -54,7 +54,7 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 
 	ArrayList<Fragment> fragmentList=new ArrayList<Fragment>();
 	ArrayList<Long> usage=new ArrayList<Long>();
-	ArrayList<Long> ids=new ArrayList<Long>();
+	static ArrayList<Long> ids=new ArrayList<Long>();
 	ArrayList<long[]> period=new ArrayList<long[]>();
 	static ArrayList<Long> timeOfStay=new ArrayList<Long>();
 	static ArrayList<Long> startTime=new ArrayList<Long>();
@@ -90,7 +90,7 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 	static long current_date;
 
 	private ProgressDialog progress;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -105,8 +105,8 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 		Log.v("ELSERVICES", "Report no: "+report_index);
 
 		if(sp.contains("JSON_RESPONSES")){
-			Log.v("ELSERVICES", "Loading All responses from saved data "+sp.getString("JSON_RESPONSES", "")
-					+"\t"+sp.getString("RESPONSE_DATES", ""));
+			//			Log.v("ELSERVICES", "Loading All responses from saved data "+sp.getString("JSON_RESPONSES", "")
+			//					+"\t"+sp.getString("RESPONSE_DATES", ""));
 			String string=sp.getString("JSON_RESPONSES", "");
 			String date=sp.getString("RESPONSE_DATES", "");
 			//			parsePref(sp.getString("JSON_RESPONSE", ""));
@@ -149,7 +149,7 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 		TextView reportDate=(TextView) findViewById(R.id.reportDate);
 		reportDate.setText(dateFormat.format(current_date).toString());
 		current_response=responses.get(report_index);
-		Log.v("ELSERVICES","Current response: " +current_response);
+		//		Log.v("ELSERVICES","Current response: " +current_response);
 
 		if(!current_response.equals("")){
 			parsePref(current_response);	
@@ -161,15 +161,27 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 	}
 
 	static void changeCorrectionIds(long id,String[] pairData,int occupant,long time,long startTime,long endTime,int flag){
-		if(flag>0){
-			if(flag>1){
+		Log.v("ELSERVICES","Flag: "+flag);
+		if(flag!=0){
+			Log.v("ELSERVICES", "Incorrect ");
+			if(flag==2){
+				Log.v("ELSERVICES", "Incorrect Flag 2");
 				int index=correctionIds.indexOf(id);
 				correctionTF.remove(index);
 				correctionTF.add(index, true);
+				Log.v("ELSERVICES", "index: "+index+" replacing");
 			}
-			else{
+			else if(flag==1 && correctionIds.size()<ids.size()){
+				Log.v("ELSERVICES", "Incorrect Flag 1");
+				Log.v("ELSERVICES", "adding");
 				correctionIds.add(id);
 				correctionTF.add(true);
+			}
+			else{
+				int index=correctionIds.indexOf(id);
+				Log.v("ELSERVICES", correctionIds.size()+ "---"+ids.size() );
+				correctionTF.remove(index);
+				correctionTF.add(index, true);
 			}
 
 		}
@@ -181,11 +193,15 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 				correctionTF.add(index, false);
 			}
 			else{
-				correctionIds.add(id);
-				correctionTF.add(false);
+				if(correctionIds.size()<ids.size()){
+					correctionIds.add(id);
+					correctionTF.add(false);
+				}
 			}
 		}
 		Log.v("ELSERVICES", "id added: "+correctionIds.indexOf(id));
+		if(id>-1)
+			Log.v("ELSERVICES", "t/f: "+correctionTF.get(correctionIds.indexOf(id)));
 		changeTimeOfStay(id,time);
 		changeStartTime(id,startTime);
 		changeStopTime(id,endTime);
@@ -195,7 +211,7 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 
 	static Boolean checkTimeOfStay(){
 		for(long check:timeOfStay){
-			Log.v("ELSERVICES", "time: "+check);
+			//			Log.v("ELSERVICES", "time: "+check);
 			if(check<0 && timeOfStay.indexOf(check)<correctionIds.size()){
 				Log.v("ELSERVICES", "time empty: "+timeOfStay.indexOf(check));
 				return false;
@@ -206,28 +222,28 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 
 	static void changeStartTime(long id,long time){
 		int index=correctionIds.indexOf(id);
-		if(startTime.size()>index)
+		if(startTime.size()>index && index>=0)
 			startTime.remove(index);
 
-		if(index<startTime.size())	
+		if(index<startTime.size() && index>=0)	
 			startTime.add(index,time);
 		else
 			startTime.add(time);
 	}
 	static void changeStopTime(long id,long time){
 		int index=correctionIds.indexOf(id);
-		if(endTime.size()>index)
+		if(endTime.size()>index && index>=0)
 			endTime.remove(index);
 
-		if(index<endTime.size())	
+		if(index<endTime.size() && index>=0)	
 			endTime.add(index,time);
 		else
 			endTime.add(time);
 	}
-	
+
 	static void changeTimeOfStay(long id,long time){
 		int index=correctionIds.indexOf(id);
-		Log.v("ELSERVICES", "time added: "+time);
+		//		Log.v("ELSERVICES", "time added: "+time);
 		if(timeOfStay.size()>index && index>-1)
 			timeOfStay.remove(index);
 
@@ -239,22 +255,27 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 
 	static void changeOccupant(long id, int pos){
 		int index=correctionIds.indexOf(id);
-		if(correctOccupant.size()>index)
+		if(correctOccupant.size()>index && index>=0)
 			correctOccupant.remove(index);
 
-		if(index<correctOccupant.size())	
+		Log.v("ELSERVICES", "index of ID for Occ: "+index+" pos of Occ: "+pos);
+		if(index<correctOccupant.size() && index>=0){	
 			correctOccupant.add(index,dev_ids.get(pos));
-		else
+			Log.v("ELSERVICES", "Old occupant changed: "+dev_ids.get(pos));
+		}
+		else{
 			correctOccupant.add(dev_ids.get(pos));
+			Log.v("ELSERVICES", "New occupant added: "+dev_ids.get(pos));
+		}
 	}
 
 
 	static void changeCorrectionPairData(long id,String[] pairData){
 		int index=correctionIds.indexOf(id);
-		if(correctionPairData.size()>index)
+		if(correctionPairData.size()>index && index>=0)
 			correctionPairData.remove(index);
 
-		if(index<correctionPairData.size())
+		if(index<correctionPairData.size() && index>=0)
 			correctionPairData.add(index,pairData);
 		else
 			correctionPairData.add(pairData);
@@ -320,8 +341,8 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 
 	public void onDoneBtn(View view){
 		Log.v("ELSERVICES", "Done");
-		Log.v("ELSERVICES", ids.size()+" == "+correctionIds.size()+" ?");
-		if((correctionIds.size()==ids.size() && ids.size()>0)){
+		Log.v("ELSERVICES","ids: "+ids.size()+" == corrections: "+correctionIds.size());
+		if(correctionIds.size()==ids.size() && ids.size()>0){
 			if(checkTimeOfStay()){
 				Log.v("ELSERVICES", "going to correct");
 				toCorrect();
@@ -354,8 +375,15 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 						activity.put("activity_id",id);
 						activity.put("time_of_stay", timeOfStay.get(index)/1000);
 						if(correctionPairData.size()>index){
-							activity.put("to_appliance", correctionPairData.get(index)[0]);
-							activity.put("to_location", correctionPairData.get(index)[1]);
+							if(correctionPairData.get(index)[0].equals("none"))
+								activity.put("to_appliance", "");
+							else
+								activity.put("to_appliance", correctionPairData.get(index)[0]);
+
+							if(correctionPairData.get(index)[1].equals("none"))
+								activity.put("to_location", "");
+							else
+								activity.put("to_location", correctionPairData.get(index)[1]);
 						}
 						if(correctOccupant.size()>index)
 							activity.put("to_occupant", correctOccupant.get(index));
@@ -374,6 +402,8 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 								activity.put("end_time","");
 						}
 						activity.put("incorrect", correctionTF.get(index));
+						//						Log.v("ELSERVICES","activity number: "+index+" start_time: "+activity.getString("start_time")
+						//								+" end_time: "+activity.getString("end_time"));
 					}
 					activities.put(activity);
 					Log.v("ELSERVICES", activities.toString());				
@@ -413,19 +443,21 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 
 		occupantList.clear();
 		Iterator it=occupants.keys();
+		dev_ids.add("");
 		while(it.hasNext()){
 			String key=it.next().toString();
 			if(!devid.equals(key)){
 				dev_ids.add(key);
 				try {
 					occupantList.add(occupants.getString(key));
+					Log.v("ELSERVICES","Occupant added "+occupants.getString(key)+", "+key);
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 		}
-		dev_ids.add(0, "");
+		//		dev_ids.add(0, "");
 	}
 
 	public void parsePref(String resp){
@@ -442,8 +474,10 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 				appliances=options.getJSONArray("appliances");
 				for(int i=0;i<appliances.length();i++){
 					JSONObject appliance=appliances.getJSONObject(i);
-					correction_apps.add(appliance.getString("appliance"));
-					correction_locs.add(appliance.getString("location"));
+					if(correction_apps.indexOf(appliance.getString("appliance"))==-1)
+						correction_apps.add(appliance.getString("appliance"));
+					if(correction_locs.indexOf(appliance.getString("location"))==-1)
+						correction_locs.add(appliance.getString("location"));
 				}					
 				Log.v("ELSERVICES","GroundReport Activitiy count: " + activities.length());
 				if(activities!=null){
@@ -569,7 +603,7 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 				if(msg.contains("ERROR")){
 					refusedTryAgain();
 				}
-					Log.i("ELSERVICES", msg);
+				Log.i("ELSERVICES", msg);
 			}
 		}.execute(null, null, null);
 	}
@@ -578,7 +612,7 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 		DialogFragment newFragment = new TryAgainConnectionRefusedDialogFragment();
 		newFragment.show(getSupportFragmentManager(), "Report submission failed. Contact administrator.");
 	}
-	
+
 	public String sendHttp(JSONObject data){
 		InputStream inputStream = null;
 
@@ -650,7 +684,7 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 	@Override
 	public void onSetTime(int hourOfDay, int minute) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 

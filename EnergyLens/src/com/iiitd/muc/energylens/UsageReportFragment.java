@@ -69,7 +69,7 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 		TextView activityText=(TextView)inflateView.findViewById(R.id.activityText);
 		String fromTimeString=dateFormat.format(from).toString();
 		String toTimeString=dateFormat.format(to).toString();
-		
+
 		final String activityLine="Used <b>"+appliance+"</b> from <b>"+fromTimeString
 				+"</b> to <b>"+toTimeString
 				+"</b> in <b>"+loc+"</b> consumed: "+Long.toString(usage)+" Wh";
@@ -137,6 +137,7 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 
 				// Check which radio button was clicked
 				if (checked){
+					Log.v("ELSERVICES", "Correct clicked");
 					setTimeView();
 					appSpinner.setVisibility(View.GONE);
 					appSpinner.setSelection(0);
@@ -167,6 +168,7 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 
 				// Check which radio button was clicked
 				if (checked){
+					Log.v("ELSERVICES", "Incorrect clicked");
 					setTimeView();
 					appSpinner.setVisibility(View.VISIBLE);
 					locSpinner.setVisibility(View.VISIBLE);
@@ -256,8 +258,8 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 		appSpinner = (Spinner) inflateView.findViewById(R.id.app_spinner);
 		for(String app:GroundReportActivity.correction_apps)
 			labelsList.add(app);
-//		labelsList.add("Unknown");
-//		labelsList.remove(0);
+		//		labelsList.add("Unknown");
+		//		labelsList.remove(0);
 		labelsList.add(0, "none");
 		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity(),
 				android.R.layout.simple_spinner_item, labelsList);
@@ -273,7 +275,7 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 		locSpinner = (Spinner) inflateView.findViewById(R.id.loc_spinner);
 		for(String loc:GroundReportActivity.correction_locs)
 			locList.add(loc);
-//		locList.remove(0);
+		//		locList.remove(0);
 		locList.add(0, "none");
 		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(getActivity(),
 				android.R.layout.simple_spinner_item, locList);
@@ -292,7 +294,7 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 		occIcon.setVisibility(View.GONE);
 		for(String occ:GroundReportActivity.occupantList){
 			occList.add(occ);
-			Log.v("ELSERVICES","Occupants: "+occ);
+			//			Log.v("ELSERVICES","Occupants: "+occ);
 		}
 		if(occList.size()>0){
 			occList.add(0, "none");
@@ -330,20 +332,15 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 		if(parent.equals(appSpinner)){
 			toApp=labelsList.get(pos);
 			Log.v("ELSERVICES", toApp+","+toLoc+" will be added");
-			if(!toApp.equals("none") && !toLoc.equals("none")){
-				Log.v("ELSERVICES", toApp+","+toLoc+" will be added");
-				String[] pair={toApp,toLoc};
-				GroundReportActivity.changeCorrectionPairData(id,pair);
-			}
+			String[] pair={toApp,toLoc};
+			GroundReportActivity.changeCorrectionPairData(id,pair);
+
 		}
 		else if(parent.equals(locSpinner)){
 			toLoc=locList.get(pos);
 			Log.v("ELSERVICES", toApp+","+toLoc+" will be added");
-			if(!toApp.equals("none") && !toLoc.equals("none")){
-				Log.v("ELSERVICES", toApp+","+toLoc+" will be added");
-				String[] pair={toApp,toLoc};
-				GroundReportActivity.changeCorrectionPairData(id,pair);
-			}
+			String[] pair={toApp,toLoc};
+			GroundReportActivity.changeCorrectionPairData(id,pair);
 		}
 		else if(parent.equals(minsSpinner)){
 			if(pos!=0){
@@ -411,15 +408,17 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 				if(changeTimeOf=="start"){
 					startTime=c.getTimeInMillis();
 					startTimeBtn.setText(timeString);
-					GroundReportActivity.changeStartTime(id, time);
+					//					Log.v("ELSERVICES", "start time: "+startTime);
+					GroundReportActivity.changeStartTime(id, startTime);
 				}
 				else if(changeTimeOf=="stop"){
 					endTime=c.getTimeInMillis();
 					endTimeBtn.setText(timeString);
-					GroundReportActivity.changeStopTime(id, time);
+					//					Log.v("ELSERVICES", "end time: "+endTime);
+					GroundReportActivity.changeStopTime(id, endTime);
 				}
 
-				//				Log.v("ELSERVICES", "Correction Time: "+c.toString());
+				Log.v("ELSERVICES",changeTimeOf+ " correction Time: "+timeString);
 			} else if (resultCode == Activity.RESULT_CANCELED){
 
 			}
