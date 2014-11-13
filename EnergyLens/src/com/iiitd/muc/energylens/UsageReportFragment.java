@@ -364,10 +364,9 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 		}
 		else if(parent.equals(occSpinner)){
 			toOcc=pos;
-			if(pos!=0){
-				Log.v("ELSERVICES",toOcc+" will be added");
-				GroundReportActivity.changeOccupant(id, pos);
-			}
+			Log.v("ELSERVICES",toOcc+" will be added");
+			GroundReportActivity.changeOccupant(id, pos);
+
 		}
 
 	}

@@ -129,10 +129,15 @@ public class PersonalEnergyFragment extends Fragment {
 		
 		mRenderer.setXLabels(0);
 		
+		int daySwitch=0;
 		for(int i=0;i<y.length;i++){
 			long currTime=lastSyncInMillis;
 			long graphTime=currTime-((y.length-i)*60*60*1000);
-			String text=DateFormat.format("dd/MM HH:mm",graphTime).toString();
+			String text=DateFormat.format("HH:mm",graphTime).toString();
+			if(daySwitch==0 && text.contains("00:")){
+				text=DateFormat.format("dd/MM HH:mm",graphTime).toString();
+				daySwitch=1;
+			}
 			mRenderer.addXTextLabel(i+1, text);
 		}
 

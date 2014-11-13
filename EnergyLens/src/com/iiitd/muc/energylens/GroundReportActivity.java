@@ -259,12 +259,18 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 			correctOccupant.remove(index);
 
 		Log.v("ELSERVICES", "index of ID for Occ: "+index+" pos of Occ: "+pos);
-		if(index<correctOccupant.size() && index>=0){	
-			correctOccupant.add(index,dev_ids.get(pos));
+		if(index<correctOccupant.size() && index>=0){
+			if(pos==0)
+				correctOccupant.add(index,"");
+			else
+				correctOccupant.add(index,dev_ids.get(pos));
 			Log.v("ELSERVICES", "Old occupant changed: "+dev_ids.get(pos));
 		}
 		else{
-			correctOccupant.add(dev_ids.get(pos));
+			if(pos==0)
+				correctOccupant.add(index,"");
+			else
+				correctOccupant.add(dev_ids.get(pos));
 			Log.v("ELSERVICES", "New occupant added: "+dev_ids.get(pos));
 		}
 	}
