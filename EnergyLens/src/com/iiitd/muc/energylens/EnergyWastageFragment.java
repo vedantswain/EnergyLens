@@ -509,10 +509,22 @@ public class EnergyWastageFragment extends Fragment{
 	private void updateViews(long syncTime){
 		long percent=(long) (((double)totalWastage/(double)totalConsumption)*100);
 		TextView totalVal=(TextView)inflateView.findViewById(R.id.totalValWaste);
-		totalVal.setText(Long.toString(totalWastage)+" Wh"+" ("+(Long.toString(percent))+"%)");
+		if(totalWastage>0)
+		{
+			totalVal.setVisibility(View.VISIBLE);
+			totalVal.setText(Long.toString(totalWastage)+" Wh"+" ("+(Long.toString(percent))+"%)");
+		}
+		else
+			totalVal.setVisibility(View.INVISIBLE);
 		
-		TextView totalConVal=(TextView)inflateView.findViewById(R.id.totalConWaste);
-		totalConVal.setText(Long.toString(totalConsumption)+" Wh");
+		TextView totalConWaste=(TextView)inflateView.findViewById(R.id.totalConWaste);
+		if(totalConsumption>0)
+		{
+			totalConWaste.setVisibility(View.VISIBLE);
+			totalConWaste.setText(Long.toString(totalConsumption)+" Wh"+" ("+(Long.toString(percent))+"%)");
+		}
+		else
+			totalConWaste.setVisibility(View.INVISIBLE);
 
 		DateFormat df=new DateFormat();
 		lastSyncTime=df.format("dd MMM yy HH:mm", syncTime).toString();

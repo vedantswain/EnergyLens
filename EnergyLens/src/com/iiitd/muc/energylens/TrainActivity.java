@@ -13,8 +13,6 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.json.JSONObject;
 
-import com.iiitd.muc.energylens.R;
-
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -29,11 +27,11 @@ import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
@@ -59,6 +57,10 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 	private NotificationManager mNotificationManager;
 	NotificationCompat.Builder builder;
 
+	private boolean audioBased,presenceBased;
+	int audioBasedCount=0;
+	int presenceBasedCount=0;
+
 	private ArrayList<String> selectedApps=new ArrayList<String>();
 	int selectedAppsCount=0;
 
@@ -79,15 +81,15 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 		}
 
 	}
-	
+
 	private void toggleServiceMessage(String message){
 		Intent intent = new Intent();
 		intent.setAction("EnergyLensPlus.toggleService");
-		  // add data
-		  intent.putExtra("message", message);
+		// add data
+		intent.putExtra("message", message);
 
-		  Log.v("ELSERVICES", "Broadcast from Train to Main receiver");
-		  sendBroadcast(intent);
+		Log.v("ELSERVICES", "Broadcast from Train to Main receiver");
+		sendBroadcast(intent);
 	}
 
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -144,8 +146,12 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 			jsonObject.put("end_time", stopTime);
 			jsonObject.put("location", lastLocation);
 			jsonObject.put("appliance", lastLabel);
+			jsonObject.put("audio_based", audioBased);
+			jsonObject.put("presence_based", presenceBased);
 
 			json = jsonObject.toString();
+			
+			Log.v("ELSERVICES","Message sent to training"+json);
 
 			StringEntity se = new StringEntity(json);
 			se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE,"application/json"));
@@ -280,16 +286,22 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 
 	public void startService(View view){
 		if(!(Common.LABEL.equals("none")) && !(Common.LOCATION.equals("none"))){
-			Common.changePrefix("Training_");
-			Log.v("ELSERVICES", Common.LABEL+" "+Common.LOCATION+" "+Common.FILE_PREFIX);
-			viewFlipper.showNext();
-			Common.changeTrainingStatus(1);
-			updatePreferences(Common.TRAINING_STATUS);
-			Toast.makeText(TrainActivity.this, "Training data collection started", LENGTH_SHORT).show();
-			sendNotification();
-//			customNotification();
-			startTime=System.currentTimeMillis();
-			toggleServiceMessage("startServices from Training");
+			if(audioBasedCount==0)
+				Toast.makeText(TrainActivity.this, "Specify if appliance is audio based", LENGTH_SHORT).show();
+			else if(presenceBasedCount==0)
+				Toast.makeText(TrainActivity.this, "Specify if appliance is presence based", LENGTH_SHORT).show();
+			else{
+				Common.changePrefix("Training_");
+				Log.v("ELSERVICES", Common.LABEL+" "+Common.LOCATION+" "+Common.FILE_PREFIX);
+				viewFlipper.showNext();
+				Common.changeTrainingStatus(1);
+				updatePreferences(Common.TRAINING_STATUS);
+				Toast.makeText(TrainActivity.this, "Training data collection started", LENGTH_SHORT).show();
+				sendNotification();
+				//			customNotification();
+				startTime=System.currentTimeMillis();
+				toggleServiceMessage("startServices from Training");
+			}
 		}
 		else
 			Toast.makeText(this, "Both appliance & location are required", LENGTH_SHORT).show();
@@ -309,8 +321,10 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 			@Override
 			protected void onPostExecute(String msg) {
 				TextView trainingPower=(TextView) findViewById(R.id.powerCon);
-				if(power!=null)
-					trainingPower.setText(power.toString());
+				if(power!=null){
+					power=(double)Math.round(power * 1000) / 1000;
+					trainingPower.setText(power.toString()+" W");
+				}
 				TextView trainingText=(TextView) findViewById(R.id.trainApp);
 				trainingText.setText(lastLabel+" in "+lastLocation+"\n consumed: ");
 
@@ -401,6 +415,29 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 		viewFlipper.showPrevious();
 		selectedAppsCount=0;
 		selectedApps=new ArrayList<String>();
+		locList=new ArrayList<String>();
+		audioBasedCount=0;
+		presenceBasedCount=0;
+		
+		RadioButton rb;
+		if(audioBased){
+			rb=(RadioButton)findViewById(R.id.radio0);
+			rb.setChecked(false);
+		}
+		else{
+			rb=(RadioButton)findViewById(R.id.radio1);
+			rb.setChecked(false);
+		}
+		
+		if(presenceBased){
+			rb=(RadioButton)findViewById(R.id.radio2);
+			rb.setChecked(false);
+		}
+		else{
+			rb=(RadioButton)findViewById(R.id.radio3);
+			rb.setChecked(false);
+		}
+			
 		TextView textView=(TextView) findViewById(R.id.appList);
 		textView.setText("");
 		textView=(TextView) findViewById(R.id.setLoc);
@@ -505,5 +542,39 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 		updatePreferences();
 		TextView textView=(TextView) findViewById(R.id.setLoc);
 		textView.setText(Common.LOCATION);
+	}
+
+	public void onAudioBasedClicked(View view) {
+		// Is the button now checked?
+		boolean checked = ((RadioButton) view).isChecked();
+		audioBasedCount=1;
+		// Check which radio button was clicked
+		switch(view.getId()) {
+		case R.id.radio0:
+			if (checked)
+				audioBased=true;
+			break;
+		case R.id.radio1:
+			if (checked)
+				audioBased=false;
+			break;
+		}
+	}
+
+	public void onPresenceBasedClicked(View view) {
+		// Is the button now checked?
+		boolean checked = ((RadioButton) view).isChecked();
+		presenceBasedCount=1;
+		// Check which radio button was clicked
+		switch(view.getId()) {
+		case R.id.radio2:
+			if (checked)
+				presenceBased=true;
+			break;
+		case R.id.radio3:
+			if (checked)
+				presenceBased=false;
+			break;
+		}
 	}
 }

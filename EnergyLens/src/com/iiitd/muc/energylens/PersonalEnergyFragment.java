@@ -507,11 +507,23 @@ public class PersonalEnergyFragment extends Fragment {
 	private void updateViews(long syncTime){
 		long percent=(long) (((double)totalUsage/(double)totalConsumption)*100);
 		TextView totalVal=(TextView)inflateView.findViewById(R.id.totalVal);
-		totalVal.setText(Long.toString(totalUsage)+" Wh"+" ("+(Long.toString(percent))+"%)");
+		if(totalUsage>0)
+		{
+			totalVal.setVisibility(View.VISIBLE);
+			totalVal.setText(Long.toString(totalUsage)+" Wh"+" ("+(Long.toString(percent))+"%)");
+		}
+		else
+			totalVal.setVisibility(View.INVISIBLE);
 		
 		TextView totalConVal=(TextView)inflateView.findViewById(R.id.totalConVal);
-		totalConVal.setText(Long.toString(totalConsumption)+" Wh");
-
+		if(totalConsumption>0)
+		{
+			totalConVal.setVisibility(View.VISIBLE);
+			totalConVal.setText(Long.toString(totalConsumption)+" Wh"+" ("+(Long.toString(percent))+"%)");
+		}
+		else
+			totalConVal.setVisibility(View.INVISIBLE);
+		
 		DateFormat df=new DateFormat();
 		lastSyncTime=df.format("dd MMM yy HH:mm", syncTime).toString();
 		TextView textView=(TextView)inflateView.findViewById(R.id.lastSyncText);

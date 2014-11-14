@@ -20,16 +20,6 @@
             android:gravity="center"
             android:orientation="vertical" >
 
-            <ImageView
-                android:id="@+id/startButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="131dp"
-                android:onClick="startService"
-                android:src="@drawable/ic_action_start" />
-
             <Button
                 android:id="@+id/setLoc"
                 android:layout_width="wrap_content"
@@ -77,6 +67,80 @@
                 android:layout_below="@+id/setApp"
                 android:onClick="removeLastApp"
                 android:src="@drawable/ic_action_remove" />
+
+            <TextView
+                android:id="@+id/presenceTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignTop="@+id/audioBasedGroup"
+                android:layout_marginTop="36dp"
+                android:text="Is your appliance presence based?" />
+
+            <TextView
+                android:id="@+id/audioTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:text="Is your appliance audio based?" />
+
+            <RadioGroup
+                android:id="@+id/audioBasedGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/audioTextView"
+                android:orientation="horizontal" >
+
+                <RadioButton
+                    android:id="@+id/radio0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Yes"
+                    android:onClick="onAudioBasedClicked" />
+
+                <RadioButton
+                    android:id="@+id/radio1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="No"
+                    android:onClick="onAudioBasedClicked" />
+            </RadioGroup>
+
+            <RadioGroup
+                android:id="@+id/presenceBasedGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/presenceTextView"
+                android:orientation="horizontal" >
+
+                <RadioButton
+                    android:id="@+id/radio2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Yes"
+                    android:onClick="onPresenceBasedClicked" />
+
+                <RadioButton
+                    android:id="@+id/radio3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="No" 
+                    android:onClick="onPresenceBasedClicked"/>
+            </RadioGroup>
+
+            <ImageView
+                android:id="@+id/startButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="28dp"
+                android:onClick="startService"
+                android:src="@drawable/ic_action_start" />
+
         </RelativeLayout>
 
         <RelativeLayout
