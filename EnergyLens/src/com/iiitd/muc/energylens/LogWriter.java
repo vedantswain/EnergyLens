@@ -156,12 +156,12 @@ public class LogWriter {
 		researchLogWrite(screenLog,logstring,SCREENHEADER);
 	}
 	
-	public static void debugLogWrite(long timestamp,String logstring){
-		debugLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"DebugLog.csv");
-		
-		String finalLog=DateFormat.format("dd/MM/yy HH:mm:ss",timestamp).toString()+","+logstring;
-		researchLogWrite(debugLog,finalLog,DEBUGHEADER);
-	}
+//	public static void debugLogWrite(long timestamp,String logstring){
+//		debugLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"DebugLog.csv");
+//		
+//		String finalLog=DateFormat.format("dd/MM/yy HH:mm:ss",timestamp).toString()+","+logstring;
+//		researchLogWrite(debugLog,finalLog,DEBUGHEADER);
+//	}
 	
 	public static void researchLogWrite(File logFile,String logstring,String header){
 		synchronized(logFile){

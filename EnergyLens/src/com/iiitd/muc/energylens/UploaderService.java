@@ -19,8 +19,12 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.json.JSONObject;
+
+import com.iiitd.muc.energylens.AxlService.UnregisterTask;
 
 import android.app.Service;
 import android.content.Context;
@@ -39,6 +43,9 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 
 public class UploaderService extends Service{
+	
+	Timer timer;
+	private int SAMPLE_TIME=50;
 
 	HttpURLConnection connection = null;
 	DataOutputStream outputStream = null;
@@ -46,8 +53,11 @@ public class UploaderService extends Service{
 	String path = Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator;
 	String dataPath=path+"SensorData"+File.separator;
 	String researchPath= path+"UsageStats"+File.separator;
-	String [] file={"accelerometer_log.csv","audio_log.csv","light_log.csv","mag_log.csv","rawaudio_log.csv","wifi_log.csv",
-			"Training_accelerometer_log.csv","Training_audio_log.csv","Training_light_log.csv","Training_mag_log.csv","Training_rawaudio_log.csv","Training_wifi_log.csv"};
+	
+	//"mag_log.csv","Training_mag_log.csv" have been removed
+	
+	String [] file={"accelerometer_log.csv","audio_log.csv","light_log.csv","rawaudio_log.csv","wifi_log.csv",
+			"Training_accelerometer_log.csv","Training_audio_log.csv","Training_light_log.csv","Training_rawaudio_log.csv","Training_wifi_log.csv"};
 	String [] researchFile={"screen_log.csv"};
 	String urlServer = Common.SERVER_URL+Common.API;
 	String lineEnd = "\r\n";
@@ -95,7 +105,7 @@ public class UploaderService extends Service{
 	@Override
 	public void onDestroy() {        
 		super.onDestroy();
-		//Log.v("ELSERVICES","axlService stopped "+System.currentTimeMillis());	
+		Log.v("ELSERVICES","UploadService stopped "+System.currentTimeMillis());
 		stopSelf();
 	}
 
@@ -110,11 +120,20 @@ public class UploaderService extends Service{
 		getUpdatedPreferences();
 		Thread thr = new Thread(null, mTask, "AlarmService_Service");
 
-		LogWriter.debugLogWrite(System.currentTimeMillis(),"Uploader started");
+		//LogWriter.debugLogWrite(System.currentTimeMillis(),"Uploader started");
 		thr.start();
 
 		return START_NOT_STICKY; //makes sure services don't restart on stopping
 
+	}
+	
+	class UnregisterTask extends TimerTask {
+		public void run() {
+	    	Log.v("ELSERVICES","UploadService stopped "+System.currentTimeMillis());
+			timer.cancel();
+//			LogWriter.debugLogWrite(System.currentTimeMillis(),"Axl service stopped");
+			stopSelf();
+		}
 	}
 
 	private void upload_research(){
@@ -122,7 +141,7 @@ public class UploaderService extends Service{
 			research_upload_setup(filename);
 		}
 		Log.i("ELSERVICES", "all research files visited "+System.currentTimeMillis());
-		LogWriter.debugLogWrite(System.currentTimeMillis(),"All research files visited");
+		//LogWriter.debugLogWrite(System.currentTimeMillis(),"All research files visited");
 		research_upload_pending();
 	}
 
@@ -145,17 +164,21 @@ public class UploaderService extends Service{
 
 			synchronized (mBinder) {
 				try {
-
+					timer = new Timer();
+					timer.schedule(new UnregisterTask(), SAMPLE_TIME*1000);
+										
 					for(String filename:file){
 						upload_setup(filename);
 					}
 					Log.i("ELSERVICES", "all files visited "+System.currentTimeMillis());
-					LogWriter.debugLogWrite(System.currentTimeMillis(),"All data files visited");
+					//LogWriter.debugLogWrite(System.currentTimeMillis(),"All data files visited");
 					
 					upload_pending();
 					timeCheck();
-
-					LogWriter.debugLogWrite(System.currentTimeMillis(),"Uploader service stopped");
+					
+					Log.v("ELSERVICES","UploadService stopped "+System.currentTimeMillis());
+					//LogWriter.debugLogWrite(System.currentTimeMillis(),"Uploader service stopped");
+					timer.cancel();
 					stopSelf();					
 				}
 				catch (Exception e) {
@@ -186,7 +209,7 @@ public class UploaderService extends Service{
 			input.close();
 			output.close();
 			Log.i("ELSERVICES", "Upload File created");
-			LogWriter.debugLogWrite(System.currentTimeMillis(),"Upload file created");
+			//LogWriter.debugLogWrite(System.currentTimeMillis(),"Upload file created");
 			src.delete();
 		}
 		catch(Exception e){
@@ -217,7 +240,7 @@ public class UploaderService extends Service{
 			File file=list[i];
 			String filename=file.getAbsolutePath().replace(researchPath, "");
 			Log.i("ELSERVICES", "pending "+filename);
-			LogWriter.debugLogWrite(System.currentTimeMillis(),"Uploading pending research: "+filename);
+			//LogWriter.debugLogWrite(System.currentTimeMillis(),"Uploading pending research: "+filename);
 			//Log.i("ELSERVICES", "uploading pending research files");
 			if(file.length()==0)
 				file.delete();
@@ -243,7 +266,7 @@ public class UploaderService extends Service{
 			File file=list[i];
 			String filename=file.getAbsolutePath().replace(dataPath, "");
 			Log.i("ELSERVICES", "pending "+filename);
-			LogWriter.debugLogWrite(System.currentTimeMillis(),"Uploading pending: "+filename);
+			//LogWriter.debugLogWrite(System.currentTimeMillis(),"Uploading pending: "+filename);
 			
 			if(filename.contains("upload_")){
 				Log.i("ELSERVICES", "uploading pending files");
@@ -400,7 +423,7 @@ public class UploaderService extends Service{
 				upFile.delete();
 			else{
 				upload(upFile,Common.SERVER_URL+Common.API);
-				LogWriter.debugLogWrite(System.currentTimeMillis(),"Uploading file: "+upFile.getName());
+				//LogWriter.debugLogWrite(System.currentTimeMillis(),"Uploading file: "+upFile.getName());
 			}
 		}
 	}
@@ -411,13 +434,13 @@ public class UploaderService extends Service{
 
 		if (mWifi.isConnected()) {
 			Log.v("ELSERVICES", "Wifi Connection: true");
-			LogWriter.debugLogWrite(System.currentTimeMillis(),"Wifi Connection: true");
+			//LogWriter.debugLogWrite(System.currentTimeMillis(),"Wifi Connection: true");
 			
 			return true;
 		}
 
 		Log.v("ELSERVICES", "Wifi Connection: false");
-		LogWriter.debugLogWrite(System.currentTimeMillis(),"Wifi Connection: false");
+		//LogWriter.debugLogWrite(System.currentTimeMillis(),"Wifi Connection: false");
 		return false;
 	}
 
@@ -511,23 +534,23 @@ public class UploaderService extends Service{
 					if(connection.getResponseCode()>=200 && connection.getResponseCode()<300 && serverResponseCode==1){
 						upFile.delete();	    	    
 						Log.v("ELSERVICES", "Upload complete "+System.currentTimeMillis());					
-						LogWriter.debugLogWrite(System.currentTimeMillis(),"upload complete");
+						//LogWriter.debugLogWrite(System.currentTimeMillis(),"upload complete");
 					}
 					else{
 						Log.i("ELSERVICES", "Can't upload due to Code: "+Integer.toString(serverResponseCode)+serverResponseMessage);
 
-						LogWriter.debugLogWrite(System.currentTimeMillis(),"Can't upload due to Code: "+Integer.toString(serverResponseCode)+serverResponseMessage);
+						//LogWriter.debugLogWrite(System.currentTimeMillis(),"Can't upload due to Code: "+Integer.toString(serverResponseCode)+serverResponseMessage);
 					}
 				}
 				else{
 					Log.v("ELSERVICES", "Upload failed "+System.currentTimeMillis());
-					LogWriter.debugLogWrite(System.currentTimeMillis(),"Upload failed due to no connection");
+					//LogWriter.debugLogWrite(System.currentTimeMillis(),"Upload failed due to no connection");
 				}
 			}
 			catch (Exception e)
 			{
 				e.printStackTrace();
-				LogWriter.debugLogWrite(System.currentTimeMillis(),"Upload failed due to: "+e.getMessage());
+				//LogWriter.debugLogWrite(System.currentTimeMillis(),"Upload failed due to: "+e.getMessage());
 			}
 		}
 	}

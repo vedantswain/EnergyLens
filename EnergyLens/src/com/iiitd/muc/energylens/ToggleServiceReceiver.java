@@ -63,26 +63,26 @@ public class ToggleServiceReceiver extends BroadcastReceiver {
 		lightAlarmMgr= (AlarmManager)context.getSystemService(context.ALARM_SERVICE);
 		setAlarm(lightServiceIntent,lightServicePendingIntent,11894,lightAlarmMgr);
 
-		magServiceIntent = new Intent(context, MagService.class);
+		/*magServiceIntent = new Intent(context, MagService.class);
 		magServicePendingIntent = PendingIntent.getService(context,
 				20591, magServiceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		magAlarmMgr= (AlarmManager)context.getSystemService(context.ALARM_SERVICE);
-		setAlarm(magServiceIntent,magServicePendingIntent,20591,magAlarmMgr);
+		setAlarm(magServiceIntent,magServicePendingIntent,20591,magAlarmMgr);*/
 
 		uploaderServiceIntent = new Intent(context, UploaderService.class);
 		uploaderServicePendingIntent = PendingIntent.getService(context,
 				4816, uploaderServiceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		uploaderAlarmMgr= (AlarmManager)context.getSystemService(context.ALARM_SERVICE);
 		uploaderAlarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-				System.currentTimeMillis()+Common.UPLOAD_INTERVAL*60*1000, Common.UPLOAD_INTERVAL*30*1000, uploaderServicePendingIntent); 
+				System.currentTimeMillis()+Common.UPLOAD_INTERVAL*60*1000, Common.UPLOAD_INTERVAL*60*1000, uploaderServicePendingIntent); 
 //		Log.v("ELSERVICES","Uploader alarm Set for service "+4816+" "+Common.INTERVAL);
 		
-		LogWriter.debugLogWrite(System.currentTimeMillis(),"All services scheduled to start");
+		//LogWriter.debugLogWrite(System.currentTimeMillis(),"All services scheduled to start");
 	}
 
 	private void stop() throws Throwable{
 		Log.v("ELSERVICES","Services stopped");
-		LogWriter.debugLogWrite(System.currentTimeMillis(),"All services stop");
+		//LogWriter.debugLogWrite(System.currentTimeMillis(),"All services stop");
 		try{
 			if(axlServicePendingIntent!=null && axlAlarmMgr!=null)
 				axlAlarmMgr.cancel(axlServicePendingIntent);
@@ -95,15 +95,15 @@ public class ToggleServiceReceiver extends BroadcastReceiver {
 			if(lightServicePendingIntent!=null && lightAlarmMgr!=null)
 				lightAlarmMgr.cancel(lightServicePendingIntent);
 
-			if(magServicePendingIntent!=null && magAlarmMgr!=null)
-				magAlarmMgr.cancel(magServicePendingIntent);
+			/*if(magServicePendingIntent!=null && magAlarmMgr!=null)
+				magAlarmMgr.cancel(magServicePendingIntent);*/
 
 			if(uploaderServicePendingIntent!=null && uploaderAlarmMgr!=null)
 				uploaderAlarmMgr.cancel(uploaderServicePendingIntent);
 		}
 		catch(Exception e){
 			e.printStackTrace();
-			LogWriter.debugLogWrite(System.currentTimeMillis(),"Error while stopping services "+e.getMessage());
+			//LogWriter.debugLogWrite(System.currentTimeMillis(),"Error while stopping services "+e.getMessage());
 		}
 	}
 

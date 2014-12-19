@@ -298,7 +298,7 @@ TryAgainConnectionRefusedDialogFragment.TryAgainDialogListener{
 					progress.dismiss();
 				if(!backendMessage.equals("")){
 					//					Toast.makeText(context, "Couldn't establish connection with server", 1000).show();
-					refusedTryAgain();
+					tryAgain();
 				}
 				if(reg_success==1)
 					toMain();

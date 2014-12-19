@@ -82,7 +82,7 @@ public class WiFiService extends Service {
 				mTask=null;
 				//				unregisterReceiver(wifiRcvr);
 				timer.cancel();
-//				LogWriter.debugLogWrite(System.currentTimeMillis(),"Mag service stopped");
+//				//LogWriter.debugLogWrite(System.currentTimeMillis(),"Mag service stopped");
 				stopSelf();
 			}
 			catch(Exception e){
@@ -101,13 +101,13 @@ public class WiFiService extends Service {
 						wifiMgr.setWifiEnabled(true);
 					wifiRcvr = new WifiReceiver();
 					getApplicationContext().registerReceiver(wifiRcvr, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-//					LogWriter.debugLogWrite(System.currentTimeMillis(),"Wifi scan started");
+//					//LogWriter.debugLogWrite(System.currentTimeMillis(),"Wifi scan started");
 					wifiMgr.startScan();
 				}
 
 			}catch(Exception e){
 				Log.v("ELSERVICES",e.toString());
-				LogWriter.debugLogWrite(System.currentTimeMillis(),"Error while starting wifi scan "+e.getStackTrace());
+				////LogWriter.debugLogWrite(System.currentTimeMillis(),"Error while starting wifi scan "+e.getStackTrace());
 			}
 			Log.i("ELSERVICES","Wifi scanning started on separate thread");
 		}
@@ -142,11 +142,11 @@ public class WiFiService extends Service {
 					for(ScanResult result:wifiList){
 						if(homeSSID.equals(result.SSID) && homeBSSID.equals(result.BSSID) && result.level>-85){
 							isHome=true;
-							Log.v("ELSERVICES", "AP isHome: "+result.SSID+", "+result.BSSID);
+//							Log.v("ELSERVICES", "AP isHome: "+result.SSID+", "+result.BSSID);
 							if(!isStarted){
 								isStarted=true;
-								Log.v("ELSERVICES", "Is home services started");
-								LogWriter.debugLogWrite(System.currentTimeMillis(),"Not home services stopped");
+//								Log.v("ELSERVICES", "Is home services started");
+								////LogWriter.debugLogWrite(System.currentTimeMillis(),"Not home services stopped");
 								toggleServiceMessage("startServices from Wifi");
 							}
 							
@@ -154,7 +154,7 @@ public class WiFiService extends Service {
 						}
 					}
 
-					Log.v("ELSERVICES", "isHome: "+isHome);
+//					Log.v("ELSERVICES", "isHome: "+isHome);
 
 					if(isHome){
 						for(ScanResult result:wifiList){
@@ -181,20 +181,20 @@ public class WiFiService extends Service {
 			}
 			catch(Exception e){
 				e.printStackTrace();
-				LogWriter.debugLogWrite(System.currentTimeMillis(),"Wifi error while home: "+e.getMessage());
+				//LogWriter.debugLogWrite(System.currentTimeMillis(),"Wifi error while home: "+e.getMessage());
 			}
 
 			if(!isHome){
 				try {
 						Log.v("ELSERVICES", "Not home services stopped");
-						LogWriter.debugLogWrite(System.currentTimeMillis(),"Not home services stopped");
+						//LogWriter.debugLogWrite(System.currentTimeMillis(),"Not home services stopped");
 						toggleServiceMessage("stopServices");
 					
 					isStarted=false;
 				} catch (Throwable e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-					LogWriter.debugLogWrite(System.currentTimeMillis(),"Wifi error while NOT home: "+e.getMessage());
+					//LogWriter.debugLogWrite(System.currentTimeMillis(),"Wifi error while NOT home: "+e.getMessage());
 				}
 			}
 

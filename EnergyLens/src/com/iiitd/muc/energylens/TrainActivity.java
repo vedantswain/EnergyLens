@@ -49,8 +49,8 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 	private Handler mHandler = new Handler();
 	private Object lastLocation;
 	private Object lastLabel;
-	private String[] locations={"New Location","Kitchen","Dining Room","Bedroom1","Bedroom2","Bedroom3","Study","Corridor"};
-	private String[] labels={"New Appliance","Fan","AC","Microwave","TV","Computer","Printer","Washing Machine","Fan+AC"};
+	private String[] locations={"New Location","Dining Room","Drawing Room","Kitchen","Master Bedroom","Bedroom 2","Bedroom 3","Study","Lobby"};
+	private String[] labels={"New Appliance","Fan","Light","TV","AC","Microwave","Geyser","Grinder","Iron"};
 	private ArrayList<String> labelsList=new ArrayList<String>();
 	private ArrayList<String> locList=new ArrayList<String>();
 

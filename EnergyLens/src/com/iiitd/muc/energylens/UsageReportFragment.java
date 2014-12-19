@@ -28,8 +28,8 @@ import android.widget.TextView;
 public class UsageReportFragment extends Fragment implements OnItemSelectedListener,TimePickerDialogFragment.TimePickerDialogListener{
 
 	View inflateView;
-	private String[] locations={"New Location","Kitchen","Dining Room","Bedroom1","Bedroom2","Bedroom3","Study","Corridor"};
-	private String[] labels={"New Appliance","Fan","AC","Microwave","TV","Computer","Printer","Washing Machine","Fan+AC"};
+	private String[] locations={"New Location","Dining Room","Drawing Room","Kitchen","Master Bedroom","Bedroom 2","Bedroom 3","Study","Lobby"};
+	private String[] labels={"New Appliance","Fan","Light,","TV","AC","Microwave","Geyser","Grinder","Iron"};
 	private ArrayList<String> labelsList=new ArrayList<String>();
 	private ArrayList<String> locList=new ArrayList<String>();
 	private ArrayList<String> occList=new ArrayList<String>();
@@ -82,7 +82,7 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 
 		activityText.setText(Html.fromHtml(activityLine));
 
-		getUpdatedPreferences();
+		//getUpdatedPreferences();
 		setAppSpinner();
 		setLocSpinner();
 		setOccSpinner();

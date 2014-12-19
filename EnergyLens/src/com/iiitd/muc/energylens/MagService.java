@@ -65,11 +65,11 @@ public class MagService extends Service{
 
 			timer = new Timer();
 			timer.schedule(new UnregisterTask(), Common.SAMPLE_TIME*1000);
-//			LogWriter.debugLogWrite(System.currentTimeMillis(),"Mag service started");
+//			//LogWriter.debugLogWrite(System.currentTimeMillis(),"Mag service started");
 
 		}catch(Exception e){
 			Log.i("ELSERVICES",e.toString());
-			LogWriter.debugLogWrite(System.currentTimeMillis(),"Error while starting mag "+e.getMessage());
+			//LogWriter.debugLogWrite(System.currentTimeMillis(),"Error while starting mag "+e.getMessage());
 		}
 	}
 
@@ -78,7 +78,7 @@ public class MagService extends Service{
 			Log.i("ELSERVICES","MagService stopped "+System.currentTimeMillis());
 			magSensorManager.unregisterListener(MagSensorListener);
 			timer.cancel(); 		
-//			LogWriter.debugLogWrite(System.currentTimeMillis(),"Mag service stopped");
+//			//LogWriter.debugLogWrite(System.currentTimeMillis(),"Mag service stopped");
 			stopSelf();
 		}
 	}
