@@ -343,7 +343,8 @@ public class EnergyWastageFragment extends Fragment{
 						e.printStackTrace();
 					}
 
-					data.putString("options", options.toString());
+					if(options!=null && options.length()>0)
+						data.putString("options", options.toString());
 
 					SecureRandom random = new SecureRandom();
 					String randomId=new BigInteger(130, random).toString(32);
@@ -437,7 +438,7 @@ public class EnergyWastageFragment extends Fragment{
 
 				JSONObject options=new JSONObject(response.getString("options"));
 
-				if(options!=null){
+				if(options!=null && options.length()>0){
 					totalConsumption=options.getLong("total_consumption");
 					totalWastage=options.getLong("total_wastage");
 					parseWastage(options.getString("hourly_wastage"));
@@ -462,7 +463,7 @@ public class EnergyWastageFragment extends Fragment{
 			JSONObject response=new JSONObject(resp);
 			JSONObject options=new JSONObject(response.getString("options"));
 
-			if(options!=null){
+			if(options!=null && options.length()>0){
 				totalConsumption=options.getLong("total_consumption");
 				totalWastage=options.getLong("total_wastage");
 				parseWastage(options.getString("hourly_wastage"));

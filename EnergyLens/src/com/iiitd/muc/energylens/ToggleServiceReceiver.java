@@ -1,5 +1,7 @@
 package com.iiitd.muc.energylens;
 
+import java.util.Calendar;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -69,15 +71,29 @@ public class ToggleServiceReceiver extends BroadcastReceiver {
 		magAlarmMgr= (AlarmManager)context.getSystemService(context.ALARM_SERVICE);
 		setAlarm(magServiceIntent,magServicePendingIntent,20591,magAlarmMgr);*/
 
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(System.currentTimeMillis());
+		calendar.add(Calendar.MINUTE, 2);
+		
 		uploaderServiceIntent = new Intent(context, UploaderService.class);
 		uploaderServicePendingIntent = PendingIntent.getService(context,
 				4816, uploaderServiceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		uploaderAlarmMgr= (AlarmManager)context.getSystemService(context.ALARM_SERVICE);
-		uploaderAlarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-				System.currentTimeMillis()+Common.UPLOAD_INTERVAL*60*1000, Common.UPLOAD_INTERVAL*60*1000, uploaderServicePendingIntent); 
-//		Log.v("ELSERVICES","Uploader alarm Set for service "+4816+" "+Common.INTERVAL);
+		uploaderAlarmMgr.setRepeating(AlarmManager.RTC_WAKEUP,
+				calendar.getTimeInMillis(), Common.UPLOAD_INTERVAL*60*1000, uploaderServicePendingIntent); 
+		
+		//		Log.v("ELSERVICES","Uploader alarm Set for service "+4816+" "+Common.INTERVAL);
 		
 		//LogWriter.debugLogWrite(System.currentTimeMillis(),"All services scheduled to start");
+		
+		/*uploaderServiceIntent = new Intent(context, UpdateAlarmReceiver.class);
+		uploaderServiceIntent.setAction("EnergyLensPlus.updateAlarm");
+		uploaderServiceIntent.putExtra("message", "EnergyLensPlus.updateAlarm");
+		uploaderServicePendingIntent = PendingIntent.getBroadcast(context,
+				4816, uploaderServiceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		uploaderAlarmMgr= (AlarmManager)context.getSystemService(context.ALARM_SERVICE);
+		uploaderAlarmMgr.setExact(AlarmManager.RTC_WAKEUP, Common.UPLOAD_INTERVAL*60*1000, uploaderServicePendingIntent);*/
+	
 	}
 
 	private void stop() throws Throwable{
@@ -111,9 +127,12 @@ public class ToggleServiceReceiver extends BroadcastReceiver {
 		Log.v("ELSERVICES","Services started "+ReqCode);
 
 		try{
-
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTimeInMillis(System.currentTimeMillis());
+			calendar.add(Calendar.SECOND, 1);
+			
 			alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-					System.currentTimeMillis()+100, Common.INTERVAL*1000, ServicePendingIntent); 
+					calendar.getTimeInMillis(), Common.INTERVAL*1000, ServicePendingIntent); 
 			Log.v("ELSERVICES","Alarm Set for service "+ReqCode+" "+Common.INTERVAL);
 		}
 		catch(Exception e){

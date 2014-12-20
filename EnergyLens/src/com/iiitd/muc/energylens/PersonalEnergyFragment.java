@@ -80,7 +80,7 @@ public class PersonalEnergyFragment extends Fragment {
 	private long lastSyncInMillis;
 	private long maxY=0;
 	private String PREFS_NAME="PEN_PREFS";
-	
+
 	View inflateView;
 
 	@Override
@@ -119,16 +119,16 @@ public class PersonalEnergyFragment extends Fragment {
 		bar_renderer.setColor(Color.rgb(0, 153, 153));
 		bar_renderer.setDisplayBoundingPoints(true);
 		bar_renderer.setDisplayChartValues(true);
-		
+
 		DisplayMetrics metrics = getActivity().getResources().getDisplayMetrics();
 		float val = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, metrics);
 
-//		DateFormat df=new DateFormat();
-//		String from_time=df.format("dd MMM yy HH:mm", Common.TIME_PERIOD_START).toString();
-//		String to_time=df.format("dd MMM yy HH:mm", Common.TIME_PERIOD_END).toString();
-		
+		//		DateFormat df=new DateFormat();
+		//		String from_time=df.format("dd MMM yy HH:mm", Common.TIME_PERIOD_START).toString();
+		//		String to_time=df.format("dd MMM yy HH:mm", Common.TIME_PERIOD_END).toString();
+
 		mRenderer.setXLabels(0);
-		
+
 		int daySwitch=0;
 		for(int i=0;i<y.length;i++){
 			long currTime=lastSyncInMillis;
@@ -143,7 +143,7 @@ public class PersonalEnergyFragment extends Fragment {
 
 		mRenderer.setXLabelsAlign(Align.RIGHT);
 		mRenderer.setXLabelsAngle(-45);
-		
+
 		mRenderer.addSeriesRenderer(bar_renderer);
 		//  	  mRenderer.addSeriesRenderer(line_renderer);
 
@@ -186,7 +186,7 @@ public class PersonalEnergyFragment extends Fragment {
 				Log.v("ELSERVICES", "Graph clicked");
 				// handle the click event on the chart
 				SeriesSelection seriesSelection = chartView.getCurrentSeriesAndPoint();
-//				Log.v("ELSERVICES", "Selected: "+seriesSelection.getSeriesIndex());
+				//				Log.v("ELSERVICES", "Selected: "+seriesSelection.getSeriesIndex());
 			}
 		});
 
@@ -297,7 +297,7 @@ public class PersonalEnergyFragment extends Fragment {
 			JSONObject response=new JSONObject(resp);
 			JSONObject options=new JSONObject(response.getString("options"));
 
-			if(options!=null){
+			if(options!=null && options.length()>0){
 				totalConsumption=options.getLong("total_consumption");
 				totalUsage=options.getLong("total_usage");
 				parseUsage(options.getString("hourly_usage"));
@@ -359,7 +359,8 @@ public class PersonalEnergyFragment extends Fragment {
 						e.printStackTrace();
 					}
 
-					data.putString("options", options.toString());
+					if(options!=null && options.length()>0)
+						data.putString("options", options.toString());
 
 					SecureRandom random = new SecureRandom();
 					String randomId=new BigInteger(130, random).toString(32);
@@ -395,8 +396,8 @@ public class PersonalEnergyFragment extends Fragment {
 				e.printStackTrace();
 			}
 		}
-//		Log.v("ELSERVICES", "parseactivities: "+activity_names.get(0).toString());
-//		Log.v("ELSERVICES", "parseactivities: "+activity_usage.get(0).toString());
+		//		Log.v("ELSERVICES", "parseactivities: "+activity_names.get(0).toString());
+		//		Log.v("ELSERVICES", "parseactivities: "+activity_usage.get(0).toString());
 	}
 
 	public void parseUsage(String arr){
@@ -442,7 +443,7 @@ public class PersonalEnergyFragment extends Fragment {
 				for(String key:keys){
 					response.put(key, data.get(key));
 				}
-				
+
 				SharedPreferences bundleData=getActivity().getSharedPreferences(PREFS_NAME,0);
 				Editor editor=bundleData.edit();
 				editor.putString("JSON_RESPONSE", response.toString());
@@ -452,7 +453,7 @@ public class PersonalEnergyFragment extends Fragment {
 
 				JSONObject options=new JSONObject(response.getString("options"));
 
-				if(options!=null){
+				if(options!=null && options.length()>0){
 					totalConsumption=options.getLong("total_consumption");
 					totalUsage=options.getLong("total_usage");
 					parseUsage(options.getString("hourly_usage"));
@@ -483,11 +484,11 @@ public class PersonalEnergyFragment extends Fragment {
 	private void updateApps(){
 		setApps(activity_names,activity_values,activity_usage);
 	}
-	
+
 	private void setViews(){
 		DisplayMetrics metrics = getActivity().getResources().getDisplayMetrics();
 		float val = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, metrics);
-		
+
 		TextView tv=(TextView)inflateView.findViewById(R.id.segText2);
 		tv.setVisibility(View.VISIBLE);
 		tv=(TextView)inflateView.findViewById(R.id.totCon1);
@@ -496,11 +497,11 @@ public class PersonalEnergyFragment extends Fragment {
 		tv.setVisibility(View.VISIBLE);
 		tv=(TextView)inflateView.findViewById(R.id.distName2);
 		tv.setVisibility(View.VISIBLE);
-		
+
 		tv=(TextView)inflateView.findViewById(R.id.sorryText2);
 		tv.setVisibility(View.GONE);
-//		ImageView history=(ImageView)inflateView.findViewById(R.id.timeSelectBtn2);
-//		history.setVisibility(View.VISIBLE);
+		//		ImageView history=(ImageView)inflateView.findViewById(R.id.timeSelectBtn2);
+		//		history.setVisibility(View.VISIBLE);
 	}
 
 
@@ -514,7 +515,7 @@ public class PersonalEnergyFragment extends Fragment {
 		}
 		else
 			totalVal.setVisibility(View.INVISIBLE);
-		
+
 		TextView totalConVal=(TextView)inflateView.findViewById(R.id.totalConVal);
 		if(totalConsumption>0)
 		{
@@ -523,7 +524,7 @@ public class PersonalEnergyFragment extends Fragment {
 		}
 		else
 			totalConVal.setVisibility(View.INVISIBLE);
-		
+
 		DateFormat df=new DateFormat();
 		lastSyncTime=df.format("dd MMM yy HH:mm", syncTime).toString();
 		TextView textView=(TextView)inflateView.findViewById(R.id.lastSyncText);

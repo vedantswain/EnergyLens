@@ -5,8 +5,8 @@
     android:versionName="1.0.1" >
 
     <uses-sdk
-        android:minSdkVersion="14"
-        android:targetSdkVersion="21" />
+        android:minSdkVersion="19"
+        android:targetSdkVersion="19" />
 
     <supports-screens
         android:anyDensity="true"
@@ -104,6 +104,11 @@
         <receiver android:name="com.iiitd.muc.energylens.ToggleServiceReceiver" >
             <intent-filter>
                 <action android:name="EnergyLensPlus.toggleService" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.iiitd.muc.energylens.UpdateAlarmReceiver" >
+            <intent-filter>
+                <action android:name="EnergyLensPlus.updateAlarm" />
             </intent-filter>
         </receiver>
         <receiver android:name="com.iiitd.muc.energylens.BootupReceiver" >
