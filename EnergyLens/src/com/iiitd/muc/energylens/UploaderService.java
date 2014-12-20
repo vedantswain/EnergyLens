@@ -16,6 +16,7 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
@@ -45,7 +46,7 @@ import android.util.Log;
 public class UploaderService extends Service{
 	
 	Timer timer;
-	private int SAMPLE_TIME=50;
+	private int SAMPLE_TIME=60;
 
 	HttpURLConnection connection = null;
 	DataOutputStream outputStream = null;
@@ -73,6 +74,9 @@ public class UploaderService extends Service{
 	public static String ERRHEADER = "error log";
 	public static String SCREENHEADER="time_of_day"+","+"screen_name"+","+"time_of_stay";
 
+	public ArrayList<File> recentFileList=new ArrayList<File>();
+	public ArrayList<File> recentResearchFileList=new ArrayList<File>();
+	
 	int bytesRead, bytesAvailable, bufferSize;
 	byte[] buffer;
 	int maxBufferSize = 2*1024*1024;
@@ -117,10 +121,12 @@ public class UploaderService extends Service{
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {  
 		Log.v("ELSERVICES","Uploader started "+System.currentTimeMillis());
+		recentFileList=new ArrayList<File>();
+		recentResearchFileList=new ArrayList<File>();
 		getUpdatedPreferences();
 		Thread thr = new Thread(null, mTask, "AlarmService_Service");
 
-		//LogWriter.debugLogWrite(System.currentTimeMillis(),"Uploader started");
+		Log.v("ELSERVICES","Uploader started");
 		thr.start();
 
 		return START_NOT_STICKY; //makes sure services don't restart on stopping
@@ -129,7 +135,7 @@ public class UploaderService extends Service{
 	
 	class UnregisterTask extends TimerTask {
 		public void run() {
-	    	Log.v("ELSERVICES","UploadService stopped "+System.currentTimeMillis());
+	    	Log.v("ELSERVICES","UploadService stopped by timer "+System.currentTimeMillis());
 			timer.cancel();
 //			LogWriter.debugLogWrite(System.currentTimeMillis(),"Axl service stopped");
 			stopSelf();
@@ -142,6 +148,13 @@ public class UploaderService extends Service{
 		}
 		Log.i("ELSERVICES", "all research files visited "+System.currentTimeMillis());
 		//LogWriter.debugLogWrite(System.currentTimeMillis(),"All research files visited");
+		
+		for(File recentFile:recentResearchFileList){
+			upload(recentFile,Common.SERVER_URL+Common.STATS_API);
+		}
+		recentResearchFileList.removeAll(recentResearchFileList);
+		Log.i("ELSERVICES", "all recent files uploaded "+System.currentTimeMillis());
+		
 		research_upload_pending();
 	}
 
@@ -172,7 +185,12 @@ public class UploaderService extends Service{
 					}
 					Log.i("ELSERVICES", "all files visited "+System.currentTimeMillis());
 					//LogWriter.debugLogWrite(System.currentTimeMillis(),"All data files visited");
-					
+					for(File recentFile:recentFileList){
+						upload(recentFile,Common.SERVER_URL+Common.API);
+					}
+					recentFileList.removeAll(recentFileList);
+					Log.i("ELSERVICES", "all recent files uploaded "+System.currentTimeMillis());
+										
 					upload_pending();
 					timeCheck();
 					
@@ -400,8 +418,8 @@ public class UploaderService extends Service{
 				upFile.delete();
 			else{
 				Log.v("ELSERVICES", "Research upload: "+oldFile.toString()+"->"+upFile.toString());
-				upload(upFile,Common.SERVER_URL+Common.STATS_API);
-
+				//upload(upFile,Common.SERVER_URL+Common.STATS_API);
+				recentResearchFileList.add(upFile);
 			}
 		}
 	}
@@ -422,8 +440,9 @@ public class UploaderService extends Service{
 			if(upFile.length()==0)
 				upFile.delete();
 			else{
-				upload(upFile,Common.SERVER_URL+Common.API);
-				//LogWriter.debugLogWrite(System.currentTimeMillis(),"Uploading file: "+upFile.getName());
+				//upload(upFile,Common.SERVER_URL+Common.API);
+				recentFileList.add(upFile);
+				Log.v("ELSERVICES","Upload file ready: "+upFile.getName());
 			}
 		}
 	}
@@ -448,7 +467,7 @@ public class UploaderService extends Service{
 		if(checkWifi()){
 			try
 			{
-				Log.i("ELSERVICES", URL);
+				Log.i("ELSERVICES","Uploading: "+upFile.getAbsolutePath()+" to: "+ URL);
 				URL url = new URL(URL);
 				connection = (HttpURLConnection) url.openConnection();
 
