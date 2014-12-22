@@ -8,13 +8,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 public class ToggleServiceReceiver extends BroadcastReceiver {
 
 	static public AlarmManager axlAlarmMgr,wifiAlarmMgr,audioAlarmMgr,lightAlarmMgr,magAlarmMgr,uploaderAlarmMgr;
-	static public PendingIntent axlServicePendingIntent,wifiServicePendingIntent,audioServicePendingIntent,lightServicePendingIntent,magServicePendingIntent,uploaderServicePendingIntent;
+	static public PendingIntent axlServicePendingIntent,wifiServicePendingIntent,audioServicePendingIntent,
+	lightServicePendingIntent,magServicePendingIntent,uploaderServicePendingIntent;
 	static public Intent axlServiceIntent,wifiServiceIntent,audioServiceIntent,lightServiceIntent,magServiceIntent,uploaderServiceIntent;
 
 	Context context;
@@ -71,24 +73,26 @@ public class ToggleServiceReceiver extends BroadcastReceiver {
 		magAlarmMgr= (AlarmManager)context.getSystemService(context.ALARM_SERVICE);
 		setAlarm(magServiceIntent,magServicePendingIntent,20591,magAlarmMgr);*/
 		
-		uploaderServiceIntent = new Intent(context, UploaderService.class);
+		/*uploaderServiceIntent = new Intent(context, UploaderService.class);
 		uploaderServicePendingIntent = PendingIntent.getService(context,
 				4816, uploaderServiceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		uploaderAlarmMgr= (AlarmManager)context.getSystemService(context.ALARM_SERVICE);
-		uploaderAlarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-				System.currentTimeMillis()+Common.UPLOAD_INTERVAL*60*1000, Common.UPLOAD_INTERVAL*60*1000, uploaderServicePendingIntent); 
-		
+		uploaderAlarmMgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+				SystemClock.elapsedRealtime()+Common.UPLOAD_INTERVAL*60*1000, Common.UPLOAD_INTERVAL*60*1000, uploaderServicePendingIntent); 
+		*/
 		//		Log.v("ELSERVICES","Uploader alarm Set for service "+4816+" "+Common.INTERVAL);
 		
 		//LogWriter.debugLogWrite(System.currentTimeMillis(),"All services scheduled to start");
 		
-		/*uploaderServiceIntent = new Intent(context, UpdateAlarmReceiver.class);
+		uploaderServiceIntent = new Intent(context, UpdateAlarmReceiver.class);
 		uploaderServiceIntent.setAction("EnergyLensPlus.updateAlarm");
 		uploaderServiceIntent.putExtra("message", "EnergyLensPlus.updateAlarm");
 		uploaderServicePendingIntent = PendingIntent.getBroadcast(context,
 				4816, uploaderServiceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		uploaderAlarmMgr= (AlarmManager)context.getSystemService(context.ALARM_SERVICE);
-		uploaderAlarmMgr.setExact(AlarmManager.RTC_WAKEUP, Common.UPLOAD_INTERVAL*60*1000, uploaderServicePendingIntent);*/
+		uploaderAlarmMgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+				SystemClock.elapsedRealtime()+Common.UPLOAD_INTERVAL*60*1000, Common.UPLOAD_INTERVAL*60*1000, uploaderServicePendingIntent); 
+		
 	
 	}
 
@@ -123,8 +127,8 @@ public class ToggleServiceReceiver extends BroadcastReceiver {
 		Log.v("ELSERVICES","Services started "+ReqCode);
 
 		try{			
-			alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-					System.currentTimeMillis()+100, Common.INTERVAL*1000, ServicePendingIntent); 
+			alarmMgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+					SystemClock.elapsedRealtime()+100, Common.INTERVAL*1000, ServicePendingIntent); 
 			Log.v("ELSERVICES","Alarm Set for service "+ReqCode+" "+Common.INTERVAL);
 		}
 		catch(Exception e){

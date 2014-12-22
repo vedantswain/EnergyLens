@@ -86,6 +86,8 @@ public class UploaderService extends Service{
 	@SuppressWarnings("unused")
 	private String serverResponseMessage;
 
+	private Intent intent;
+	
 	@Override
 	public IBinder onBind(Intent arg0) {
 		// TODO Auto-generated method stub
@@ -110,6 +112,7 @@ public class UploaderService extends Service{
 	public void onDestroy() {        
 		super.onDestroy();
 		Log.v("ELSERVICES","UploadService stopped "+System.currentTimeMillis());
+		UpdateAlarmReceiver.completeWakefulIntent(intent);
 		stopSelf();
 	}
 
@@ -126,6 +129,8 @@ public class UploaderService extends Service{
 		getUpdatedPreferences();
 		Thread thr = new Thread(null, mTask, "AlarmService_Service");
 
+		this.intent=intent;
+		
 		Log.v("ELSERVICES","Uploader started");
 		thr.start();
 
@@ -138,6 +143,7 @@ public class UploaderService extends Service{
 	    	Log.v("ELSERVICES","UploadService stopped by timer "+System.currentTimeMillis());
 			timer.cancel();
 //			LogWriter.debugLogWrite(System.currentTimeMillis(),"Axl service stopped");
+			UpdateAlarmReceiver.completeWakefulIntent(intent);
 			stopSelf();
 		}
 	}
@@ -197,6 +203,7 @@ public class UploaderService extends Service{
 					Log.v("ELSERVICES","UploadService stopped "+System.currentTimeMillis());
 					//LogWriter.debugLogWrite(System.currentTimeMillis(),"Uploader service stopped");
 					timer.cancel();
+					UpdateAlarmReceiver.completeWakefulIntent(intent);
 					stopSelf();					
 				}
 				catch (Exception e) {
