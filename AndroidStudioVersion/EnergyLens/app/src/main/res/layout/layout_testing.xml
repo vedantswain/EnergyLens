@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TextView
+        android:id="@+id/powerCon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="141dp"
+        android:text="0000W"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/trainApp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/powerCon"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="42dp"
+        android:text="App at Location consumed: "
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/powerCon"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="105dp"
+        android:text="Train More?" />
+
+    <Button
+        android:id="@+id/yesBtn"
+        android:textColor="#ffffff"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/trainApp"
+        android:layout_below="@+id/textView1"
+        android:layout_marginTop="28dp"
+        android:text="Yes" />
+
+    <Button
+        android:id="@+id/noBtn"
+        android:textColor="#ffffff"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView1"
+        android:layout_marginTop="28dp"
+        android:layout_alignLeft="@+id/trainApp"
+        android:text="No" />
+
+</RelativeLayout>

@@ -1,0 +1,126 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/textGuide"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/chartComparison"
+            android:layout_centerHorizontal="true"
+            android:padding="20dp"
+            android:text="touch a point to select a start time"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/correctToText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/setStart"
+            android:layout_centerHorizontal="true"
+            android:padding="10dp"
+            android:text="Corrected Activity?"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/lastSyncCorrect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/appLocation"
+            android:textSize="12sp" />
+
+        <LinearLayout
+            android:id="@+id/chartComparison"
+            android:layout_width="match_parent"
+            android:layout_height="382dp"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/lastSyncCorrect"
+            android:orientation="vertical" >
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/resetSliceBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/chartComparison"
+            android:layout_centerHorizontal="true"
+            android:onClick="resetSlice"
+            android:src="@drawable/ic_action_reset" />
+
+        <Button
+            android:id="@+id/appLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/lastSyncReassign"
+            android:onClick="launchLocDialog"
+            android:text="Location: "
+            android:textColor="#ffffff" />
+
+        <Button
+            android:id="@+id/correctLoc"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/correctToText"
+            android:layout_centerHorizontal="true"
+            android:onClick="correctLoc"
+            android:text="Location"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/correctApp"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/correctLoc"
+            android:layout_alignBottom="@+id/correctLoc"
+            android:layout_alignParentRight="true"
+            android:layout_centerHorizontal="true"
+            android:onClick="correctApp"
+            android:text="Appliance"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/correct"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/correctApp"
+            android:onClick="toCorrect"
+            android:text="Correct"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/setEnd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textGuide"
+            android:layout_toRightOf="@+id/correctToText"
+            android:padding="10dp"
+            android:text="--:--"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/setStart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/setEnd"
+            android:layout_alignBottom="@+id/setEnd"
+            android:layout_alignLeft="@+id/textGuide"
+            android:padding="10dp"
+            android:text="--:--"
+            android:visibility="gone" />
+    </RelativeLayout>
+
+</ScrollView>

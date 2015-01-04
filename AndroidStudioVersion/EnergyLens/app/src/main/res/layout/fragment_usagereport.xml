@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/topbottomborder" >
+
+    <TextView
+        android:id="@+id/activityText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:paddingTop="10dp"
+        android:text="Using Appliance from start_time to end_time \nconsumes: 0000W"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <RadioGroup
+        android:id="@+id/radioGroup1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/activityText" 
+        >
+
+        <RadioButton
+            android:id="@+id/radio_correct"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Correct" />
+
+        <RadioButton
+            android:id="@+id/radio_incorrect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Incorrect" />
+    </RadioGroup>
+
+    <ImageView
+        android:id="@+id/appIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/app_spinner"
+        android:layout_alignTop="@+id/app_spinner"
+        android:layout_toLeftOf="@+id/app_spinner"
+        android:src="@drawable/ic_appliance" />
+
+    <ImageView
+        android:id="@+id/locIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/loc_spinner"
+        android:layout_alignTop="@+id/loc_spinner"
+        android:src="@drawable/ic_location" />
+
+    <TextView
+        android:id="@+id/textHours"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/imageView1"
+        android:layout_toRightOf="@+id/imageView1"
+        android:text="hours"
+        android:visibility="invisible" />
+
+    <Spinner
+        android:id="@+id/hourSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/minSpinner"
+        android:layout_toLeftOf="@+id/minSpinner"
+        android:visibility="invisible"
+        android:layout_toRightOf="@+id/imageView1" />
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/radioGroup1"
+        android:layout_toRightOf="@+id/radioGroup1"
+        android:src="@drawable/ic_time"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/textMins"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/minSpinner"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="32dp"
+        android:text="minutes"
+        android:visibility="invisible" />
+
+    <Spinner
+        android:id="@+id/app_spinner"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/minSpinner"
+        android:padding="0dp"
+        android:layout_marginTop="19dp"  />
+
+    <Spinner
+        android:id="@+id/loc_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/appIcon"
+        android:layout_toLeftOf="@+id/appIcon"
+        android:layout_toRightOf="@+id/locIcon"
+        android:padding="0dp" 
+        />
+
+    <Spinner
+        android:id="@+id/minSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textMins"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/textHours"
+        android:visibility="invisible" />
+
+    <Spinner
+        android:id="@+id/occSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/loc_spinner"
+        android:layout_below="@+id/appIcon"
+        android:layout_toLeftOf="@+id/minSpinner"
+        android:layout_marginTop="19dp"/>
+
+    <ImageView
+        android:id="@+id/occIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/occSpinner"
+        android:layout_below="@+id/locIcon"
+        android:layout_toLeftOf="@+id/occSpinner"
+        android:src="@drawable/ic_occupant" />
+
+    <TextView
+        android:id="@+id/startTimeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/occSpinner"
+        android:layout_marginTop="36dp"
+        android:text="Start Time" />
+
+    <Button
+        android:id="@+id/startTimeBtn"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/startTimeText"
+        android:layout_alignBottom="@+id/startTimeText"
+        android:layout_toRightOf="@+id/startTimeText"
+        android:text="00:00"
+        android:padding="10dp"
+        android:layout_alignParentBottom="true" />
+
+    <Button
+        android:id="@+id/stopTimeBtn"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/startTimeBtn"
+        android:layout_alignBottom="@+id/startTimeBtn"
+        android:layout_toRightOf="@+id/stopTimeText"
+        android:text="00:00" 
+        android:padding="10dp"
+        android:layout_alignParentBottom="true" />
+
+    <TextView
+        android:id="@+id/stopTimeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/stopTimeBtn"
+        android:layout_alignBottom="@+id/stopTimeBtn"
+        android:layout_alignLeft="@+id/app_spinner"
+        android:text="End Time" />
+    
+</RelativeLayout>

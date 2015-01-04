@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+                android:key="SERVER_URL"
+                android:title="Server URL"
+                android:summary="Change server URL for uploading data"
+                android:defaultValue="http://192.168.20.217:9010/"
+                android:dialogTitle="Edit Server URL" />
+   
+</PreferenceScreen>

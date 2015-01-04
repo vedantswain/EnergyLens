@@ -1,0 +1,88 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="${relativePackage}.${activityClass}" >
+
+    <Button
+        android:id="@+id/tryAgain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="Try Again"
+        android:visibility="invisible" />
+
+    <EditText
+        android:id="@+id/gcmName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/tryAgain"
+        android:ems="10"
+        android:hint="What should we call you?"
+        android:inputType="textPersonName" />
+    <requestFocus />
+
+    <Button
+        android:id="@+id/register"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="44dp"
+        android:onClick="onRegister"
+        android:text="Register Device"
+        android:textColor="#ffffff" />
+
+    <AutoCompleteTextView
+        android:id="@+id/serverUrl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/gcmEmail"
+        android:layout_marginTop="18dp"
+        android:ems="10"
+        android:hint="Which server do we connect to? (optional)" />
+
+    <EditText
+        android:id="@+id/gcmEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/gcmName"
+        android:layout_marginTop="14dp"
+        android:ems="10"
+        android:hint="How do we reach you by mail (optional)?"
+        android:inputType="textEmailAddress" >
+
+        
+    </EditText>
+
+    <EditText
+        android:id="@+id/apptNo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/serverUrl"
+        android:layout_marginTop="23dp"
+        android:ems="10"
+        android:hint="Which apartment do you live in?" />
+
+    <Button
+        android:id="@+id/selectWifi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/apptNo"
+        android:onClick="launchWifiDialog"
+        android:text="Select Home AP"
+        android:textColor="#ffffff" />
+
+</RelativeLayout>
