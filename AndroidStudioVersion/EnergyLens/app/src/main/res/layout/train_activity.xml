@@ -127,7 +127,7 @@
                     android:id="@+id/radio3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="No" 
+                    android:text="No"
                     android:onClick="onPresenceBasedClicked"/>
             </RadioGroup>
 
@@ -156,7 +156,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
                 android:layout_marginBottom="158dp"
-                android:onClick="launchTrainMoreDialog"
+                android:onClick="stopSendMetadata"
                 android:src="@drawable/ic_action_stop" />
 
             <ProgressBar
@@ -167,6 +167,25 @@
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="83dp" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/stopButton2"
+                android:layout_alignTop="@+id/stopButton"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="63dp"
+                android:src="@drawable/ic_stop_nometa"
+                android:onClick="dontSendMetadata" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Stop without sending metadata"
+                android:id="@+id/textView"
+                android:layout_below="@+id/stopButton2"
+                android:layout_centerHorizontal="true" />
         </RelativeLayout>
 
         <RelativeLayout

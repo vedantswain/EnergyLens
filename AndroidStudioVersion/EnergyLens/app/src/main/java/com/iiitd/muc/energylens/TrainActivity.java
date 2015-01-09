@@ -39,7 +39,7 @@ import android.widget.ViewFlipper;
 
 public class TrainActivity extends FragmentActivity implements ApplianceDialogFragment.ApplianceDialogListener,
 LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDialogListener,AddOtherLocDialogFragment.AddOtherDialogListener{
-	private static final int LENGTH_SHORT = 1000;
+	//private static final int Toast.LENGTH_SHORT = 1000;
 	private AlarmManager axlAlarmMgr,wifiAlarmMgr,audioAlarmMgr,lightAlarmMgr,magAlarmMgr,uploaderAlarmMgr;
 	private PendingIntent axlServicePendingIntent,wifiServicePendingIntent,audioServicePendingIntent,lightServicePendingIntent,magServicePendingIntent,uploaderServicePendingIntent;
 	private Intent axlServiceIntent,wifiServiceIntent,audioServiceIntent,lightServiceIntent,magServiceIntent,uploaderServiceIntent;
@@ -102,10 +102,10 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 				super.onOptionsItemSelected(item);
 			}
 			else if(Common.TRAINING_STATUS==2){
-				Toast.makeText(TrainActivity.this, "Press the No to exit", LENGTH_SHORT).show();
+				Toast.makeText(TrainActivity.this, "Press the No to exit", Toast.LENGTH_SHORT).show();
 			}
 			else{
-				Toast.makeText(TrainActivity.this, "Training in progress. Stop training to exit", LENGTH_SHORT).show();
+				Toast.makeText(TrainActivity.this, "Training in progress. Stop training to exit", Toast.LENGTH_SHORT).show();
 			}
 
 		}
@@ -120,10 +120,10 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 			super.onBackPressed();
 		}
 		else if(Common.TRAINING_STATUS==2){
-			Toast.makeText(TrainActivity.this, "Press the No to exit", LENGTH_SHORT).show();
+			Toast.makeText(TrainActivity.this, "Press the No to exit", Toast.LENGTH_SHORT).show();
 		}
 		else{
-			Toast.makeText(TrainActivity.this, "Training in progress. Stop training to exit", LENGTH_SHORT).show();
+			Toast.makeText(TrainActivity.this, "Training in progress. Stop training to exit", Toast.LENGTH_SHORT).show();
 		}
 	}
 
@@ -203,15 +203,24 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 		newFragment.show(getSupportFragmentManager(), "Appliances");
 	}
 
-	public void launchTrainMoreDialog(View view){
+    public void stopSendMetadata(View view){
+        launchTrainMoreDialog(true);
+    }
+
+    public void dontSendMetadata(View view){
+        launchTrainMoreDialog(false);
+    }
+    
+	public void launchTrainMoreDialog(boolean sendMeta){
 		viewFlipper.showNext();
 		lastLabel=Common.LABEL;
 		lastLocation=Common.LOCATION;
-		mHandler.post(mTask);
+        if(sendMeta)
+		    mHandler.post(mTask);
 		//		View prog_view=findViewById(R.id.trainingResume);
 		//		prog_view.setVisibility(View.GONE);
 		if(Common.TRAINING_STATUS==1){
-			Toast.makeText(TrainActivity.this, "Training data collection stopped", LENGTH_SHORT).show();
+			Toast.makeText(TrainActivity.this, "Training data collection stopped", Toast.LENGTH_SHORT).show();
 		}
 		Common.changeTrainingStatus(2);
 		//		DialogFragment newFragment = new TrainMoreDialogFragment();
@@ -287,16 +296,16 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 	public void startService(View view){
 		if(!(Common.LABEL.equals("none")) && !(Common.LOCATION.equals("none"))){
 			if(audioBasedCount==0)
-				Toast.makeText(TrainActivity.this, "Specify if appliance is audio based", LENGTH_SHORT).show();
+				Toast.makeText(TrainActivity.this, "Specify if appliance is audio based", Toast.LENGTH_SHORT).show();
 			else if(presenceBasedCount==0)
-				Toast.makeText(TrainActivity.this, "Specify if appliance is presence based", LENGTH_SHORT).show();
+				Toast.makeText(TrainActivity.this, "Specify if appliance is presence based", Toast.LENGTH_SHORT).show();
 			else{
 				Common.changePrefix("Training_");
 				Log.v("ELSERVICES", Common.LABEL+" "+Common.LOCATION+" "+Common.FILE_PREFIX);
 				viewFlipper.showNext();
 				Common.changeTrainingStatus(1);
 				updatePreferences(Common.TRAINING_STATUS);
-				Toast.makeText(TrainActivity.this, "Training data collection started", LENGTH_SHORT).show();
+				Toast.makeText(TrainActivity.this, "Training data collection started", Toast.LENGTH_SHORT).show();
 				sendNotification();
 				//			customNotification();
 				startTime=System.currentTimeMillis();
@@ -304,7 +313,7 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 			}
 		}
 		else
-			Toast.makeText(this, "Both appliance & location are required", LENGTH_SHORT).show();
+			Toast.makeText(this, "Both appliance & location are required", Toast.LENGTH_SHORT).show();
 	}
 
 
@@ -360,7 +369,7 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 		}
 		else if(selectedAppsCount>4){
 			Common.changeLabel(selectedApps.toString());
-			Toast.makeText(getApplicationContext(), "Cant add more than 4 appliances", 1000).show();
+			Toast.makeText(getApplicationContext(), "Cant add more than 4 appliances", Toast.LENGTH_SHORT).show();
 		}
 		else{
 			if(selectedAppsCount==1)
@@ -449,7 +458,7 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 		try {
 			Common.changeTrainingStatus(0);
 			updatePreferences(Common.TRAINING_STATUS);
-			Toast.makeText(TrainActivity.this, "Regular data collection started", LENGTH_SHORT).show();
+			Toast.makeText(TrainActivity.this, "Regular data collection started", Toast.LENGTH_SHORT).show();
 			toggleServiceMessage("startServices from Training");
 		} catch (Throwable e) {
 			// TODO Auto-generated catch block
@@ -514,7 +523,7 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 		updatePreferences();
 		if(selectedAppsCount>4){
 			Common.changeLabel(selectedApps.toString());
-			Toast.makeText(getApplicationContext(), "Cant add more than 4 appliances", 1000).show();
+			Toast.makeText(getApplicationContext(), "Cant add more than 4 appliances", Toast.LENGTH_SHORT).show();
 		}
 		else{
 			if(selectedAppsCount==1)
