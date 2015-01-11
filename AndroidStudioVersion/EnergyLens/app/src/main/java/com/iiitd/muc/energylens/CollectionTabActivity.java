@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.PendingIntent;
@@ -210,7 +211,7 @@ private void toggleServiceMessage(String message){
 	// add data
 	intent.putExtra("message", message);
 
-	Log.v("ELSERVICES", "Broadcast from Train to Main receiver");
+	Log.v("ELSERVICES", "Broadcast from Main Activity to Main receiver");
 	sendBroadcast(intent);
 }
 
@@ -381,8 +382,9 @@ public boolean onOptionsItemSelected(MenuItem item) {
 		openAbout();
 		return true;
 	}
-	else if(id==R.id.appForceStart){
-		toggleServiceMessage("Force startServices");
+	else if(id==R.id.appManualOverride){
+        ManualOverrideDialogFragment newFragment = new ManualOverrideDialogFragment();
+        newFragment.show(getFragmentManager(),"Manual Override");
 		return true;
 	}
 	else if(id == R.id.groundReport){
@@ -392,10 +394,10 @@ public boolean onOptionsItemSelected(MenuItem item) {
 			if(groundReportDates.length()>2)
 				startActivity(intent);
 			else
-				Toast.makeText(getApplicationContext(), "No new requests made", 2000).show();
+				Toast.makeText(getApplicationContext(), "No new requests made", Toast.LENGTH_SHORT).show();
 		}
 		else
-			Toast.makeText(getApplicationContext(), "No new requests made", 2000).show();
+			Toast.makeText(getApplicationContext(), "No new requests made", Toast.LENGTH_SHORT).show();
 		return true;
 	}
 	else if(id == R.id.training){

@@ -23,9 +23,9 @@
         android:showAsAction="never"
         android:title="@string/action_about"/>
 	<item
-        android:id="@+id/appForceStart"
+        android:id="@+id/appManualOverride"
         android:orderInCategory="102"
         android:showAsAction="never"
-        android:title="@string/action_force_start"/>  
+        android:title="@string/action_manual_override"/>
  
 </menu>

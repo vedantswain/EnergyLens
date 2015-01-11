@@ -115,7 +115,7 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 				parseResponses(string,date);
 			}
 			else{
-				Toast.makeText(GroundReportActivity.this, "No new reports", 2000).show();
+				Toast.makeText(GroundReportActivity.this, "No new reports", Toast.LENGTH_SHORT).show();
 				finish();
 			}
 		}
@@ -155,7 +155,7 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 			parsePref(current_response);	
 		}
 		else{
-			Toast.makeText(GroundReportActivity.this, "No new reports", 2000).show();
+			Toast.makeText(GroundReportActivity.this, "No new reports", Toast.LENGTH_SHORT).show();
 			finish();
 		}
 	}
@@ -354,10 +354,10 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 				toCorrect();
 			}
 			else
-				Toast.makeText(GroundReportActivity.this, "You've forgotten to fill time of stay", 1000).show();
+				Toast.makeText(GroundReportActivity.this, "You've forgotten to fill time of stay", Toast.LENGTH_SHORT).show();
 		}
 		else{
-			Toast.makeText(GroundReportActivity.this, "You've not corrected all the activities", 1000).show();
+			Toast.makeText(GroundReportActivity.this, "You've not corrected all the activities", Toast.LENGTH_SHORT).show();
 		}
 	}
 
@@ -546,7 +546,7 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 				}
 			}
 			else{
-				Toast.makeText(GroundReportActivity.this, "There was an error. Try again", 1000).show();
+				Toast.makeText(GroundReportActivity.this, "There was an error. Try again", Toast.LENGTH_SHORT).show();
 			}
 
 		} catch (JSONException e) {
@@ -588,7 +588,7 @@ public class GroundReportActivity extends FragmentActivity implements TimePicker
 			setApps(ids,apps,usage,locs,period);
 		}
 		else
-			Toast.makeText(GroundReportActivity.this, "no activities", 1000).show();
+			Toast.makeText(GroundReportActivity.this, "no activities", Toast.LENGTH_SHORT).show();
 	}
 
 

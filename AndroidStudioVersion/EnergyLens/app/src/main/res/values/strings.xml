@@ -8,6 +8,7 @@
     <string name="action_about">About</string>
     <string name="action_force_start">Force Start</string>
     <string name="action_force_stop">Force Stop</string>
+    <string name="action_manual_override">Manual Override</string>
     <string name="title_activity_axl_serv">AxlServ</string>
     <string name="title_activity_collection_tab">EnergyLens+</string>
     <string name="title_section1">Train</string>
@@ -42,5 +43,11 @@
     <string name="title_activity_socket">SocketActivity</string>
     <string name="title_activity_about">EnergyLens+</string>
     <string name="instruction_ground_report">"Please mark each entry as Correct/Incorrect. If incorrect, please correct the individual values (in bold) by selecting appropriate values"</string>
-
+    <string-array
+        name="string_array_manual_override">
+        <item
+            >Force Start</item>
+        <item
+            >Force Stop</item>
+    </string-array>
 </resources>

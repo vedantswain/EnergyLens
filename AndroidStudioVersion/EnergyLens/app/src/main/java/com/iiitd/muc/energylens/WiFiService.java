@@ -163,7 +163,8 @@ public class WiFiService extends Service {
 								//							Log.v("ELSERVICES", homeSSID+" = "+result.SSID+", "+homeBSSID+" = "+result.BSSID+", level: "+result.level);
 								
 								synchronized(this){
-									LogWriter.wifiLogWrite(log);
+                                    if(ToggleServiceReceiver.isCollecting)
+									    LogWriter.wifiLogWrite(log);
 								}
 							}
 							catch (Exception e) {
@@ -175,7 +176,7 @@ public class WiFiService extends Service {
 				else{
 					log=epoch+"," + "00:00:00:00:00" + ","+ "None" +","+ 1;
 					synchronized(this){
-						LogWriter.wifiLogWrite(log);
+						//LogWriter.wifiLogWrite(log);
 					}			
 				}
 			}

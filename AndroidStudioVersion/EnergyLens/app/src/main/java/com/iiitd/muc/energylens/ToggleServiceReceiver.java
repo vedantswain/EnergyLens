@@ -18,7 +18,7 @@ public class ToggleServiceReceiver extends BroadcastReceiver {
 	static public PendingIntent axlServicePendingIntent,wifiServicePendingIntent,audioServicePendingIntent,
 	lightServicePendingIntent,magServicePendingIntent,uploaderServicePendingIntent;
 	static public Intent axlServiceIntent,wifiServiceIntent,audioServiceIntent,lightServiceIntent,magServiceIntent,uploaderServiceIntent;
-
+    static boolean isCollecting=false;
 	Context context;
 
 	@Override
@@ -27,10 +27,13 @@ public class ToggleServiceReceiver extends BroadcastReceiver {
 		this.context=context;
 	    String message = intent.getStringExtra("message");
 	    Log.v("ELSERVICES", "Main receiver got message: " + message);
-	    if(message.contains("startServices"))
-	    	start();
-	    else if(message.equals("stopServices"))
+	    if(message.contains("startServices")) {
+            isCollecting=true;
+            start();
+        }
+	    else if(message.contains("stopServices"))
 			try {
+                isCollecting=false;
 				stop();
 			} catch (Throwable e) {
 				// TODO Auto-generated catch block
@@ -114,8 +117,8 @@ public class ToggleServiceReceiver extends BroadcastReceiver {
 			/*if(magServicePendingIntent!=null && magAlarmMgr!=null)
 				magAlarmMgr.cancel(magServicePendingIntent);*/
 
-			if(uploaderServicePendingIntent!=null && uploaderAlarmMgr!=null)
-				uploaderAlarmMgr.cancel(uploaderServicePendingIntent);
+			/*if(uploaderServicePendingIntent!=null && uploaderAlarmMgr!=null)
+				uploaderAlarmMgr.cancel(uploaderServicePendingIntent);*/
 		}
 		catch(Exception e){
 			e.printStackTrace();

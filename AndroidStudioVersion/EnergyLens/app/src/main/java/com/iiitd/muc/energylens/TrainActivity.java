@@ -521,6 +521,7 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 		labels=labelsList.toArray(labels);
 		Common.changeActivityApps(labels);
 		updatePreferences();
+        labelsList=null;
 		if(selectedAppsCount>4){
 			Common.changeLabel(selectedApps.toString());
 			Toast.makeText(getApplicationContext(), "Cant add more than 4 appliances", Toast.LENGTH_SHORT).show();
@@ -549,6 +550,7 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 		locations=locList.toArray(locations);
 		Common.changeActivityLocs(locations);
 		updatePreferences();
+        locList=null;
 		TextView textView=(TextView) findViewById(R.id.setLoc);
 		textView.setText(Common.LOCATION);
 	}

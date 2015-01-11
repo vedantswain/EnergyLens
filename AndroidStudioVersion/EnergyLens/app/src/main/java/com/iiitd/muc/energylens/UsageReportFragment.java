@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.Spinner;
@@ -37,6 +38,8 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 	private Spinner appSpinner,locSpinner,hoursSpinner,minsSpinner,occSpinner;	
 	private ImageView appIcon,locIcon,occIcon;
 	private String toApp="none",toLoc="none";
+
+    CheckBox ftCheckBox;
 
 	int wasClicked=-1,toOcc=0;
 	long mins=0;
@@ -61,6 +64,8 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 		long usage=getArguments().getLong("usage");
 		final long from=getArguments().getLong("from")*1000;
 		final long to=getArguments().getLong("to")*1000;
+        //startTime=from;
+        //endTime=to;
 		id=getArguments().getLong("id");
 		String loc=getArguments().getString("loc");
 
@@ -89,10 +94,11 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 		setMinsSpinner();
 		setHoursSpinner();
 
+
 		startTimeText=(TextView)inflateView.findViewById(R.id.startTimeText);
 		startTimeText.setVisibility(View.GONE);
 		startTimeBtn=(Button)inflateView.findViewById(R.id.startTimeBtn);
-		startTimeBtn.setText(dateFormat.format(from).toString());
+		//startTimeBtn.setText(dateFormat.format(from).toString());
 		startTimeBtn.setVisibility(View.GONE);
 		startTimeBtn.setOnClickListener(new OnClickListener()
 		{
@@ -112,7 +118,7 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 		endTimeText=(TextView)inflateView.findViewById(R.id.stopTimeText);
 		endTimeText.setVisibility(View.GONE);
 		endTimeBtn=(Button)inflateView.findViewById(R.id.stopTimeBtn);
-		endTimeBtn.setText(dateFormat.format(to).toString());
+		//endTimeBtn.setText(dateFormat.format(to).toString());
 		endTimeBtn.setVisibility(View.GONE);
 		endTimeBtn.setOnClickListener(new OnClickListener()
 		{
@@ -159,7 +165,7 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 			}
 		});
 
-		RadioButton isIncorrect=(RadioButton) inflateView.findViewById(R.id.radio_incorrect);
+		final RadioButton isIncorrect=(RadioButton) inflateView.findViewById(R.id.radio_incorrect);
 		isIncorrect.setOnClickListener(new OnClickListener(){
 			//			@Override
 			public void onClick(View view) {
@@ -194,7 +200,48 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 			}
 		});
 
-		return inflateView;
+        ftCheckBox = (CheckBox)inflateView.findViewById(R.id.fullTimeCheckBox);
+        ftCheckBox.setOnClickListener(new OnClickListener() {
+
+                                          @Override
+                                          public void onClick(View v) {
+                                              Log.v("ELSERVICES","full time checkBox clicked");
+                                              boolean checked = ((CheckBox) v).isChecked();
+                                              if (checked) {
+                                                  hoursSpinner.setVisibility(View.INVISIBLE);
+                                                  TextView tv = (TextView) inflateView.findViewById(R.id.textHours);
+                                                  tv.setVisibility(View.INVISIBLE);
+
+                                                  minsSpinner.setVisibility(View.INVISIBLE);
+                                                  tv = (TextView) inflateView.findViewById(R.id.textMins);
+                                                  tv.setVisibility(View.INVISIBLE);
+
+                                                  timeOfStay=to-from;
+                                                  if(isIncorrect.isChecked() && startTime!=0 && endTime!=0 ){
+                                                       Log.v("ELSERVICES","adding new time of stay");
+                                                       timeOfStay=endTime-startTime;
+                                                  }
+                                                  GroundReportActivity.changeTimeOfStay(id,timeOfStay);
+                                              } else {
+                                                  hoursSpinner.setVisibility(View.VISIBLE);
+                                                  hoursSpinner.setSelection(0);
+                                                  TextView tv = (TextView) inflateView.findViewById(R.id.textHours);
+                                                  tv.setVisibility(View.VISIBLE);
+
+                                                  minsSpinner.setVisibility(View.VISIBLE);
+                                                  minsSpinner.setSelection(0);
+                                                  tv = (TextView) inflateView.findViewById(R.id.textMins);
+                                                  tv.setVisibility(View.VISIBLE);
+
+                                                  timeOfStay=-1;
+                                                  GroundReportActivity.changeTimeOfStay(id,timeOfStay);
+                                              }
+                                          }
+                                      }
+        );
+
+
+        return inflateView;
 	}
 
 
@@ -207,9 +254,14 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 		minsSpinner.setVisibility(View.VISIBLE);
 		tv=(TextView)inflateView.findViewById(R.id.textMins);
 		tv.setVisibility(View.VISIBLE);
-		ImageView iv=(ImageView)inflateView.findViewById(R.id.imageView1);
+
+        ImageView iv=(ImageView)inflateView.findViewById(R.id.imageView1);
 		iv.setVisibility(View.VISIBLE);
+
+        ftCheckBox.setVisibility(View.VISIBLE);
+
 	}
+
 
 	public void getUpdatedPreferences(){
 		SharedPreferences sp=getActivity().getSharedPreferences(Common.EL_PREFS,0);
@@ -416,6 +468,12 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 					//					Log.v("ELSERVICES", "end time: "+endTime);
 					GroundReportActivity.changeStopTime(id, endTime);
 				}
+
+                if(startTime!=0 && endTime!=0 && ftCheckBox.isChecked()){
+                    //Log.v("ELSERVICES","adding new time of stay");
+                    timeOfStay=endTime-startTime;
+                    GroundReportActivity.changeTimeOfStay(id,timeOfStay);
+                }
 
 				Log.v("ELSERVICES",changeTimeOf+ " correction Time: "+timeString);
 			} else if (resultCode == Activity.RESULT_CANCELED){
