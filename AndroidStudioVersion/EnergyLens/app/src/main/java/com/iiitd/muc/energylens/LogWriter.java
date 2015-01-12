@@ -20,7 +20,7 @@ public class LogWriter {
 	public static String LIGHTHEADER = "time" + "," + "value" + "," + "label" +","+"location";
 	public static String MAGHEADER = "time" + "," + "x" + "," + "y" + "," + "z" + ","+"label"+","+"location"; 
 	public static String ERRHEADER = "error log";
-	public static String DEBUGHEADER = "time"+","+"event";
+	public static String DEBUGHEADER = "time"+","+"Service"+","+"isHome"+"isCollecting";
 	
 	public static String SCREENHEADER="time_of_day"+","+"screen_name"+","+"time_of_stay";
 	public static String NOTIFHEADER="received_at"+","+"notification_id"+","+"seen_at";
@@ -156,17 +156,17 @@ public class LogWriter {
 		researchLogWrite(screenLog,logstring,SCREENHEADER);
 	}
 	
-//	public static void debugLogWrite(long timestamp,String logstring){
-//		debugLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"DebugLog.csv");
-//		
-//		String finalLog=DateFormat.format("dd/MM/yy HH:mm:ss",timestamp).toString()+","+logstring;
-//		researchLogWrite(debugLog,finalLog,DEBUGHEADER);
-//	}
+	public static void debugLogWrite(long timestamp,String logstring){
+		debugLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"DebugLog.csv");
+
+		String finalLog=DateFormat.format("dd/MM/yy HH:mm:ss",timestamp).toString()+","+logstring;
+		researchLogWrite(debugLog,finalLog,DEBUGHEADER);
+	}
 	
 	public static void researchLogWrite(File logFile,String logstring,String header){
 		synchronized(logFile){
 					
-					Log.v("ELSERVICES", "Writing research Log to: "+logFile.toString());
+					//Log.v("ELSERVICES", "Writing research Log to: "+logFile.toString());
 					PathCheck(logFile,header);
 					
 					BufferedWriter buf;
@@ -176,7 +176,7 @@ public class LogWriter {
 						buf.append(logstring);
 						buf.newLine();
 						buf.close();
-						Log.v("ELSERVICES", logstring+"research written  into"+logFile.toString() );
+						//Log.v("ELSERVICES", logstring+"research written  into"+logFile.toString() );
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

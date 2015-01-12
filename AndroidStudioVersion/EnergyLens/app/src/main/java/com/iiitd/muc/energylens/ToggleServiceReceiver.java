@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -18,8 +19,7 @@ public class ToggleServiceReceiver extends BroadcastReceiver {
 	static public PendingIntent axlServicePendingIntent,wifiServicePendingIntent,audioServicePendingIntent,
 	lightServicePendingIntent,magServicePendingIntent,uploaderServicePendingIntent;
 	static public Intent axlServiceIntent,wifiServiceIntent,audioServiceIntent,lightServiceIntent,magServiceIntent,uploaderServiceIntent;
-    static boolean isCollecting=false;
-	Context context;
+    Context context;
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -27,19 +27,22 @@ public class ToggleServiceReceiver extends BroadcastReceiver {
 		this.context=context;
 	    String message = intent.getStringExtra("message");
 	    Log.v("ELSERVICES", "Main receiver got message: " + message);
-	    if(message.contains("startServices")) {
-            isCollecting=true;
+        SharedPreferences sharedPref = context.getSharedPreferences(Common.EL_PREFS,0);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        if(message.contains("startServices")) {
+            editor.putBoolean("isCollecting",true);
+            editor.commit();
             start();
         }
 	    else if(message.contains("stopServices"))
 			try {
-                isCollecting=false;
-				stop();
+                editor.putBoolean("isCollecting",false);
+                editor.commit();
+                stop();
 			} catch (Throwable e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-	  
 	}
 
 	private void start(){

@@ -144,7 +144,8 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 				// Check which radio button was clicked
 				if (checked){
 					Log.v("ELSERVICES", "Correct clicked");
-					setTimeView();
+                    if(!ftCheckBox.isChecked())
+					    setTimeView();
 					appSpinner.setVisibility(View.GONE);
 					appSpinner.setSelection(0);
 					appIcon.setVisibility(View.GONE);
@@ -175,7 +176,8 @@ public class UsageReportFragment extends Fragment implements OnItemSelectedListe
 				// Check which radio button was clicked
 				if (checked){
 					Log.v("ELSERVICES", "Incorrect clicked");
-					setTimeView();
+                    if(!ftCheckBox.isChecked())
+                        setTimeView();
 					appSpinner.setVisibility(View.VISIBLE);
 					locSpinner.setVisibility(View.VISIBLE);
 					if(occList.size()>1){

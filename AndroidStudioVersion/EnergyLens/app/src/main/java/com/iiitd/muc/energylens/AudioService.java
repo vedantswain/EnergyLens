@@ -66,9 +66,17 @@ public class AudioService extends Service {
 	private void recordAudio(){
 
 		synchronized(this){
+            SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(Common.EL_PREFS,0);
+            boolean isCollecting=sharedPref.getBoolean("isCollecting",false);
 
-			audio=new AudioData();
-			audio.start();
+            if(isCollecting) {
+                audio = new AudioData();
+                audio.start();
+            }
+            else {
+                audio.stopReader();
+                stopSelf();
+            }
 		}
 	}
 }

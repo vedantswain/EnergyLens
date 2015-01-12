@@ -5,6 +5,7 @@ import java.util.TimerTask;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -127,8 +128,18 @@ public class LightService extends Service{
 //					Log.v("ELSERVICES", log);
 					}
 				
-				synchronized(this){	    
-					LogWriter.lightLogWrite(log);					
+				synchronized(this){
+                    SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(Common.EL_PREFS,0);
+                    boolean isCollecting=sharedPref.getBoolean("isCollecting",false);
+
+                    if(isCollecting)
+					    LogWriter.lightLogWrite(log);
+                    else {
+                        lightSensorManager.unregisterListener(lightSensorListener);
+                        timer.cancel();
+//				LogWriter.debugLogWrite(System.currentTimeMillis(),"Light service stopped");
+                        stopSelf();
+                    }
 				}
 
 			}

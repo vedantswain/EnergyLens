@@ -89,11 +89,12 @@
         android:visibility="invisible"
         android:layout_below="@+id/activityText"
         android:layout_toRightOf="@+id/hourSpinner"
-        android:layout_toEndOf="@+id/hourSpinner" />
+        android:layout_toEndOf="@+id/hourSpinner"
+        android:layout_marginLeft="5dp" />
 
     <Spinner
         android:id="@+id/app_spinner"
-        android:layout_width="150dp"
+        android:layout_width="130dp"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/minSpinner"
@@ -112,13 +113,11 @@
 
     <Spinner
         android:id="@+id/minSpinner"
-        android:layout_width="wrap_content"
+        android:layout_width="55dp"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/textMins"
         android:layout_below="@+id/textHours"
         android:visibility="invisible"
-        android:layout_toLeftOf="@+id/stopTimeBtn"
-        android:layout_toStartOf="@+id/stopTimeBtn"
         android:layout_alignBottom="@+id/radioGroup1" />
 
     <Spinner

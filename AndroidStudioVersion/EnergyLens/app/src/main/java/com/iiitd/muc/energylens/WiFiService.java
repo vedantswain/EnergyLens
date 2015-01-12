@@ -29,6 +29,8 @@ public class WiFiService extends Service {
 	static String log,homeSSID,homeBSSID;
 	public static List<ScanResult> wifiList;
 	private Timer timer;
+    public static boolean isHome=false;
+
 
 //	private static AlarmManager axlAlarmMgr,wifiAlarmMgr,audioAlarmMgr,lightAlarmMgr,magAlarmMgr,uploaderAlarmMgr;
 //	private  static PendingIntent axlServicePendingIntent,wifiServicePendingIntent,audioServicePendingIntent,lightServicePendingIntent,magServicePendingIntent,uploaderServicePendingIntent;
@@ -131,8 +133,7 @@ public class WiFiService extends Service {
 		}
 		
 		public void onReceive(Context c, Intent intent) {
-			boolean isHome=false;
-			
+
 			try{
 				long epoch = System.currentTimeMillis();
 //				Log.i("ELSERVICES","Wifi received in MainActivity");
@@ -152,9 +153,13 @@ public class WiFiService extends Service {
 							
 							break;
 						}
+                        else
+                            isHome=false;
 					}
 
 //					Log.v("ELSERVICES", "isHome: "+isHome);
+                    SharedPreferences sharedPref = context.getSharedPreferences(Common.EL_PREFS,0);
+                    boolean isCollecting=sharedPref.getBoolean("isCollecting",false);
 
 					if(isHome){
 						for(ScanResult result:wifiList){
@@ -163,8 +168,13 @@ public class WiFiService extends Service {
 								//							Log.v("ELSERVICES", homeSSID+" = "+result.SSID+", "+homeBSSID+" = "+result.BSSID+", level: "+result.level);
 								
 								synchronized(this){
-                                    if(ToggleServiceReceiver.isCollecting)
-									    LogWriter.wifiLogWrite(log);
+                                    if(isCollecting) {
+                                        LogWriter.wifiLogWrite(log);
+                                        LogWriter.debugLogWrite(System.currentTimeMillis(),"WiFi"+","+isHome+","+isCollecting);
+                                    }
+                                    else{
+                                        LogWriter.debugLogWrite(System.currentTimeMillis(),"WiFi_c"+","+isHome+","+isCollecting);
+                                    }
 								}
 							}
 							catch (Exception e) {
@@ -172,7 +182,8 @@ public class WiFiService extends Service {
 							}
 						}
 					}
-				}
+
+                }
 				else{
 					log=epoch+"," + "00:00:00:00:00" + ","+ "None" +","+ 1;
 					synchronized(this){
@@ -185,20 +196,23 @@ public class WiFiService extends Service {
 				//LogWriter.debugLogWrite(System.currentTimeMillis(),"Wifi error while home: "+e.getMessage());
 			}
 
-			if(!isHome){
-				try {
-						Log.v("ELSERVICES", "Not home services stopped");
-						//LogWriter.debugLogWrite(System.currentTimeMillis(),"Not home services stopped");
-						toggleServiceMessage("stopServices");
-					
-					isStarted=false;
-				} catch (Throwable e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					//LogWriter.debugLogWrite(System.currentTimeMillis(),"Wifi error while NOT home: "+e.getMessage());
-				}
-			}
+            if(!isHome) {
+                SharedPreferences sharedPref = context.getSharedPreferences(Common.EL_PREFS,0);
+                boolean isCollecting=sharedPref.getBoolean("isCollecting",false);
 
+                LogWriter.debugLogWrite(System.currentTimeMillis(), "WiFi_h" + "," + isHome + "," + isCollecting);
+                try {
+                    Log.v("ELSERVICES", "Not home services stopped");
+                    //LogWriter.debugLogWrite(System.currentTimeMillis(),"Not home services stopped");
+                    toggleServiceMessage("notHome stopServices");
+
+                    isStarted=false;
+                } catch (Throwable e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    //LogWriter.debugLogWrite(System.currentTimeMillis(),"Wifi error while NOT home: "+e.getMessage());
+                }
+            }
 		}
 
 	}

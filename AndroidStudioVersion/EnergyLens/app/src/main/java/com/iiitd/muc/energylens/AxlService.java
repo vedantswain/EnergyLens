@@ -5,6 +5,7 @@ import java.util.TimerTask;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -108,9 +109,22 @@ public class AxlService extends Service {
 				//Log.v("ELSERVICES", log);
 				}
 			
-			synchronized(this){	    
-				LogWriter.axlLogWrite(log);					
-			}
+			synchronized(this){
+                SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(Common.EL_PREFS,0);
+                boolean isCollecting=sharedPref.getBoolean("isCollecting",false);
+
+                if(isCollecting)
+				    LogWriter.axlLogWrite(log);
+                else{
+                    axlSensorManager.unregisterListener(axlSensorListener);
+                    timer.cancel();
+//			LogWriter.debugLogWrite(System.currentTimeMillis(),"Axl service stopped");
+                    stopSelf();
+                }
+//
+//                LogWriter.debugLogWrite(System.currentTimeMillis(),"WiFi"+","+WiFiService.isHome+","+ToggleServiceReceiver.isCollecting);
+
+            }
 
 		}
 		

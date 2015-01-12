@@ -107,8 +107,18 @@ public class MagService extends Service{
 					e.printStackTrace();
 				}
 			}
-				synchronized(this){	    
-					LogWriter.magLogWrite(log);	
+				synchronized(this){
+                    SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(Common.EL_PREFS,0);
+                    boolean isCollecting=sharedPref.getBoolean("isCollecting",false);
+
+                    if(isCollecting)
+					    LogWriter.magLogWrite(log);
+                    else {
+                        magSensorManager.unregisterListener(MagSensorListener);
+                        timer.cancel();
+//				LogWriter.debugLogWrite(System.currentTimeMillis(),"Light service stopped");
+                        stopSelf();
+                    }
 			
 			}
 		}
