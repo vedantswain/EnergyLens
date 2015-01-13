@@ -34,10 +34,10 @@
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <permission
-        android:name="com.example.gcm.permission.C2D_MESSAGE"
+        android:name="com.iiitd.muc.gcm.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
 
-    <uses-permission android:name="com.example.gcm.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.iiitd.muc.gcm.permission.C2D_MESSAGE" />
 
     <application
         android:allowBackup="true"
@@ -45,10 +45,7 @@
         android:label="@string/app_name"
         android:largeHeap="true"
         android:theme="@style/AppTheme" >
-        <activity
-            android:name="com.iiitd.muc.energylens.RegisterActivity"
-            android:label="@string/title_activity_register" >
-        </activity>
+
         <activity
             android:name="com.iiitd.muc.energylens.CollectionTabActivity"
             android:label="@string/title_activity_collection_tab"
@@ -129,7 +126,7 @@
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
 
-                <category android:name="com.example.gcm" />
+                <category android:name="com.iiitd.muc.gcm" />
             </intent-filter>
         </receiver>
 
@@ -151,7 +148,7 @@
             android:parentActivityName="com.iiitd.muc.energylens.CollectionTabActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.energylens.CollectionTabActivity" />
+                android:value="com.iiitd.muc.energylens.CollectionTabActivity" />
         </activity>
         <activity
             android:name="com.iiitd.muc.energylens.DisaggregationActivity"
@@ -159,7 +156,7 @@
             android:parentActivityName="com.iiitd.muc.energylens.CollectionTabActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.energylens.CollectionTabActivity" />
+                android:value="com.iiitd.muc.energylens.CollectionTabActivity" />
         </activity>
         <activity
             android:name="com.iiitd.muc.energylens.GroundReportActivity"
@@ -168,7 +165,7 @@
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.energylens.GroundReportListActivity" />
+                android:value="com.iiitd.muc.energylens.GroundReportListActivity" />
         </activity>
         <activity
             android:name="com.iiitd.muc.energylens.GroundReportListActivity"
@@ -177,23 +174,16 @@
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.energylens.CollectionTabActivity" />
+                android:value="com.iiitd.muc.energylens.CollectionTabActivity" />
         </activity>
-        <activity
-            android:name="com.iiitd.muc.energylens.SocketActivity"
-            android:label="@string/title_activity_socket"
-            android:parentActivityName="com.example.hw_3.MainActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.hw_3.MainActivity" />
-        </activity>
+        
         <activity
             android:name="com.iiitd.muc.energylens.AboutActivity"
             android:label="@string/title_activity_about"
             android:parentActivityName="com.iiitd.muc.energylens.CollectionTabActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.energylens.CollectionTabActivity" />
+                android:value="com.iiitd.muc.energylens.CollectionTabActivity" />
         </activity>
     </application>
 

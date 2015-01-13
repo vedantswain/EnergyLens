@@ -135,8 +135,13 @@ public class LightService extends Service{
                     if(isCollecting)
 					    LogWriter.lightLogWrite(log);
                     else {
-                        lightSensorManager.unregisterListener(lightSensorListener);
-                        timer.cancel();
+                        try{
+                            lightSensorManager.unregisterListener(lightSensorListener);
+                            timer.cancel();
+                        }
+                        catch(NullPointerException e){
+                            e.printStackTrace();
+                        }
 //				LogWriter.debugLogWrite(System.currentTimeMillis(),"Light service stopped");
                         stopSelf();
                     }

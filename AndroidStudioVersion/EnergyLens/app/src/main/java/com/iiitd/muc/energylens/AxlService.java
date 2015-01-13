@@ -116,12 +116,17 @@ public class AxlService extends Service {
                 if(isCollecting)
 				    LogWriter.axlLogWrite(log);
                 else{
-                    axlSensorManager.unregisterListener(axlSensorListener);
-                    timer.cancel();
+                    try {
+                        axlSensorManager.unregisterListener(axlSensorListener);
+                        timer.cancel();
+                    }
+                    catch (NullPointerException e){
+                        e.printStackTrace();
+                    }
 //			LogWriter.debugLogWrite(System.currentTimeMillis(),"Axl service stopped");
                     stopSelf();
                 }
-//
+
 //                LogWriter.debugLogWrite(System.currentTimeMillis(),"WiFi"+","+WiFiService.isHome+","+ToggleServiceReceiver.isCollecting);
 
             }

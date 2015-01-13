@@ -114,8 +114,13 @@ public class MagService extends Service{
                     if(isCollecting)
 					    LogWriter.magLogWrite(log);
                     else {
-                        magSensorManager.unregisterListener(MagSensorListener);
-                        timer.cancel();
+                        try {
+                            magSensorManager.unregisterListener(MagSensorListener);
+                            timer.cancel();
+                        }
+                        catch (NullPointerException e){
+                            e.printStackTrace();
+                        }
 //				LogWriter.debugLogWrite(System.currentTimeMillis(),"Light service stopped");
                         stopSelf();
                     }

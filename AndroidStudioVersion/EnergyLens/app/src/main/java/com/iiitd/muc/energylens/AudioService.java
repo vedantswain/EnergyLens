@@ -30,7 +30,12 @@ public class AudioService extends Service {
 	public void onDestroy() {
 		super.onDestroy();
 		Log.i("ELSERVICES","Audio service stopped");
-		audio.stopReader();
+		try {
+            audio.stopReader();
+        }
+        catch (NullPointerException e){
+            e.printStackTrace();
+        }
 		stopSelf();
 	}
 
@@ -73,15 +78,15 @@ public class AudioService extends Service {
                 audio = new AudioData();
                 audio.start();
             }
-//            else {
-//                try {
-//                    audio.stopReader();
-//                }
-//                catch (NullPointerException e){
-//                    e.printStackTrace();
-//                }
-//                stopSelf();
-//            }
+            else {
+                try {
+                    audio.stopReader();
+                }
+                catch (NullPointerException e){
+                    e.printStackTrace();
+                }
+                stopSelf();
+            }
 		}
 	}
 }
