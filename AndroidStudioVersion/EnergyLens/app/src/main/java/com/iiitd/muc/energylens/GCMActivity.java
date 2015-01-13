@@ -1,5 +1,6 @@
 package com.iiitd.muc.energylens;
 
+import com.crashlytics.android.Crashlytics;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -98,6 +99,7 @@ TryAgainConnectionRefusedDialogFragment.TryAgainDialogListener{
 	@Override
 	public void onCreate(Bundle savedInstanceState) { 	
 		super.onCreate(savedInstanceState);
+ 			Crashlytics.start(this);
 
 		//        Intent intent1 = new Intent(this,CollectionTabActivity.class);
 		//		startActivity(intent1);

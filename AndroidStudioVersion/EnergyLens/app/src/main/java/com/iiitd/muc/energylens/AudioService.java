@@ -73,10 +73,15 @@ public class AudioService extends Service {
                 audio = new AudioData();
                 audio.start();
             }
-            else {
-                audio.stopReader();
-                stopSelf();
-            }
+//            else {
+//                try {
+//                    audio.stopReader();
+//                }
+//                catch (NullPointerException e){
+//                    e.printStackTrace();
+//                }
+//                stopSelf();
+//            }
 		}
 	}
 }
