@@ -1,5 +1,23 @@
 package com.iiitd.muc.energylens;
 
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Binder;
+import android.os.Environment;
+import android.os.IBinder;
+import android.os.Parcel;
+import android.os.RemoteException;
+import android.preference.PreferenceManager;
+import android.telephony.TelephonyManager;
+import android.util.Log;
+
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
@@ -23,26 +41,6 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.json.JSONObject;
-
-import com.iiitd.muc.energylens.AxlService.UnregisterTask;
-
-import android.app.Service;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.Binder;
-import android.os.Environment;
-import android.os.IBinder;
-import android.os.Parcel;
-import android.os.RemoteException;
-import android.preference.PreferenceManager;
-import android.telephony.TelephonyManager;
-import android.util.Log;
-
 public class UploaderService extends Service{
 	
 	Timer timer;
@@ -59,7 +57,7 @@ public class UploaderService extends Service{
 	
 	String [] file={"accelerometer_log.csv","audio_log.csv","light_log.csv","rawaudio_log.csv","wifi_log.csv",
 			"Training_accelerometer_log.csv","Training_audio_log.csv","Training_light_log.csv","Training_rawaudio_log.csv","Training_wifi_log.csv"};
-	String [] researchFile={"screen_log.csv"};
+	String [] researchFile={"screen_log.csv","battery_log.csv"};
 	String urlServer = Common.SERVER_URL+Common.API;
 	String lineEnd = "\r\n";
 	String twoHyphens = "--";
@@ -73,8 +71,10 @@ public class UploaderService extends Service{
 	public static String MAGHEADER = "time" + "," + "x" + "," + "y" + "," + "z" + ","+"label"+","+"location"; 
 	public static String ERRHEADER = "error log";
 	public static String SCREENHEADER="time_of_day"+","+"screen_name"+","+"time_of_stay";
+    public static String BATTHEADER="time"+","+"value"+","+"charging state"+","+"scaled battery";
 
-	public ArrayList<File> recentFileList=new ArrayList<File>();
+
+    public ArrayList<File> recentFileList=new ArrayList<File>();
 	public ArrayList<File> recentResearchFileList=new ArrayList<File>();
 	
 	int bytesRead, bytesAvailable, bufferSize;
@@ -389,8 +389,12 @@ public class UploaderService extends Service{
 		else if(file.getAbsolutePath().contains("screen_log")){
 			header=SCREENHEADER;
 		}
+        else if(file.getAbsolutePath().contains("battery_log")){
+            header=BATTHEADER;
+        }
 
-		BufferedReader br;
+
+        BufferedReader br;
 		try {
 			br = new BufferedReader(new FileReader(file.getAbsolutePath()));
 			String firstline=br.readLine();

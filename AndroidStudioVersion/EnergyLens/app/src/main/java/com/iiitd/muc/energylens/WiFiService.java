@@ -1,13 +1,5 @@
 package com.iiitd.muc.energylens;
 
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import com.iiitd.muc.energylens.AxlService.UnregisterTask;
-
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -17,9 +9,11 @@ import android.content.SharedPreferences;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.IBinder;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.Toast;
+
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class WiFiService extends Service {
 
@@ -170,10 +164,10 @@ public class WiFiService extends Service {
 								synchronized(this){
                                     if(isCollecting) {
                                         LogWriter.wifiLogWrite(log);
-                                        LogWriter.debugLogWrite(System.currentTimeMillis(),"WiFi"+","+isHome+","+isCollecting);
+//                                        LogWriter.debugLogWrite(System.currentTimeMillis(),"WiFi"+","+isHome+","+isCollecting);
                                     }
                                     else{
-                                        LogWriter.debugLogWrite(System.currentTimeMillis(),"WiFi_c"+","+isHome+","+isCollecting);
+//                                        LogWriter.debugLogWrite(System.currentTimeMillis(),"WiFi_c"+","+isHome+","+isCollecting);
                                     }
 								}
 							}
@@ -200,7 +194,7 @@ public class WiFiService extends Service {
                 SharedPreferences sharedPref = context.getSharedPreferences(Common.EL_PREFS,0);
                 boolean isCollecting=sharedPref.getBoolean("isCollecting",false);
 
-                LogWriter.debugLogWrite(System.currentTimeMillis(), "WiFi_h" + "," + isHome + "," + isCollecting);
+                //LogWriter.debugLogWrite(System.currentTimeMillis(), "WiFi_h" + "," + isHome + "," + isCollecting);
                 try {
                     Log.v("ELSERVICES", "Not home services stopped");
                     //LogWriter.debugLogWrite(System.currentTimeMillis(),"Not home services stopped");

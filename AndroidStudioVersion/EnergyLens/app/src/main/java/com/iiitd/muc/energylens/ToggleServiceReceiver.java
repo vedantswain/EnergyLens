@@ -1,7 +1,5 @@
 package com.iiitd.muc.energylens;
 
-import java.util.Calendar;
-
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -9,16 +7,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.SystemClock;
-import android.preference.PreferenceManager;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 public class ToggleServiceReceiver extends BroadcastReceiver {
 
-	static public AlarmManager axlAlarmMgr,wifiAlarmMgr,audioAlarmMgr,lightAlarmMgr,magAlarmMgr,uploaderAlarmMgr;
+	static public AlarmManager axlAlarmMgr,wifiAlarmMgr,audioAlarmMgr,lightAlarmMgr,magAlarmMgr,battAlarmMgr,uploaderAlarmMgr;
 	static public PendingIntent axlServicePendingIntent,wifiServicePendingIntent,audioServicePendingIntent,
-	lightServicePendingIntent,magServicePendingIntent,uploaderServicePendingIntent;
-	static public Intent axlServiceIntent,wifiServiceIntent,audioServiceIntent,lightServiceIntent,magServiceIntent,uploaderServiceIntent;
+	lightServicePendingIntent,magServicePendingIntent,battServicePendingIntent,uploaderServicePendingIntent;
+	static public Intent axlServiceIntent,wifiServiceIntent,audioServiceIntent,lightServiceIntent,magServiceIntent,
+            battServiceIntent,uploaderServiceIntent;
     Context context;
 
 	@Override
@@ -73,6 +70,19 @@ public class ToggleServiceReceiver extends BroadcastReceiver {
 		lightAlarmMgr= (AlarmManager)context.getSystemService(context.ALARM_SERVICE);
 		setAlarm(lightServiceIntent,lightServicePendingIntent,11894,lightAlarmMgr);
 
+        battServiceIntent = new Intent(context, BatteryService.class);
+        battServicePendingIntent = PendingIntent.getService(context,
+                19994, battServiceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        battAlarmMgr= (AlarmManager)context.getSystemService(context.ALARM_SERVICE);
+        try{
+            battAlarmMgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    SystemClock.elapsedRealtime()+100, Common.BATTERY_INTERVAL*60*1000, battServicePendingIntent);
+            Log.v("ELSERVICES","Alarm Set for Battery service "+19994+" "+Common.INTERVAL);
+        }
+        catch(Exception e){
+            Log.e("ELSERVICES",e.toString(), e.getCause());
+        }
+
 		/*magServiceIntent = new Intent(context, MagService.class);
 		magServicePendingIntent = PendingIntent.getService(context,
 				20591, magServiceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -96,9 +106,13 @@ public class ToggleServiceReceiver extends BroadcastReceiver {
 		uploaderServicePendingIntent = PendingIntent.getBroadcast(context,
 				4816, uploaderServiceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		uploaderAlarmMgr= (AlarmManager)context.getSystemService(context.ALARM_SERVICE);
-		uploaderAlarmMgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-				SystemClock.elapsedRealtime()+Common.UPLOAD_INTERVAL*60*1000, Common.UPLOAD_INTERVAL*60*1000, uploaderServicePendingIntent); 
-		
+        try {
+            uploaderAlarmMgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    SystemClock.elapsedRealtime() + Common.UPLOAD_INTERVAL * 60 * 1000, Common.UPLOAD_INTERVAL * 60 * 1000, uploaderServicePendingIntent);
+        }
+        catch(Exception e){
+            Log.e("ELSERVICES",e.toString(), e.getCause());
+        }
 	
 	}
 
@@ -116,6 +130,9 @@ public class ToggleServiceReceiver extends BroadcastReceiver {
 
 			if(lightServicePendingIntent!=null && lightAlarmMgr!=null)
 				lightAlarmMgr.cancel(lightServicePendingIntent);
+
+            if(battServicePendingIntent!=null && battAlarmMgr!=null)
+                battAlarmMgr.cancel(battServicePendingIntent);
 
 			/*if(magServicePendingIntent!=null && magAlarmMgr!=null)
 				magAlarmMgr.cancel(magServicePendingIntent);*/

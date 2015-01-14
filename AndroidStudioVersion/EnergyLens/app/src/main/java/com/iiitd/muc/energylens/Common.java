@@ -1,10 +1,9 @@
 package com.iiitd.muc.energylens;
 
+import android.os.Bundle;
+
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import android.content.SharedPreferences;
-import android.os.Bundle;
 
 public class Common{
 	public static long WASTAGE_LAST_SENT,PERSONAL_LAST_SENT,DISAGG_LAST_SENT;
@@ -22,6 +21,7 @@ public class Common{
 	public static int SAMPLE_TIME=10; //seconds for which sensors will take data
 	public static String LABEL="none";
 	public static String LOCATION="none";
+    public static long BATTERY_INTERVAL = 1; //minutes between battery collection
 	public static long UPLOAD_INTERVAL = 2; //minutes between each upload
 	public static String FILE_PREFIX="";
 	public static String SERVER_URL="http://energy.iiitd.edu.in:9030/";//192.168.20.217/"; //

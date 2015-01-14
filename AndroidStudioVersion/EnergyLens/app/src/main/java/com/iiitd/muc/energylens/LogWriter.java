@@ -1,18 +1,16 @@
 package com.iiitd.muc.energylens;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import android.os.Environment;
 import android.text.format.DateFormat;
 import android.util.Log;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 public class LogWriter {
-	public static File axlLog, errorLog, wifiLog,audioLog,rawaudioLog,lightLog,magLog,screenLog,notifLog,debugLog; 
+	public static File axlLog, errorLog, wifiLog,audioLog,rawaudioLog,lightLog,magLog,battLog,screenLog,notifLog,debugLog;
 	public static String WIFIHEADER="time"+","+"mac"+","+"ssid"+","+"rssi"+","+"label";
 	public static String ACCLHEADER="time"+","+"x"+","+"y"+","+"z"+","+"label"+","+"location";
 	public static String RAWSOUNDHEADER="time"+","+"values"+","+"label"+","+"location";
@@ -21,7 +19,8 @@ public class LogWriter {
 	public static String MAGHEADER = "time" + "," + "x" + "," + "y" + "," + "z" + ","+"label"+","+"location"; 
 	public static String ERRHEADER = "error log";
 	public static String DEBUGHEADER = "time"+","+"Service"+","+"isHome"+"isCollecting";
-	
+
+    public static String BATTHEADER="time"+","+"value"+","+"charging state"+","+"scaled battery";
 	public static String SCREENHEADER="time_of_day"+","+"screen_name"+","+"time_of_stay";
 	public static String NOTIFHEADER="received_at"+","+"notification_id"+","+"seen_at";
 	
@@ -155,6 +154,12 @@ public class LogWriter {
 		screenLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"UsageStats"+File.separator+filename+".csv");
 		researchLogWrite(screenLog,logstring,SCREENHEADER);
 	}
+
+    public static void battLogWrite(String logstring){
+        String filename="battery_log";
+        battLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"UsageStats"+File.separator+filename+".csv");
+        researchLogWrite(battLog,logstring,BATTHEADER);
+    }
 	
 	public static void debugLogWrite(long timestamp,String logstring){
 		debugLog=new File(Environment.getExternalStorageDirectory()+File.separator+"EnergyLens+"+File.separator+"DebugLog.csv");
