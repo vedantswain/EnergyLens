@@ -1,12 +1,32 @@
 package com.iiitd.muc.energylens;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Set;
+import android.annotation.SuppressLint;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.graphics.Color;
+import android.graphics.Paint.Align;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v4.view.ViewPager;
+import android.text.format.DateFormat;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
@@ -22,38 +42,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.annotation.SuppressLint;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.graphics.Color;
-import android.graphics.Paint.Align;
-import android.graphics.PorterDuff.Mode;
-import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.support.v4.view.ViewPager;
-import android.text.format.DateFormat;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.util.TypedValue;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewParent;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-
-import com.iiitd.muc.energylens.R;
-import com.google.android.gms.gcm.GoogleCloudMessaging;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Set;
 
 
 public class EnergyWastageFragment extends Fragment{
@@ -510,21 +506,25 @@ public class EnergyWastageFragment extends Fragment{
 	}
 
 	private void updateViews(long syncTime){
-		long percent=(long) (((double)totalWastage/(double)totalConsumption)*100);
+        long percent=0;
+        if((double)totalConsumption!=0)
+		    percent=(long) (((double)totalWastage/(double)totalConsumption)*100);
 		TextView totalVal=(TextView)inflateView.findViewById(R.id.totalValWaste);
-		if(totalWastage>0)
+		if(totalWastage>=0)
 		{
 			totalVal.setVisibility(View.VISIBLE);
 			totalVal.setText(Long.toString(totalWastage)+" Wh"+" ("+(Long.toString(percent))+"%)");
-		}
+            if(percent==0 && totalConsumption==0)
+                totalVal.setText(Long.toString(totalWastage)+" Wh");
+        }
 		else
 			totalVal.setVisibility(View.INVISIBLE);
 		
 		TextView totalConWaste=(TextView)inflateView.findViewById(R.id.totalConWaste);
-		if(totalConsumption>0)
+		if(totalConsumption>=0)
 		{
 			totalConWaste.setVisibility(View.VISIBLE);
-			totalConWaste.setText(Long.toString(totalConsumption)+" Wh"+" ("+(Long.toString(percent))+"%)");
+			totalConWaste.setText(Long.toString(totalConsumption)+" Wh");
 		}
 		else
 			totalConWaste.setVisibility(View.INVISIBLE);
@@ -544,8 +544,13 @@ public class EnergyWastageFragment extends Fragment{
 		tv=(TextView)inflateView.findViewById(R.id.lastSyncWastage);
 		tv.setVisibility(View.VISIBLE);
 		tv=(TextView)inflateView.findViewById(R.id.distName);
-		tv.setVisibility(View.VISIBLE);
-
+        tv.setVisibility(View.VISIBLE);
+        if(activities==null){
+            tv.setVisibility(View.INVISIBLE);
+        }
+        else if(activities.length()==0){
+            tv.setVisibility(View.INVISIBLE);
+        }
 		tv=(TextView)inflateView.findViewById(R.id.sorryText);
 		tv.setVisibility(View.GONE);
 
