@@ -150,6 +150,9 @@ public class BatteryService extends Service {
             catch (NullPointerException e){
                 e.printStackTrace();
             }
+            catch (IllegalArgumentException e){
+                e.printStackTrace();
+            }
         }
 
     };

@@ -468,12 +468,16 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 	}
 
 	public void updateLabelList(){
+        if(labelsList==null)
+            labelsList=new ArrayList<String>();
 		for(String label:labels){
 			labelsList.add(label);
 		}
 	}
 
 	public void updateLocList(){
+        if(locList==null)
+            labelsList=new ArrayList<String>();
 		for(String loc:locations){
 			locList.add(loc);
 		}
@@ -484,16 +488,20 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 		SharedPreferences sp=getSharedPreferences(Common.EL_PREFS,0);
 		Editor editor=sp.edit();
 		StringBuilder sb=new StringBuilder();
-		for(String app:labelsList){
-			sb.append(app+",");
-		}
-		editor.putString("APP_LIST", sb.toString());
+        if(labelsList!=null) {
+            for (String app : labelsList) {
+                sb.append(app + ",");
+            }
+            editor.putString("APP_LIST", sb.toString());
+        }
 
-		sb=new StringBuilder();
-		for(String loc:locList){
-			sb.append(loc+",");
-		}
-		editor.putString("LOC_LIST", sb.toString());
+        if(locList!=null) {
+            sb = new StringBuilder();
+            for (String loc : locList) {
+                sb.append(loc + ",");
+            }
+            editor.putString("LOC_LIST", sb.toString());
+        }
 		editor.commit();
 	}
 
