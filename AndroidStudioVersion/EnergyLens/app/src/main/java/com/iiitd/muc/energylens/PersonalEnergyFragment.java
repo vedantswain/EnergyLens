@@ -388,8 +388,12 @@ public class PersonalEnergyFragment extends Fragment {
 				activity = activities.getJSONObject(i);
 				activity_names.add(activity.getString("name"));
 				activity_values.add(activity.getLong("usage"));
-				activity_usage.add((int) ((activity.getLong("usage")*100)/totalUsage));
-			} catch (JSONException e) {
+                if(totalUsage==0)
+                    activity_usage.add(0);
+                else {
+                    activity_usage.add((int) ((activity.getLong("usage") * 100) / totalUsage));
+                }
+            } catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

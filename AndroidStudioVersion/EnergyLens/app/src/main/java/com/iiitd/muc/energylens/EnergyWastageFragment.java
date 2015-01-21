@@ -372,7 +372,10 @@ public class EnergyWastageFragment extends Fragment{
 				activity = activities.getJSONObject(i);
 				activity_names.add(activity.getString("name"));
 				activity_values.add(activity.getLong("wastage"));
-				activity_wastage.add((int) ((activity.getLong("wastage")*100)/totalWastage));
+                if(totalWastage==0)
+                    activity_wastage.add(0);
+                else
+				    activity_wastage.add((int) ((activity.getLong("wastage")*100)/totalWastage));
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

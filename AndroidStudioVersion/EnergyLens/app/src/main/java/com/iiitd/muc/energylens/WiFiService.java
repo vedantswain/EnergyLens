@@ -191,11 +191,11 @@ public class WiFiService extends Service {
 			}
 
             if(!isHome) {
-                SharedPreferences sharedPref = context.getSharedPreferences(Common.EL_PREFS,0);
-                boolean isCollecting=sharedPref.getBoolean("isCollecting",false);
-
                 //LogWriter.debugLogWrite(System.currentTimeMillis(), "WiFi_h" + "," + isHome + "," + isCollecting);
                 try {
+                    SharedPreferences sharedPref = context.getSharedPreferences(Common.EL_PREFS,0);
+                    boolean isCollecting=sharedPref.getBoolean("isCollecting",false);
+
                     Log.v("ELSERVICES", "Not home services stopped");
                     //LogWriter.debugLogWrite(System.currentTimeMillis(),"Not home services stopped");
                     toggleServiceMessage("notHome stopServices");

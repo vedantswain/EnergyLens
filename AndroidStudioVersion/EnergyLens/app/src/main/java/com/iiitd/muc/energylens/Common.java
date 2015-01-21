@@ -20,7 +20,9 @@ public class Common{
 	public static long INTERVAL = 30; //seconds between each scheduling of service
 	public static int SAMPLE_TIME=10; //seconds for which sensors will take data
 	public static String LABEL="none";
+    public static String LAST_LABEL="none";
 	public static String LOCATION="none";
+    public static String LAST_LOCATION="none";
     public static long BATTERY_INTERVAL = 1; //minutes between battery collection
 	public static long UPLOAD_INTERVAL = 2; //minutes between each upload
 	public static String FILE_PREFIX="";
@@ -97,6 +99,11 @@ public class Common{
 		LABEL=newLabel; 
 		// Restore preferences
 	}
+
+    public static void changeLastLabel(String newLabel){
+        LAST_LABEL=newLabel;
+        // Restore preferences
+    }
 	
 	public static void changeServerUrl(String newURL){
 		SERVER_URL=newURL;
@@ -106,6 +113,10 @@ public class Common{
 		LOCATION=newLocation; 
 		// Restore preferences
 	}
+    public static void changeLastLocation(String newLocation){
+        LAST_LOCATION=newLocation;
+        // Restore preferences
+    }
 	
 	public static void changePrefix(String prefix){
 		FILE_PREFIX=prefix;

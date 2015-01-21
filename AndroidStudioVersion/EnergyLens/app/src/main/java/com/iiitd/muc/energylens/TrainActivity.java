@@ -62,6 +62,7 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 	int presenceBasedCount=0;
 
 	private ArrayList<String> selectedApps=new ArrayList<String>();
+    private ArrayList<String> metaApps=new ArrayList<String>();
 	int selectedAppsCount=0;
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -213,7 +214,7 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
     
 	public void launchTrainMoreDialog(boolean sendMeta){
 		viewFlipper.showNext();
-		lastLabel=Common.LABEL;
+		lastLabel=Common.LAST_LABEL;
 		lastLocation=Common.LOCATION;
         if(sendMeta)
 		    mHandler.post(mTask);
@@ -369,20 +370,44 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 		}
 		else if(selectedAppsCount>4){
 			Common.changeLabel(selectedApps.toString());
+            Common.changeLastLabel(metaApps.toString());
 			Toast.makeText(getApplicationContext(), "Cant add more than 4 appliances", Toast.LENGTH_SHORT).show();
 		}
 		else{
-			if(selectedAppsCount==1)
-				selectedApps.add(label);
-			else if(selectedAppsCount>0){
-				selectedApps.add(" + "+label);
-			}
+            String suffix="";
+            String tempLabel;
+
+            if(label.contains("-")){
+                tempLabel=label.split("-")[0];
+                suffix="-"+label.split("-")[1];
+                label=tempLabel;
+            }
+            else if(label.contains("_")){
+                tempLabel=label.split("_")[0];
+                suffix="_"+label.split("_")[1];
+                label=tempLabel;
+            }
+
+            if(selectedAppsCount==1) {
+                selectedApps.add(label);
+                metaApps.add(label+suffix);
+            }
+            else if(selectedAppsCount>0){
+                selectedApps.add(" + "+label);
+                metaApps.add("+"+label+suffix);
+            }
 			StringBuilder sb=new StringBuilder();
 			for(String apps:selectedApps)
 				sb.append(apps);
 			Common.changeLabel(sb.toString());
-			TextView textView=(TextView) findViewById(R.id.appList);
-			textView.setText(Common.LABEL);
+
+            StringBuilder meta_sb=new StringBuilder();
+            for(String apps:metaApps)
+                meta_sb.append(apps);
+            Common.changeLastLabel(meta_sb.toString());
+
+            TextView textView=(TextView) findViewById(R.id.appList);
+			textView.setText(Common.LAST_LABEL);
 		}
 	}
 
@@ -390,15 +415,26 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 		if(selectedAppsCount>0){
 			selectedAppsCount--;
 			selectedApps.remove(selectedApps.get(selectedApps.size()-1));
+            metaApps.remove(metaApps.get(metaApps.size()-1));
+
 			StringBuilder sb=new StringBuilder();
 			for(String apps:selectedApps)
 				sb.append(apps);
-			if(selectedAppsCount>0)
-				Common.changeLabel(sb.toString());
-			else
-				Common.changeLabel("none");
+
+            StringBuilder meta_sb=new StringBuilder();
+            for(String apps:metaApps)
+                meta_sb.append(apps);
+
+            if(selectedAppsCount>0) {
+                Common.changeLabel(sb.toString());
+                Common.changeLastLabel(meta_sb.toString());
+            }
+			else {
+                Common.changeLabel("none");
+                Common.changeLastLabel("none");
+            }
 			TextView textView=(TextView) findViewById(R.id.appList);
-			textView.setText(Common.LABEL);
+			textView.setText(Common.LAST_LABEL);
 		}
 	}
 
@@ -424,6 +460,7 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 		viewFlipper.showPrevious();
 		selectedAppsCount=0;
 		selectedApps=new ArrayList<String>();
+        metaApps=new ArrayList<String>();
 		locList=new ArrayList<String>();
 		audioBasedCount=0;
 		presenceBasedCount=0;
@@ -523,29 +560,55 @@ LocationDialogFragment.LocationDialogListener,AddOtherDialogFragment.AddOtherDia
 	@Override
 	public void onOtherSelected(String label) {
 		// TODO Auto-generated method stub
-		Common.changeLabel(label);
-		updateLabelList();
-		labelsList.add(label);
-		labels=labelsList.toArray(labels);
-		Common.changeActivityApps(labels);
-		updatePreferences();
+
+        updateLabelList();
+        labelsList.add(label);
+        labels=labelsList.toArray(labels);
+        Common.changeActivityApps(labels);
+        updatePreferences();
         labelsList=null;
+
+        String suffix="";
+        String tempLabel;
+
+        if(label.contains("-")){
+            tempLabel=label.split("-")[0];
+            suffix="-"+label.split("-")[1];
+            label=tempLabel;
+        }
+        else if(label.contains("_")){
+            tempLabel=label.split("_")[0];
+            suffix="_"+label.split("_")[1];
+            label=tempLabel;
+        }
+		Common.changeLabel(label);
+
 		if(selectedAppsCount>4){
 			Common.changeLabel(selectedApps.toString());
+            Common.changeLastLabel(metaApps.toString());
 			Toast.makeText(getApplicationContext(), "Cant add more than 4 appliances", Toast.LENGTH_SHORT).show();
 		}
 		else{
-			if(selectedAppsCount==1)
-				selectedApps.add(label);
+			if(selectedAppsCount==1) {
+                selectedApps.add(label);
+                metaApps.add(label+suffix);
+            }
 			else if(selectedAppsCount>0){
 				selectedApps.add(" + "+label);
+                metaApps.add("+"+label+suffix);
 			}
 			StringBuilder sb=new StringBuilder();
 			for(String apps:selectedApps)
 				sb.append(apps);
 			Common.changeLabel(sb.toString());
+
+            StringBuilder meta_sb=new StringBuilder();
+            for(String apps:metaApps)
+                meta_sb.append(apps);
+            Common.changeLastLabel(meta_sb.toString());
+
 			TextView textView=(TextView) findViewById(R.id.appList);
-			textView.setText(Common.LABEL);
+			textView.setText(Common.LAST_LABEL);
 		}
 	}
 
